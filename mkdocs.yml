@@ -1,0 +1,32 @@
+site_name: Flare Portal
+repo_url: e.g. https://git.torchbox.com/[client_name]/flare_portal, no trailing slash
+site_url:
+edit_uri: 'edit/master/docs/'
+
+repo_name: Gitlab
+dev_addr: 0.0.0.0:8001
+theme:
+  name: material
+  font: false
+markdown_extensions:
+  - codehilite
+  - admonition
+  - sane_lists
+  - toc:
+      permalink: true
+  # pymdown-extensions meant to bring the Markdown implementation closer to GFM.
+  - pymdownx.details
+  - pymdownx.magiclink
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+
+nav:
+  - 'Home': 'index.md'
+  - 'Infrastructure': 'infrastructure.md'
+  - 'Project conventions': 'project_conventions.md'
+  - 'Deployment': 'deployment.md'
+  - 'Front end tooling': 'front-end-tooling.md'
+  - 'Continuous integration': 'continuous-integration.md'
+  - 'Anonymised data': 'anonymised_data.md'
+  - 'Data protection': 'data_protection.md'

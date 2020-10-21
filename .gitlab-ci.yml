@@ -1,0 +1,217 @@
+# vim:set sw=2 ts=2 et:
+# This is a sample .gitlab-ci.yml created by wagtail-kit.  You should review
+# it for any necessary changes.
+
+# Stages are groups that jobs can be groupped into.
+# Jobs within each stage run in parallel and if one of them fails, the next
+# stage won't be run.
+# This will set up the following:
+#
+# - Build stage: build of static assets.
+# - Test stage: code style, migration, basic configuration checks and unit
+#   tests.
+# - Deploy stage: deploy to Heroku.
+stages:
+  - build
+  - test
+  - deploy_site
+  - pages
+
+# Test if static assets can be built succesfully.
+static:
+  image: node:14
+  stage: build
+  script:
+    - npm ci --no-optional --no-audit --progress=false
+    - npm run build:prod
+  # Saving the job result as an artifact means that the files can be used by
+  # other jobs.
+  artifacts:
+    name: 'static-$CI_JOB_ID'
+    paths:
+      - ./node_modules
+      - ./flare_portal/static_compiled
+    expire_in: 30 mins
+
+poetry:
+  # If you update the python image version here, make sure you update all jobs that depend on this
+  # and the version in the Dockerfile and provision scripts as well
+  image: python:3.7
+  stage: build
+  variables:
+    POETRY_VERSION: 1.1.1
+  script:
+    - pip install poetry==$POETRY_VERSION
+    - python -m venv venv
+    - source venv/bin/activate
+    - poetry install
+  artifacts:
+    name: 'poetry-$CI_JOB_ID'
+    paths:
+      - ./venv/
+    expire_in: 30 mins
+
+# Check python code style.
+flake8:
+  # Make sure the python image version here matches the poetry job
+  image: python:3.7
+  stage: test
+  dependencies:
+    - poetry
+  before_script:
+    - source venv/bin/activate
+  script:
+    - flake8 flare_portal
+
+# Check imports sort order, i.e. check whether they are in an alphabetical
+# order and grouped properly.
+isort:
+  # Make sure the python image version here matches the poetry job
+  image: python:3.7
+  stage: test
+  dependencies:
+    - poetry
+  before_script:
+    - source venv/bin/activate
+  script:
+    - isort --check-only --diff --recursive flare_portal
+
+lint_js:
+  image: node:14
+  stage: test
+  dependencies:
+    - static
+  script:
+    - npm run lint:js
+
+lint_css:
+  image: node:14
+  stage: test
+  dependencies:
+    - static
+  script:
+    - npm run lint:css
+
+lint_format:
+  image: node:14
+  stage: test
+  dependencies:
+    - static
+  script:
+    - npm run lint:format
+
+# Run black and check for changes
+black:
+  # Make sure the python image version here matches the poetry job
+  image: python:3.7
+  stage: test
+  dependencies:
+    - poetry
+  before_script:
+    - source venv/bin/activate
+  script:
+    - black --check ./
+
+# Check settings, migrations and run tests.
+test_python:
+  # Make sure the python image version here matches the poetry job
+  image: python:3.7
+  stage: test
+  services:
+    # Make sure this matches the Postgres version you run on your servers.
+    - postgres:12.3
+  dependencies:
+    - static
+    - poetry
+  variables:
+    POSTGRES_HOST_AUTH_METHOD: trust
+    # Run tests with the production settings.
+    DJANGO_SETTINGS_MODULE: flare_portal.settings.production
+
+    # SECRET_KEY is required by Django to start.
+    SECRET_KEY: fake_secret_key_to_run_tests
+
+    # Silence RECAPTCHA
+    RECAPTCHA_PUBLIC_KEY: 'dummy-key-value'
+    RECAPTCHA_PRIVATE_KEY: 'dummy-key-value'
+
+    # This is the URL used by databases on our CI.
+    DATABASE_URL: postgres://postgres@postgres/postgres
+
+    # Don't redirect to HTTPS in tests.
+    SECURE_SSL_REDIRECT: 'false'
+  before_script:
+    - source venv/bin/activate
+  script:
+    # We need to run the collectstatic command, because we use ManifestStaticFilesStorage.
+    # Otherwise the check command will fail
+    - python manage.py collectstatic --verbosity 0 --noinput --clear
+
+    # Run system checks
+    - python manage.py check
+
+    # Check for missing migrations
+    - python manage.py makemigrations --check --noinput
+
+    # Create cache table.
+    - python manage.py createcachetable
+
+    # Run back-end tests
+    - python manage.py test
+
+test_js:
+  image: node:14
+  stage: test
+  dependencies:
+    - static
+  script:
+    # Run front-end tests
+    - npm run test:coverage
+
+.heroku_deployment_template: &heroku_deployment_template
+  stage: deploy
+
+  script:
+    - 'echo "Deploying to Heroku. To see progress, go to: https://dashboard.heroku.com/apps/$HEROKU_APP/activity"'
+    - curl -sf -X POST -m 900 https://heroku-deploy.torchbox.com/$HEROKU_APP/$CI_COMMIT_SHA?key=$DEPLOYMENT_KEY
+
+# Deploy to the staging server.
+deploy_staging:
+  variables:
+    # Your app's name.
+    #   $ heroku apps -t torchbox
+    HEROKU_APP: flare_portal-staging
+  only:
+    - staging
+  <<: *heroku_deployment_template
+
+# Deploy to the production site.
+deploy_production:
+  variables:
+    # Your app's name.
+    #   $ heroku apps -t torchbox
+    HEROKU_APP: flare_portal-production
+  only:
+    - master
+  when: manual
+  <<: *heroku_deployment_template
+
+pages:
+  # Make sure the python image version here matches the poetry job
+  image: python:3.7
+  stage: pages
+  only:
+    refs:
+      - master
+    changes:
+      - public/**/*
+  dependencies:
+    - poetry
+  before_script:
+    - . .venv/bin/activate
+  script:
+    - mkdocs build
+    - mv site/* public
+  artifacts:
+    paths:
+      - public
