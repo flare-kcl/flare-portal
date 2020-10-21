@@ -1,3 +1,5 @@
+from functools import update_wrapper
+
 from django.apps import apps
 from django.conf import settings
 from django.contrib import admin
@@ -5,27 +7,31 @@ from django.urls import include, path
 from django.views.decorators.vary import vary_on_headers
 from django.views.generic import TemplateView
 
-from wagtail.admin import urls as wagtailadmin_urls
-from wagtail.contrib.sitemaps.views import sitemap
-from wagtail.core import urls as wagtail_urls
-from wagtail.documents import urls as wagtaildocs_urls
-from wagtail.utils.urlpatterns import decorate_urlpatterns
-
-from flare_portal.search import views as search_views
 from flare_portal.utils.cache import get_default_cache_control_decorator
+
+
+def decorate_urlpatterns(urlpatterns, decorator):
+    """Decorate all the views in the passed urlpatterns list with the given decorator"""
+    for pattern in urlpatterns:
+        if hasattr(pattern, "url_patterns"):
+            # this is an included RegexURLResolver; recursively decorate the views
+            # contained in it
+            decorate_urlpatterns(pattern.url_patterns, decorator)
+
+        if getattr(pattern, "callback", None):
+            pattern.callback = update_wrapper(
+                decorator(pattern.callback), pattern.callback
+            )
+
+    return urlpatterns
+
 
 # Private URLs are not meant to be cached.
 private_urlpatterns = [
     path("django-admin/", admin.site.urls),
-    path("admin/", include(wagtailadmin_urls)),
-    path("documents/", include(wagtaildocs_urls)),
-    # Search cache-control headers are set on the view itself.
-    path("search/", search_views.search, name="search"),
 ]
 
-
-# Public URLs that are meant to be cached.
-urlpatterns = [path("sitemap.xml", sitemap)]
+urlpatterns = []
 
 
 if settings.DEBUG:
@@ -55,18 +61,6 @@ if settings.DEBUG:
         urlpatterns = [path("__debug__/", include(debug_toolbar.urls))] + urlpatterns
 
 
-# Style guide
-if getattr(settings, "PATTERN_LIBRARY_ENABLED", False) and apps.is_installed(
-    "pattern_library"
-):
-    from flare_portal.project_styleguide.views import example_form
-
-    private_urlpatterns += [
-        path("pattern-library/example-form/", example_form),
-        path("pattern-library/", include("pattern_library.urls")),
-    ]
-
-
 # Set public URLs to use the "default" cache settings.
 urlpatterns = decorate_urlpatterns(urlpatterns, get_default_cache_control_decorator())
 
@@ -81,15 +75,7 @@ urlpatterns = decorate_urlpatterns(
 )
 
 # Join private and public URLs.
-urlpatterns = (
-    private_urlpatterns
-    + urlpatterns
-    + [
-        # Add Wagtail URLs at the end.
-        # Wagtail cache-control is set on the page models's serve methods.
-        path("", include(wagtail_urls))
-    ]
-)
+urlpatterns = private_urlpatterns + urlpatterns
 
 # Error handlers
 handler404 = "flare_portal.utils.views.page_not_found"
