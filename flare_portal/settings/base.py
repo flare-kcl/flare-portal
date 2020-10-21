@@ -5,8 +5,6 @@ import os
 import sys
 
 import dj_database_url
-import raven
-from raven.exceptions import InvalidGitRepository
 
 env = os.environ.copy()
 
@@ -52,37 +50,7 @@ INSTALLED_APPS = [
     # According to the official docs, it's important that Scout is listed
     # first - http://help.apm.scoutapp.com/#django.
     "scout_apm.django",
-    "flare_portal.documents",
-    "flare_portal.events",
-    "flare_portal.forms",
-    "flare_portal.home",
-    "flare_portal.images",
-    "flare_portal.navigation",
-    "flare_portal.news",
-    "flare_portal.people",
-    "flare_portal.search",
-    "flare_portal.standardpages",
     "flare_portal.users",
-    "flare_portal.utils",
-    "wagtail.contrib.modeladmin",
-    "wagtail.contrib.postgres_search",
-    "wagtail.contrib.settings",
-    "wagtail.contrib.search_promotions",
-    "wagtail.contrib.forms",
-    "wagtail.contrib.redirects",
-    "wagtail.embeds",
-    "wagtail.sites",
-    "wagtail.users",
-    "wagtail.snippets",
-    "wagtail.documents",
-    "wagtail.images",
-    "wagtail.search",
-    "wagtail.admin",
-    "wagtail.core",
-    "modelcluster",
-    "taggit",
-    "captcha",
-    "wagtailcaptcha",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -90,9 +58,6 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.sitemaps",
-    "pattern_library",
-    "flare_portal.project_styleguide.apps.ProjectStyleguideConfig",
-    "wagtailaccessibility",
 ]
 
 
@@ -112,8 +77,6 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "wagtail.core.middleware.SiteMiddleware",
-    "wagtail.contrib.redirects.middleware.RedirectMiddleware",
 ]
 
 ROOT_URLCONF = "flare_portal.urls"
@@ -128,12 +91,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
-                "wagtail.contrib.settings.context_processors.settings",
-                # This is a custom context processor that lets us add custom
-                # global variables to all the templates.
-                "flare_portal.utils.context_processors.global_vars",
             ],
-            "builtins": ["pattern_library.loader_tags"],
         },
     }
 ]
@@ -183,13 +141,6 @@ else:
             "LOCATION": "database_cache",
         }
     }
-
-# Search
-# https://docs.wagtail.io/en/latest/topics/search/backends.html
-
-WAGTAILSEARCH_BACKENDS = {
-    "default": {"BACKEND": "wagtail.contrib.postgres_search.backend"}
-}
 
 
 # Password validation
@@ -475,62 +426,6 @@ if "SENTRY_DSN" in env:
                 pass
 
 
-# Front-end cache
-# This configuration is used to allow purging pages from cache when they are
-# published.
-# These settings are usually used only on the production sites.
-# This is a configuration of the CDN/front-end cache that is used to cache the
-# production websites.
-# https://docs.wagtail.io/en/latest/reference/contrib/frontendcache.html
-# The backend can be configured to use an account-wide API key, or an API token with
-# restricted access.
-
-if (
-    "FRONTEND_CACHE_CLOUDFLARE_TOKEN" in env
-    or "FRONTEND_CACHE_CLOUDFLARE_BEARER_TOKEN" in env
-):
-    INSTALLED_APPS.append("wagtail.contrib.frontend_cache")
-    WAGTAILFRONTENDCACHE = {
-        "default": {
-            "BACKEND": "wagtail.contrib.frontend_cache.backends.CloudflareBackend",
-            "ZONEID": env["FRONTEND_CACHE_CLOUDFLARE_ZONEID"],
-        }
-    }
-
-    if "FRONTEND_CACHE_CLOUDFLARE_TOKEN" in env:
-        # To use an account-wide API key, set the following environment variables:
-        #  * FRONTEND_CACHE_CLOUDFLARE_TOKEN
-        #  * FRONTEND_CACHE_CLOUDFLARE_EMAIL
-        #  * FRONTEND_CACHE_CLOUDFLARE_ZONEID
-        # These can be obtained from a sysadmin.
-        WAGTAILFRONTENDCACHE["default"].update(
-            {
-                "EMAIL": env["FRONTEND_CACHE_CLOUDFLARE_EMAIL"],
-                "TOKEN": env["FRONTEND_CACHE_CLOUDFLARE_TOKEN"],
-            }
-        )
-
-    else:
-        # To use an API token with restricted access, set the following environment variables:
-        #  * FRONTEND_CACHE_CLOUDFLARE_BEARER_TOKEN
-        #  * FRONTEND_CACHE_CLOUDFLARE_ZONEID
-        WAGTAILFRONTENDCACHE["default"].update(
-            {"BEARER_TOKEN": env["FRONTEND_CACHE_CLOUDFLARE_BEARER_TOKEN"]}
-        )
-
-    # Set up front-end cache if the S3 uses custom domain. This assumes that
-    # the same Cloudflare zone is used.
-    if env.get("AWS_S3_CUSTOM_DOMAIN"):
-        WAGTAIL_STORAGES_DOCUMENTS_FRONTENDCACHE = {
-            "default": {
-                "BACKEND": "wagtail.contrib.frontend_cache.backends.CloudflareBackend",
-                "EMAIL": env["FRONTEND_CACHE_CLOUDFLARE_EMAIL"],
-                "TOKEN": env["FRONTEND_CACHE_CLOUDFLARE_TOKEN"],
-                "ZONEID": env["FRONTEND_CACHE_CLOUDFLARE_ZONEID"],
-            },
-        }
-
-
 # Set s-max-age header that is used by reverse proxy/front end cache. See
 # urls.py.
 try:
@@ -676,58 +571,6 @@ REST_FRAMEWORK = {
 
 
 AUTH_USER_MODEL = "users.User"
-
-# Wagtail settings
-
-
-# This name is displayed in the Wagtail admin.
-WAGTAIL_SITE_NAME = "Flare Portal"
-
-
-# This is used by Wagtail's email notifications for constructing absolute
-# URLs. Please set to the domain that users will access the admin site.
-if "PRIMARY_HOST" in env:
-    BASE_URL = "https://{}".format(env["PRIMARY_HOST"])
-
-# Custom image model
-# https://docs.wagtail.io/en/stable/advanced_topics/images/custom_image_model.html
-WAGTAILIMAGES_IMAGE_MODEL = "images.CustomImage"
-WAGTAILIMAGES_FEATURE_DETECTION_ENABLED = False
-
-# Rich text settings to remove unneeded features
-# We normally don't want editors to use the images
-# in the rich text editor, for example.
-# They should use the image stream block instead
-WAGTAILADMIN_RICH_TEXT_EDITORS = {
-    "default": {
-        "WIDGET": "wagtail.admin.rich_text.DraftailRichTextArea",
-        "OPTIONS": {"features": ["bold", "italic", "h3", "h4", "ol", "ul", "link"]},
-    }
-}
-
-# Custom document model
-# https://docs.wagtail.io/en/stable/advanced_topics/documents/custom_document_model.html
-WAGTAILDOCS_DOCUMENT_MODEL = "documents.CustomDocument"
-
-
-# Document serve method - avoid serving files directly from the storage.
-# https://docs.wagtail.io/en/stable/advanced_topics/settings.html#documents
-WAGTAILDOCS_SERVE_METHOD = "serve_view"
-
-
-PASSWORD_REQUIRED_TEMPLATE = "patterns/pages/wagtail/password_required.html"
-
-
-# Default size of the pagination used on the front-end.
-DEFAULT_PER_PAGE = 20
-
-
-# Styleguide
-PATTERN_LIBRARY_ENABLED = env.get("PATTERN_LIBRARY_ENABLED", "false").lower() == "true"
-PATTERN_LIBRARY_TEMPLATE_DIR = os.path.join(
-    PROJECT_DIR, "project_styleguide", "templates"
-)
-
 
 # Google Tag Manager ID from env
 GOOGLE_TAG_MANAGER_ID = env.get("GOOGLE_TAG_MANAGER_ID")
