@@ -1,0 +1,47 @@
+[tool.poetry]
+name = "flare_portal"
+version = "0.1.0"
+description = ""
+authors = ["Torchbox <hello@torchbox.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+django = "~3.1"
+psycopg2 = "~2.8"
+gunicorn = {version = "~20.0", optional = true}
+whitenoise = "~5.0"
+dj-database-url = "~0.5"
+django-redis = "~4.11"
+django-storages = { version ="~1.9", extras = ["boto3"] }
+django-referrer-policy = "~1.0"
+django-csp = "~3.6"
+scout-apm = "~2.10"
+django-basic-auth-ip-whitelist = "~0.3.3"
+
+[tool.poetry.extras]
+gunicorn = ["gunicorn"]
+
+[tool.poetry.dev-dependencies]
+Werkzeug = "~0.16"
+django-extensions = "~2.2"
+fabric = "~2.5"
+stellar = "~0.4"
+SQLAlchemy = "1.2.5"
+SQLAlchemy-Utils = "0.33.1"
+
+# Linters etc.
+black = "19.10b0"
+detect-secrets = "~0.13"
+flake8 = "3.7.7"
+isort = "4.3.21"
+pre-commit = "~2.0"
+seed-isort-config = "1.9.4"
+
+# Documentation
+mkdocs = "~1.0"
+mkdocs-material = "~4.6"
+pymdown-extensions = "~6.2"
+
+[build-system]
+requires = ["poetry>=1,<2"]
+build-backend = "poetry.masonry.api"
