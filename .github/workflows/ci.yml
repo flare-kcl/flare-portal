@@ -109,3 +109,16 @@ jobs:
 
       # Run back-end tests
       - run: poetry run python manage.py test
+
+  deploy:
+    if: contains(github.ref, 'main')
+    runs-on: ubuntu-latest
+    needs: [python, static]
+
+    env:
+      DEPLOYMENT_KEY: ${{ secrets.DEPLOYMENT_KEY }}
+      HEROKU_APP: ${{ secrets.HEROKU_APP }}
+
+    steps:
+      - name: 'Deploying to Heroku. To see progress, go to: https://dashboard.heroku.com/apps/$HEROKU_APP/activity'
+        run: curl -sf -X POST -m 900 https://heroku-deploy.torchbox.com/$HEROKU_APP/$GITHUB_SHA?key=$DEPLOYMENT_KEY
