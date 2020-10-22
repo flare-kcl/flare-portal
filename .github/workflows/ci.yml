@@ -13,7 +13,8 @@ jobs:
     container: node:12
 
     steps:
-      # Setup Node
+      - uses: actions/checkout@v2
+
       - name: Cache node modules
         uses: actions/cache@v2
         with:
@@ -40,6 +41,7 @@ jobs:
   python:
     runs-on: ubuntu-latest
     container: python:3.8
+    needs: [static]
 
     env:
       # Run tests with the production settings.
@@ -70,7 +72,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      # Setup Python
       - name: Install Poetry
         run: pip install poetry
       - name: Cache virtualenv
