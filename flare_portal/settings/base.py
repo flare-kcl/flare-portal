@@ -148,7 +148,8 @@ else:
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
+        "NAME": "django.contrib.auth.password_validation."
+        "UserAttributeSimilarityValidator"
     },
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
@@ -183,7 +184,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/stable/ref/settings/#staticfiles-storage
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
-# Place static files that need a specific URL (such as robots.txt and favicon.ico) in the "public" folder
+# Place static files that need a specific URL (such as robots.txt and
+# favicon.ico) in the "public" folder
 WHITENOISE_ROOT = os.path.join(BASE_DIR, "public")
 
 
@@ -401,7 +403,8 @@ if "SENTRY_DSN" in env and not (
             SENTRY_CONFIG["release"] = env["GIT_REV"]
         except KeyError:
             try:
-                # Assume this is a Heroku-hosted app with the "runtime-dyno-metadata" lab enabled
+                # Assume this is a Heroku-hosted app with the
+                # "runtime-dyno-metadata" lab enabled
                 SENTRY_CONFIG["release"] = env["HEROKU_RELEASE_VERSION"]
             except KeyError:
                 # If there's no commit hash, we do not set a specific release.
@@ -425,7 +428,8 @@ CACHE_CONTROL_STALE_WHILE_REVALIDATE = int(
 )
 
 
-# Required to get e.g. wagtail-sharing working on Heroku and probably many other platforms.
+# Required to get e.g. wagtail-sharing working on Heroku and probably many
+# other platforms.
 # https://docs.djangoproject.com/en/stable/ref/settings/#use-x-forwarded-port
 USE_X_FORWARDED_PORT = env.get("USE_X_FORWARDED_PORT", "true").lower().strip() == "true"
 
@@ -434,7 +438,8 @@ USE_X_FORWARDED_PORT = env.get("USE_X_FORWARDED_PORT", "true").lower().strip() =
 # You can test it using https://securityheaders.com/
 # https://docs.djangoproject.com/en/stable/ref/middleware/#module-django.middleware.security
 
-# When set to True, client-side JavaScript will not to be able to access the CSRF cookie.
+# When set to True, client-side JavaScript will not to be able to access the
+# CSRF cookie.
 # https://docs.djangoproject.com/en/stable/ref/settings/#csrf-cookie-httponly
 CSRF_COOKIE_HTTPONLY = True
 
@@ -473,7 +478,8 @@ if env.get("SECURE_CONTENT_TYPE_NOSNIFF", "true").lower().strip() == "true":
 if "CSP_DEFAULT_SRC" in env:
     MIDDLEWARE.append("csp.middleware.CSPMiddleware")
 
-    # The “special” source values of 'self', 'unsafe-inline', 'unsafe-eval', and 'none' must be quoted!
+    # The “special” source values of 'self', 'unsafe-inline', 'unsafe-eval',
+    # and 'none' must be quoted!
     # e.g.: CSP_DEFAULT_SRC = "'self'" Without quotes they will not work as intended.
 
     CSP_DEFAULT_SRC = env.get("CSP_DEFAULT_SRC").split(",")
