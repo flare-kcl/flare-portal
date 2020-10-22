@@ -1,0 +1,48 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  node:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '12.x'
+      - name: Cache node modules
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: v1-npm-deps-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: v1-npm-deps-
+      - run: npm ci --no-optional --no-audit --progress=false
+      - run: npm run build:prod
+      - run: npm run lint:js
+      - run: npm run lint:css
+      - run: npm run lint:format
+  python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.8.x'
+      - uses: Gr1N/setup-poetry@v4
+        with:
+          poetry-version: 1.1.1
+      - uses: actions/cache@v2
+        with:
+          path: ~/.cache/pypoetry/virtualenvs
+          key: poetry-${{ hashFiles('poetry.lock') }}
+          restore-keys: |
+            poetry-
+      - run: poetry install
+      - run: poetry run flake8 flare_portal
+      - run: poetry run black --check ./
+      - run: poetry run isort --check-only --diff --recursive flare_portal

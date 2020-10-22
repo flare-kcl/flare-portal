@@ -4,8 +4,8 @@ The VM comes preinstalled with Fabric, Heroku CLI and AWS CLI.
 
 ## Deployed environments
 
-| Environment | Branch    | URL                                           | Heroku                        |
-| ----------- | --------- | --------------------------------------------- | ----------------------------- |
+| Environment | Branch    | URL                                            | Heroku                         |
+| ----------- | --------- | ---------------------------------------------- | ------------------------------ |
 | Production  | `master`  | e.g. https://flare_portal.org                  | e.g. `flare_portal-production` |
 | Staging     | `staging` | e.g. https://flare_portal.staging.torchbox.com | e.g. `flare_portal-staging`    |
 
