@@ -8,9 +8,38 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  code_checks:
+  static:
     runs-on: ubuntu-latest
     container: node:12
+
+    steps:
+      # Setup Node
+      - name: Cache node modules
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: v1-npm-deps-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: v1-npm-deps-
+      - run: npm ci --no-optional --no-audit --progress=false
+
+      # Build static files
+      - name: Build static files
+        run: npm run build:prod
+
+      # Linting for static files
+      - run: npm run lint:js
+      - run: npm run lint:css
+      - run: npm run lint:format
+
+      - name: Upload static_compiled
+        uses: actions/upload-artifact@v2
+        with:
+          name: static_compiled
+          path: flare_portal/static_compiled
+
+  python:
+    runs-on: ubuntu-latest
+    container: python:3.8
 
     env:
       # Run tests with the production settings.
@@ -41,19 +70,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      # Setup Node
-      - name: Cache node modules
-        uses: actions/cache@v2
-        with:
-          path: ~/.npm
-          key: v1-npm-deps-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: v1-npm-deps-
-      - run: npm ci --no-optional --no-audit --progress=false
-
       # Setup Python
-      - uses: actions/setup-python@v2
-        with:
-          python-version: '3.8.x'
       - name: Install Poetry
         run: pip install poetry
       - name: Cache virtualenv
@@ -65,15 +82,6 @@ jobs:
             poetry-
       - run: poetry install
 
-      # Build static files
-      - name: Build static files
-        run: npm run build:prod
-
-      # Linting for static files
-      - run: npm run lint:js
-      - run: npm run lint:css
-      - run: npm run lint:format
-
       # Linting for Python
       - run: poetry run flake8 flare_portal
       - run: poetry run black --check ./
@@ -82,6 +90,11 @@ jobs:
       # Tests for Python
       # We need to run the collectstatic command, because we use ManifestStaticFilesStorage.
       # Otherwise the check command will fail
+      - name: Download static_compiled
+        uses: actions/download-artifact@v2
+        with:
+          name: static_compiled
+          path: flare_portal/static_compiled
       - run: poetry run python manage.py collectstatic --verbosity 0 --noinput --clear
 
       # Run system checks
