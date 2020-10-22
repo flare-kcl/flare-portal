@@ -22,8 +22,8 @@ jobs:
       # This is the URL used by databases on our CI.
       DATABASE_URL: postgres://postgres:postgres@postgres:5432/postgres
 
-    # Don't redirect to HTTPS in tests.
-    SECURE_SSL_REDIRECT: 'false'
+      # Don't redirect to HTTPS in tests.
+      SECURE_SSL_REDIRECT: 'false'
 
     # Service container for postgres
     services:
