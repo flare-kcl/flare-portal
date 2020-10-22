@@ -8,13 +8,40 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  node:
+  code_checks:
     runs-on: ubuntu-latest
+    container: node:12
+
+    env:
+      # Run tests with the production settings.
+      DJANGO_SETTINGS_MODULE: flare_portal.settings.production
+
+      # SECRET_KEY is required by Django to start.
+      SECRET_KEY: fake_secret_key_to_run_tests
+
+      # This is the URL used by databases on our CI.
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/postgres
+
+    # Don't redirect to HTTPS in tests.
+    SECURE_SSL_REDIRECT: 'false'
+
+    # Service container for postgres
+    services:
+      postgres:
+        image: postgres:12
+        env:
+          POSTGRES_PASSWORD: postgres
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
-        with:
-          node-version: '12.x'
+
+      # Setup Node
       - name: Cache node modules
         uses: actions/cache@v2
         with:
@@ -22,14 +49,8 @@ jobs:
           key: v1-npm-deps-${{ hashFiles('**/package-lock.json') }}
           restore-keys: v1-npm-deps-
       - run: npm ci --no-optional --no-audit --progress=false
-      - run: npm run build:prod
-      - run: npm run lint:js
-      - run: npm run lint:css
-      - run: npm run lint:format
-  python:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
+
+      # Setup Python
       - uses: actions/setup-python@v2
         with:
           python-version: '3.8.x'
@@ -43,6 +64,33 @@ jobs:
           restore-keys: |
             poetry-
       - run: poetry install
+
+      # Build static files
+      - run: npm run build:prod
+
+      # Linting for static files
+      - run: npm run lint:js
+      - run: npm run lint:css
+      - run: npm run lint:format
+
+      # Linting for Python
       - run: poetry run flake8 flare_portal
       - run: poetry run black --check ./
       - run: poetry run isort --check-only --diff --recursive flare_portal
+
+      # Tests for Python
+      # We need to run the collectstatic command, because we use ManifestStaticFilesStorage.
+      # Otherwise the check command will fail
+      - run: poetry run python manage.py collectstatic --verbosity 0 --noinput --clear
+
+      # Run system checks
+      - run: poetry run python manage.py check
+
+      # Check for missing migrations
+      - run: poetry run python manage.py makemigrations --check --noinput
+
+      # Create cache table.
+      - run: poetry run python manage.py createcachetable
+
+      # Run back-end tests
+      - run: poetry run python manage.py test
