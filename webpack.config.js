@@ -82,7 +82,7 @@ const options = {
                 // sync font files referenced by the css to the fonts directory
                 // the publicPath matches the path from the compiled css to the font file
                 // only looks in the fonts folder so pngs in the images folder won't get put in the fonts folder
-                test: /\.(woff|woff2)$/,
+                test: /\.(eot|woff|woff2)$/,
                 include: /fonts/,
                 use: {
                     loader: 'file-loader',
@@ -98,16 +98,14 @@ const options = {
                 // Those less than 1024 bytes are automatically encoded in the CSS - see `_test-background-images.scss`
                 // the publicPath matches the path from the compiled css to the cssBackgrounds file
                 test: /\.(svg|jpg|png)$/,
-                include: path.resolve(
-                    `./${projectRoot}/static_src/images/cssBackgrounds/`,
-                ),
+                include: path.resolve(`./${projectRoot}/static_src/images/`),
                 use: {
                     loader: 'url-loader',
                     options: {
                         fallback: 'file-loader',
                         name: '[name].[ext]',
-                        outputPath: 'images/cssBackgrounds/',
-                        publicPath: '../images/cssBackgrounds/',
+                        outputPath: 'images/',
+                        publicPath: '../images/',
                         limit: 1024,
                     },
                 },

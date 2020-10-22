@@ -29,6 +29,7 @@ def decorate_urlpatterns(urlpatterns, decorator):
 # Private URLs are not meant to be cached.
 private_urlpatterns = [
     path("django-admin/", admin.site.urls),
+    path("", TemplateView.as_view(template_name="home.html")),
 ]
 
 urlpatterns = []
