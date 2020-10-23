@@ -120,5 +120,7 @@ jobs:
       HEROKU_APP: ${{ secrets.HEROKU_APP }}
 
     steps:
-      - name: 'Deploying to Heroku. To see progress, go to: https://dashboard.heroku.com/apps/$HEROKU_APP/activity'
+      - name: Deploying to Heroku.
         run: curl -sf -X POST -m 900 https://heroku-deploy.torchbox.com/$HEROKU_APP/$GITHUB_SHA?key=$DEPLOYMENT_KEY
+      - name: Sending Slack notification
+        run: 'curl -H "Content-Type: application/json" --request POST --data "{\"attachments\":[{\"fallback\":\"Deployed $HEROKU_APP\",\"color\":\"#2EB67D\",\"blocks\":[{\"type\":\"section\",\"text\":{\"type\":\"mrkdwn\",\"text\":\"Deployed <https://$HEROKU_APP.herokuapp.com|$HEROKU_APP>\"}},{\"type\":\"context\",\"elements\":[{\"type\":\"image\",\"image_url\":\"https://github.com/$GITHUB_ACTOR.png\",\"alt_text\":\"$GITHUB_ACTOR\"},{\"type\":\"mrkdwn\",\"text\":\"$GITHUB_ACTOR - ref: $GITHUB_REF - SHA: $GITHUB_SHA\"}]}]}]}" $SLACK_WEBHOOK_URL'
