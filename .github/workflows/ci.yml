@@ -118,6 +118,7 @@ jobs:
     env:
       DEPLOYMENT_KEY: ${{ secrets.DEPLOYMENT_KEY }}
       HEROKU_APP: ${{ secrets.HEROKU_APP }}
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
     steps:
       - name: Deploying to Heroku.
