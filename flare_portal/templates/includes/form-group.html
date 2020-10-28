@@ -1,0 +1,9 @@
+{% load widget_tweaks %}
+<div class="form-group">
+    {{ field|add_label_class:"form-label" }}
+    {{ field|add_class:"form-control"|add_error_class:"is-invalid" }}
+
+    {% for error in field.errors %}
+        <div>{{ error }}</div>
+    {% endfor %}
+</div>

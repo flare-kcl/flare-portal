@@ -3,6 +3,7 @@ from functools import update_wrapper
 from django.apps import apps
 from django.conf import settings
 from django.contrib import admin
+from django.contrib.auth.decorators import login_required
 from django.urls import include, path
 from django.views.decorators.vary import vary_on_headers
 from django.views.generic import TemplateView
@@ -32,7 +33,9 @@ private_urlpatterns = [
     path("", TemplateView.as_view(template_name="home.html")),
 ]
 
-urlpatterns = []
+private_urlpatterns = decorate_urlpatterns(private_urlpatterns, login_required)
+
+urlpatterns = [path("accounts/", include("flare_portal.users.urls"))]
 
 
 if settings.DEBUG:
