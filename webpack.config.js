@@ -30,6 +30,18 @@ const options = {
                 },
             ],
         }),
+        new CopyPlugin({
+            patterns: [
+                {
+                    // Copy pre-compiled scripts that tabler uses
+                    from: 'tabler',
+                    context: path.resolve(
+                        `./${projectRoot}/static_src/javascript/`,
+                    ),
+                    to: path.resolve(`./${projectRoot}/static_compiled/js`),
+                },
+            ],
+        }),
         new MiniCssExtractPlugin({
             filename: 'css/[name].css',
         }),

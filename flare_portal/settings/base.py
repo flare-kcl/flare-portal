@@ -562,7 +562,11 @@ REST_FRAMEWORK = {
 }
 
 
+# Auth settings
+
 AUTH_USER_MODEL = "users.User"
+LOGOUT_REDIRECT_URL = "/"
+
 
 # Google Tag Manager ID from env
 GOOGLE_TAG_MANAGER_ID = env.get("GOOGLE_TAG_MANAGER_ID")
