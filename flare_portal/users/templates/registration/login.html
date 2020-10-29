@@ -16,6 +16,10 @@
                             <div class="card-body p-6">
                                 <div class="card-title">Log in to your account</div>
 
+                                {% if messages %}
+                                    {% include "includes/messages.html" %}
+                                {% endif %}
+
                                 {% if form.non_field_errors %}
                                     <div class="card-alert alert alert-danger my-3">
                                         {% for error in form.non_field_errors %}{{ error }}{% endfor %}

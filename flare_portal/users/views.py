@@ -6,6 +6,7 @@ from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic.list import ListView
 
+from .decorators import role_required
 from .forms import UserCreateForm, UserUpdateForm
 from .models import User
 
@@ -17,7 +18,7 @@ class UserListView(ListView):
         return User.objects.order_by("first_name")
 
 
-user_list_view = UserListView.as_view()
+user_list_view = role_required(UserListView.as_view(), "ADMIN")
 
 
 class UserCreateView(CreateView):
@@ -32,7 +33,7 @@ class UserCreateView(CreateView):
         return response
 
 
-user_create_view = UserCreateView.as_view()
+user_create_view = role_required(UserCreateView.as_view(), "ADMIN")
 
 
 class UserUpdateView(UpdateView):
@@ -47,4 +48,4 @@ class UserUpdateView(UpdateView):
         return response
 
 
-user_update_view = UserUpdateView.as_view()
+user_update_view = role_required(UserUpdateView.as_view(), "ADMIN")

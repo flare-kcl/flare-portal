@@ -6,8 +6,35 @@ from ..models import User
 
 
 class UserAuthorizationTest(TestCase):
-    def test_only_admins_can_access_user_management(self):
-        self.fail()
+    def setUp(self) -> None:
+        self.user: User = UserFactory()
+        self.client.force_login(self.user)
+
+    def test_only_admins_can_access_user_management(self) -> None:
+        resp = self.client.get(reverse("users:user_list"))
+        self.assertEqual(302, resp.status_code)
+
+        resp = self.client.get(reverse("users:user_create"))
+        self.assertEqual(302, resp.status_code)
+
+        resp = self.client.get(
+            reverse("users:user_update", kwargs={"pk": self.user.pk})
+        )
+        self.assertEqual(302, resp.status_code)
+
+        self.user.grant_role("ADMIN")
+        self.user.save()
+
+        resp = self.client.get(reverse("users:user_list"))
+        self.assertEqual(200, resp.status_code)
+
+        resp = self.client.get(reverse("users:user_create"))
+        self.assertEqual(200, resp.status_code)
+
+        resp = self.client.get(
+            reverse("users:user_update", kwargs={"pk": self.user.pk})
+        )
+        self.assertEqual(200, resp.status_code)
 
 
 class UserIndexViewTest(TestCase):

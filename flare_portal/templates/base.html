@@ -25,7 +25,7 @@
         <script src="{% static "js/require.min.js" %}"></script>
         <script>
             requirejs.config({
-                baseUrl: '{% get_static_prefix %}/js'
+                baseUrl: '{% get_static_prefix %}js'
             });
         </script>
         <script src="{% static "js/dashboard.js" %}"></script>
@@ -39,12 +39,7 @@
 
                     {% if messages %}
                         <div class="container my-6">
-                            {% for message in messages %}
-                                <div class="alert alert-icon alert-{{ message.tags }}" role="alert">
-                                    {% if message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}<i class="fe fe-check mr-2" aria-hidden="true"></i>{% endif %}
-                                    {{ message }}
-                                </div>
-                            {% endfor %}
+                            {% include "includes/messages.html" %}
                         </div>
                     {% endif %}
 

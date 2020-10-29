@@ -6,10 +6,14 @@
     <div class="container">
         <div class="page-header">
             <h1 class="page-title">Users</h1>
+            <div class="page-options d-flex">
+                <a href="{% url "users:user_create" %}" class="btn btn-block btn-primary">
+                    Add new user
+                </a>
+            </div>
         </div>
         <div class="row">
             <div class="col-lg-9">
-
                 <div class="card">
                     <div class="table-responsive">
                         <table class="table card-table table-striped table-vcenter">
@@ -36,11 +40,6 @@
                         </table>
                     </div>
                 </div>
-            </div>
-            <div class="col-lg-3">
-                <a href="{% url "users:user_create" %}" class="btn btn-block btn-primary">
-                    Add new user
-                </a>
             </div>
         </div>
     </div>
