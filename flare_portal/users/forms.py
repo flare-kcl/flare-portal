@@ -5,7 +5,7 @@ from django.contrib.auth.password_validation import (
     password_validators_help_text_html,
     validate_password,
 )
-from django.utils.html import mark_safe
+from django.utils.safestring import mark_safe
 
 from . import constants
 from .models import User
