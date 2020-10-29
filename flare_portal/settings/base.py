@@ -412,7 +412,7 @@ if "SENTRY_DSN" in env and not (
                 # If there's no commit hash, we do not set a specific release.
                 pass
 
-    sentry_sdk.init(**SENTRY_CONFIG)
+    sentry_sdk.init(**SENTRY_CONFIG)  # type: ignore
 
 
 # Set s-max-age header that is used by reverse proxy/front end cache. See

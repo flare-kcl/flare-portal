@@ -87,6 +87,7 @@ jobs:
       - run: poetry run flake8 flare_portal
       - run: poetry run black --check ./
       - run: poetry run isort --check-only --diff --recursive flare_portal
+      - run: poetry run mypy
 
       # Tests for Python
       # We need to run the collectstatic command, because we use ManifestStaticFilesStorage.

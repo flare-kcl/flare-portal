@@ -10,7 +10,7 @@ class InvalidGitRepository(Exception):
     pass
 
 
-def fetch_git_sha(path, head=None):
+def fetch_git_sha(path: str, head: str = None) -> str:
     """
     >>> fetch_git_sha(os.path.dirname(__file__))
     """
@@ -61,7 +61,7 @@ def fetch_git_sha(path, head=None):
         return str(fh.read()).strip()
 
 
-def fetch_package_version(dist_name):
+def fetch_package_version(dist_name: str) -> str:
     """
     >>> fetch_package_version('sentry')
     """

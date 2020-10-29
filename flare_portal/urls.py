@@ -1,10 +1,11 @@
 from functools import update_wrapper
+from typing import Callable, List, Union
 
 from django.apps import apps
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth.decorators import login_required
-from django.urls import include, path
+from django.urls import URLPattern, URLResolver, include, path
 from django.views.decorators.vary import vary_on_headers
 from django.views.generic import TemplateView
 
@@ -12,7 +13,7 @@ from flare_portal.users import urls as users_urls
 from flare_portal.utils.cache import get_default_cache_control_decorator
 
 
-def decorate_urlpatterns(urlpatterns, decorator):
+def decorate_urlpatterns(urlpatterns: list, decorator: Callable) -> list:
     """Decorate all the views in the passed urlpatterns list with the given decorator"""
     for pattern in urlpatterns:
         if hasattr(pattern, "url_patterns"):
@@ -37,7 +38,9 @@ private_urlpatterns = [
 
 private_urlpatterns = decorate_urlpatterns(private_urlpatterns, login_required)
 
-urlpatterns = [path("accounts/", include(users_urls.public_urlpatterns))]
+urlpatterns: List[Union[URLPattern, URLResolver]] = [
+    path("accounts/", include(users_urls.public_urlpatterns))
+]
 
 
 if settings.DEBUG:
@@ -45,8 +48,10 @@ if settings.DEBUG:
     from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
     # Serve static and media files from development server
-    urlpatterns += staticfiles_urlpatterns()
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += staticfiles_urlpatterns()  # type: ignore
+    urlpatterns += static(
+        settings.MEDIA_URL, document_root=settings.MEDIA_ROOT
+    )  # type:ignore
 
     urlpatterns += [
         # Add views for testing 404 and 500 templates
@@ -58,7 +63,9 @@ if settings.DEBUG:
     if apps.is_installed("debug_toolbar"):
         import debug_toolbar
 
-        urlpatterns = [path("__debug__/", include(debug_toolbar.urls))] + urlpatterns
+        urlpatterns = [
+            path("__debug__/", include(debug_toolbar.urls))
+        ] + urlpatterns  # type: ignore
 
 
 # Set public URLs to use the "default" cache settings.
