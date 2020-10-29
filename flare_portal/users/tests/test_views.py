@@ -40,6 +40,8 @@ class UserAuthorizationTest(TestCase):
 class UserIndexViewTest(TestCase):
     def setUp(self) -> None:
         self.user = UserFactory()
+        self.user.grant_role("ADMIN")
+        self.user.save()
         self.client.force_login(self.user)
 
     def test_get(self) -> None:
@@ -50,6 +52,8 @@ class UserIndexViewTest(TestCase):
 class UserCreateViewTest(TestCase):
     def setUp(self) -> None:
         self.user = UserFactory()
+        self.user.grant_role("ADMIN")
+        self.user.save()
         self.client.force_login(self.user)
 
     def test_create_user(self) -> None:
@@ -81,6 +85,8 @@ class UserCreateViewTest(TestCase):
 class UserUpdateViewTest(TestCase):
     def setUp(self) -> None:
         self.user = UserFactory()
+        self.user.grant_role("ADMIN")
+        self.user.save()
         self.client.force_login(self.user)
 
     def test_update_user(self) -> None:
