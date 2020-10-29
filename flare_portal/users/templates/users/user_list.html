@@ -4,16 +4,13 @@
 
 {% block content %}
     <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">Users</h1>
+        </div>
         <div class="row">
-            <div class="col-lg-8">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Users</h3>
-                        <div class="card-options">
-                            <a href="{% url "users:user_create" %}" class="btn btn-primary btn-sm">Add new user</a>
-                        </div>
-                    </div>
+            <div class="col-lg-9">
 
+                <div class="card">
                     <div class="table-responsive">
                         <table class="table card-table table-striped table-vcenter">
                             <thead>
@@ -28,11 +25,11 @@
                             <tbody>
                                 {% for user in users %}
                                     <tr>
-                                        <td><a href="#" class="text-inherit">{{ user.name }}</a></td>
+                                        <td><a href="{% url "users:user_update" pk=user.pk %}" class="text-inherit">{{ user.name }}</a></td>
                                         <td>{{ user.username }}</td>
                                         <td>{{ user.email }}</td>
                                         <td>{{ user.get_roles_display }}</td>
-                                        <td><a class="icon" href="#"><i class="fe fe-edit"></i></a></td>
+                                        <td><a class="icon" href="{% url "users:user_update" pk=user.pk %}"><i class="fe fe-edit"></i></a></td>
                                     </tr>
                                 {% endfor %}
                             </tbody>
@@ -40,7 +37,11 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-4"></div>
+            <div class="col-lg-3">
+                <a href="{% url "users:user_create" %}" class="btn btn-block btn-primary">
+                    Add new user
+                </a>
+            </div>
         </div>
     </div>
 {% endblock content %}

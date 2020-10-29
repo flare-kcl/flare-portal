@@ -4,6 +4,8 @@ Django settings for flare_portal project.
 import os
 import sys
 
+from django.contrib.messages import constants as messages
+
 import dj_database_url
 
 env = os.environ.copy()
@@ -58,6 +60,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.sitemaps",
+    "django.forms",
     "widget_tweaks",
 ]
 
@@ -97,6 +100,17 @@ TEMPLATES = [
         },
     }
 ]
+
+FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
+
+# Customize message tags for tabler
+MESSAGE_TAGS = {
+    messages.INFO: "info",
+    messages.DEBUG: "secondary",
+    messages.SUCCESS: "success",
+    messages.WARNING: "warning",
+    messages.ERROR: "danger",
+}
 
 WSGI_APPLICATION = "flare_portal.wsgi.application"
 

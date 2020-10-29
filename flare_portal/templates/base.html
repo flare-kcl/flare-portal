@@ -37,6 +37,17 @@
                     {% include "includes/main-header.html" %}
                     {% include "includes/sub-header.html" %}
 
+                    {% if messages %}
+                        <div class="container my-6">
+                            {% for message in messages %}
+                                <div class="alert alert-icon alert-{{ message.tags }}" role="alert">
+                                    {% if message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}<i class="fe fe-check mr-2" aria-hidden="true"></i>{% endif %}
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
                     <div class="my-3 my-md-5">
                         {% block content %}
                         {% endblock content %}

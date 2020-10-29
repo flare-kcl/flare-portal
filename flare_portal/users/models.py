@@ -70,7 +70,7 @@ class User(AbstractUser):
 
     def get_roles_display(self) -> str:
         role_dict = dict(constants.ROLE_CHOICES)
-        roles = [role_dict[role] for role in self.roles]
+        roles = sorted([role_dict[role] for role in self.roles])
         return ", ".join(roles)
 
     def __str__(self) -> str:

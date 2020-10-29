@@ -4,3 +4,4 @@ from .base import *  # noqa
 
 SECRET_KEY = "test-key"
 DEBUG = False
+AUTH_PASSWORD_VALIDATORS = []
