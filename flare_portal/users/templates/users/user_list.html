@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Users{% endblock title %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Users</h3>
+                        <div class="card-options">
+                            <a href="#" class="btn btn-primary btn-sm">Add new user</a>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table card-table table-striped table-vcenter">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Username</th>
+                                    <th>Email</th>
+                                    <th>Roles</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in users %}
+                                    <tr>
+                                        <td><a href="#" class="text-inherit">{{ user.name }}</a></td>
+                                        <td>{{ user.username }}</td>
+                                        <td>{{ user.email }}</td>
+                                        <td>Admin, Researcher</td>
+                                        <td><a class="icon" href="#"><i class="fe fe-edit"></i></a></td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4"></div>
+        </div>
+    </div>
+{% endblock content %}

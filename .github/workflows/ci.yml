@@ -108,7 +108,7 @@ jobs:
       - run: poetry run python manage.py createcachetable
 
       # Run back-end tests
-      - run: poetry run python manage.py test
+      - run: poetry run python manage.py test --settings flare_portal.settings.test
 
   deploy:
     if: contains(github.ref, 'main')

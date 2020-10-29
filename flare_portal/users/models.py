@@ -3,6 +3,10 @@ from django.contrib.auth.models import AbstractUser
 
 class User(AbstractUser):
     def __str__(self):
+        return self.name or self.username
+
+    @property
+    def name(self):
         parts = []
 
         if self.first_name:
@@ -16,7 +20,7 @@ class User(AbstractUser):
         if name:
             return name
 
-        return self.username
+        return ""
 
     @property
     def initials(self):

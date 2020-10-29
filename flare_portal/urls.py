@@ -8,6 +8,7 @@ from django.urls import include, path
 from django.views.decorators.vary import vary_on_headers
 from django.views.generic import TemplateView
 
+from flare_portal.users import urls as users_urls
 from flare_portal.utils.cache import get_default_cache_control_decorator
 
 
@@ -30,12 +31,13 @@ def decorate_urlpatterns(urlpatterns, decorator):
 # Private URLs are not meant to be cached.
 private_urlpatterns = [
     path("django-admin/", admin.site.urls),
+    path("users/", include(users_urls)),
     path("", TemplateView.as_view(template_name="home.html")),
 ]
 
 private_urlpatterns = decorate_urlpatterns(private_urlpatterns, login_required)
 
-urlpatterns = [path("accounts/", include("flare_portal.users.urls"))]
+urlpatterns = [path("accounts/", include(users_urls.public_urlpatterns))]
 
 
 if settings.DEBUG:
