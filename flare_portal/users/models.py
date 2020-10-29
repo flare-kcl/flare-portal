@@ -1,12 +1,18 @@
 from django.contrib.auth.models import AbstractUser
+from django.contrib.postgres.fields import ArrayField
+from django.db import models
+
+from . import constants
 
 
 class User(AbstractUser):
-    def __str__(self):
-        return self.name or self.username
+    roles = ArrayField(models.CharField(max_length=10, blank=False), default=list)
 
     @property
-    def name(self):
+    def name(self) -> str:
+        """
+        Returns the most complete name of the user
+        """
         parts = []
 
         if self.first_name:
@@ -23,7 +29,10 @@ class User(AbstractUser):
         return ""
 
     @property
-    def initials(self):
+    def initials(self) -> str:
+        """
+        Returns the user's initials
+        """
         letters = ""
 
         if self.first_name:
@@ -36,3 +45,28 @@ class User(AbstractUser):
             return letters.upper()
 
         return self.username[0].upper()
+
+    def has_role(self, role_name: constants.Roles) -> bool:
+        """
+        Returns True if the user has the given role, False otherwise
+        """
+        return role_name in self.roles
+
+    def grant_role(self, role_name: constants.Roles) -> None:
+        """
+        Grants the provided role to the user
+        """
+        roles = set(self.roles)
+        roles.add(role_name)
+        self.roles = list(roles)
+
+    def revoke_role(self, role_name: constants.Roles) -> None:
+        """
+        Revokes the given role from the user
+        """
+        roles = set(self.roles)
+        roles.discard(role_name)
+        self.roles = list(roles)
+
+    def __str__(self) -> str:
+        return self.name or self.username

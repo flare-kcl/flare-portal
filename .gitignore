@@ -34,3 +34,5 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+.vim
+.nvimrc

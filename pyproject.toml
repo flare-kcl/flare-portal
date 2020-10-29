@@ -44,6 +44,7 @@ seed-isort-config = "1.9.4"
 mkdocs = "~1.0"
 mkdocs-material = "~4.6"
 pymdown-extensions = "~6.2"
+mypy = "^0.790"
 
 [build-system]
 requires = ["poetry>=1,<2"]

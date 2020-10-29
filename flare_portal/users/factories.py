@@ -15,6 +15,6 @@ class UserFactory(factory.django.DjangoModelFactory):
     email = factory.LazyAttribute(lambda o: "%s@example.com" % o.username)
 
     @factory.post_generation
-    def passwd(self, create, extracted, **kwargs):
+    def passwd(self, create: bool, extracted: bool, **kwargs: dict) -> None:
         # make the user's password the same as their username
         self.set_password(self.username)
