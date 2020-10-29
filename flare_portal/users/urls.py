@@ -11,4 +11,7 @@ public_urlpatterns = [
     path("logout/", auth_views.LogoutView.as_view(), name="logout"),
 ]
 
-urlpatterns = [path("", views.user_list_view, name="user_list")]
+urlpatterns = [
+    path("", views.user_list_view, name="user_list"),
+    path("create/", views.user_create_view, name="user_create"),
+]

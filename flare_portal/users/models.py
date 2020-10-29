@@ -68,5 +68,10 @@ class User(AbstractUser):
         roles.discard(role_name)
         self.roles = list(roles)
 
+    def get_roles_display(self) -> str:
+        role_dict = dict(constants.ROLE_CHOICES)
+        roles = [role_dict[role] for role in self.roles]
+        return ", ".join(roles)
+
     def __str__(self) -> str:
         return self.name or self.username

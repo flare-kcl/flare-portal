@@ -46,6 +46,7 @@ mkdocs-material = "~4.6"
 pymdown-extensions = "~6.2"
 mypy = "^0.790"
 django-stubs = "^1.7.0"
+ipdb = "^0.13.4"
 
 [build-system]
 requires = ["poetry>=1,<2"]
