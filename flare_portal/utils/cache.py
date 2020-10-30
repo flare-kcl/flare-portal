@@ -1,8 +1,10 @@
+from typing import Callable
+
 from django.conf import settings
 from django.views.decorators.cache import cache_control
 
 
-def get_default_cache_control_kwargs():
+def get_default_cache_control_kwargs() -> dict:
     """
     Get cache control parameters used by the cache control decorators
     used by default on most pages. These parameters are meant to be
@@ -20,7 +22,7 @@ def get_default_cache_control_kwargs():
     return {k: v for k, v in cache_control_kwargs.items() if v is not None}
 
 
-def get_default_cache_control_decorator():
+def get_default_cache_control_decorator() -> Callable:
     """
     Get cache control decorator that can be applied to views as a
     sane default for normal content pages.

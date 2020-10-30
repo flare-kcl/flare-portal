@@ -4,6 +4,8 @@ Django settings for flare_portal project.
 import os
 import sys
 
+from django.contrib.messages import constants as messages
+
 import dj_database_url
 
 env = os.environ.copy()
@@ -58,6 +60,8 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.sitemaps",
+    "django.forms",
+    "widget_tweaks",
 ]
 
 
@@ -96,6 +100,17 @@ TEMPLATES = [
         },
     }
 ]
+
+FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
+
+# Customize message tags for tabler
+MESSAGE_TAGS = {
+    messages.INFO: "info",
+    messages.DEBUG: "secondary",
+    messages.SUCCESS: "success",
+    messages.WARNING: "warning",
+    messages.ERROR: "danger",
+}
 
 WSGI_APPLICATION = "flare_portal.wsgi.application"
 
@@ -411,7 +426,7 @@ if "SENTRY_DSN" in env and not (
                 # If there's no commit hash, we do not set a specific release.
                 pass
 
-    sentry_sdk.init(**SENTRY_CONFIG)
+    sentry_sdk.init(**SENTRY_CONFIG)  # type: ignore
 
 
 # Set s-max-age header that is used by reverse proxy/front end cache. See
@@ -561,7 +576,11 @@ REST_FRAMEWORK = {
 }
 
 
+# Auth settings
+
 AUTH_USER_MODEL = "users.User"
+LOGOUT_REDIRECT_URL = "/"
+
 
 # Google Tag Manager ID from env
 GOOGLE_TAG_MANAGER_ID = env.get("GOOGLE_TAG_MANAGER_ID")

@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Users{% endblock title %}
+
+{% block content %}
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">Users</h1>
+            <div class="page-options d-flex">
+                <a href="{% url "users:user_create" %}" class="btn btn-block btn-primary">
+                    Add new user
+                </a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-9">
+                <div class="card">
+                    <div class="table-responsive">
+                        <table class="table card-table table-striped table-vcenter">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Username</th>
+                                    <th>Email</th>
+                                    <th>Roles</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in users %}
+                                    <tr>
+                                        <td><a href="{% url "users:user_update" pk=user.pk %}" class="text-inherit">{{ user.name }}</a></td>
+                                        <td>{{ user.username }}</td>
+                                        <td>{{ user.email }}</td>
+                                        <td>{{ user.get_roles_display }}</td>
+                                        <td><a class="icon" href="{% url "users:user_update" pk=user.pk %}"><i class="fe fe-edit"></i></a></td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
