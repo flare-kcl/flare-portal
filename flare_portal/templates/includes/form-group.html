@@ -1,0 +1,16 @@
+{% load widget_tweaks %}
+<div class="form-group">
+    {{ field|add_label_class:"form-label" }}
+
+    {% if field.field.widget.input_type == 'checkbox' %}
+        {{ field|add_class:"custom-checkbox-group"|add_error_class:"is-invalid" }}
+    {% else %}
+        {% with help_text_attr="placeholder:"|add:field.help_text %}
+            {{ field|add_class:"form-control"|add_error_class:"is-invalid"|attr:help_text_attr }}
+        {% endwith %}
+    {% endif %}
+
+    {% for error in field.errors %}
+        <div class="invalid-feedback">{{ error }}</div>
+    {% endfor %}
+</div>

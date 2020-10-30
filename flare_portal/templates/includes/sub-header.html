@@ -1,0 +1,15 @@
+<div class="header collapse d-lg-flex p-0" id="headerMenuCollapse">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg">
+                <ul class="nav nav-tabs border-0 flex-column flex-lg-row">
+                    <li class="nav-item">
+                        {# TODO: The check should be startswith and not == #}
+                        {% url "users:user_list" as user_list_url %}
+                        <a href="{{ user_list_url }}" class="nav-link {% if request.path == user_list_url %}active{% endif %}"><i class="fe fe-users"></i> Users</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

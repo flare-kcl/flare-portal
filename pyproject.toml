@@ -18,6 +18,7 @@ django-csp = "~3.6"
 scout-apm = "~2.10"
 django-basic-auth-ip-whitelist = "~0.3.3"
 sentry-sdk = "^0.19.1"
+django-widget-tweaks = "^1.4.8"
 
 [tool.poetry.extras]
 gunicorn = ["gunicorn"]
@@ -29,6 +30,7 @@ fabric = "~2.5"
 stellar = "~0.4"
 SQLAlchemy = "1.2.5"
 SQLAlchemy-Utils = "0.33.1"
+factory-boy = "^3.1.0"
 
 # Linters etc.
 black = "19.10b0"
@@ -42,6 +44,9 @@ seed-isort-config = "1.9.4"
 mkdocs = "~1.0"
 mkdocs-material = "~4.6"
 pymdown-extensions = "~6.2"
+mypy = "^0.790"
+django-stubs = "^1.7.0"
+ipdb = "^0.13.4"
 
 [build-system]
 requires = ["poetry>=1,<2"]

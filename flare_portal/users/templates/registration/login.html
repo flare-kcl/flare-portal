@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Log in{% endblock title %}
+
+{% block base_content %}
+    <div class="page">
+        <div class="page-single">
+            <div class="container">
+                <div class="row">
+                    <div class="col col-login mx-auto">
+                        <div class="text-center mb-6">
+                            <img src="./assets/brand/tabler.svg" class="h-6" alt="">
+                        </div>
+                        <form class="card" action="" method="post">
+                            {% csrf_token %}
+                            <div class="card-body p-6">
+                                <div class="card-title">Log in to your account</div>
+
+                                {% if messages %}
+                                    {% include "includes/messages.html" %}
+                                {% endif %}
+
+                                {% if form.non_field_errors %}
+                                    <div class="card-alert alert alert-danger my-3">
+                                        {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
+
+                                {% for field in form %}
+                                    {% include "includes/form-group.html" %}
+                                {% endfor %}
+                                <div class="form-footer">
+                                    <button type="submit" class="btn btn-primary btn-block">Log in</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock base_content %}

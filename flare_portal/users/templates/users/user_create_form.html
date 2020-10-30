@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Add new user{% endblock title %}
+
+{% block content %}
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">Add new user</h1>
+        </div>
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="card">
+                    <form action="" method="POST">
+                        {% csrf_token %}
+
+                        <div class="card-body">
+                            {% if form.non_field_errors %}
+                                <div class="card-alert alert alert-danger my-3">
+                                    {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+
+                            {% for field in form %}
+                                {% include "includes/form-group.html" %}
+                            {% endfor %}
+
+                        </div>
+
+                        <div class="card-footer">
+                            <div class="d-flex">
+                                <a href="{% url "users:user_list" %}" class="btn btn-link">Cancel</a>
+                                <button type="submit" class="btn btn-primary ml-auto">Add user</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
