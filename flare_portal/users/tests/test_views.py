@@ -100,6 +100,7 @@ class UserUpdateViewTest(TestCase):
             "first_name": "John",
             "last_name": "Smith",
             "email": "john@smith.com",
+            "is_active": False,
             "password1": "",
             "password2": "",
             "roles": ["RESEARCHER"],
@@ -119,6 +120,7 @@ class UserUpdateViewTest(TestCase):
         self.assertEqual(user.last_name, form_data["last_name"])
         self.assertTrue(user.has_role("RESEARCHER"))
         self.assertEqual(1, len(user.roles))
+        self.assertFalse(user.is_active)
 
         # Password shouldn't change because the password fields are empty
         self.assertTrue(user.check_password("dontchangeme"))
