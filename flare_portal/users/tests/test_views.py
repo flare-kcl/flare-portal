@@ -128,3 +128,29 @@ class UserUpdateViewTest(TestCase):
         self.assertEqual(
             str(list(resp.context["messages"])[0]), f'Updated user "{user}"'
         )
+
+
+class UserDeleteViewTest(TestCase):
+    def setUp(self) -> None:
+        self.user = UserFactory()
+        self.user.grant_role("ADMIN")
+        self.user.save()
+        self.client.force_login(self.user)
+
+    def test_delete_user(self) -> None:
+        user: User = UserFactory()
+        resp = self.client.get(reverse("users:user_delete", kwargs={"pk": user.pk}))
+
+        self.assertEqual(200, resp.status_code)
+
+        resp = self.client.post(
+            reverse("users:user_delete", kwargs={"pk": user.pk}), follow=True
+        )
+
+        self.assertRedirects(resp, reverse("users:user_list"))
+
+        self.assertEqual(0, User.objects.filter(pk=user.pk).count())
+
+        self.assertEqual(
+            str(list(resp.context["messages"])[0]), f'Deleted user "{user}"'
+        )
