@@ -1,13 +1,20 @@
+{% load user_tags %}
+
 <div class="header collapse d-lg-flex p-0" id="headerMenuCollapse">
     <div class="container">
         <div class="row align-items-center">
             <div class="col-lg">
                 <ul class="nav nav-tabs border-0 flex-column flex-lg-row">
                     <li class="nav-item">
-                        {# TODO: The check should be startswith and not == #}
-                        {% url "users:user_list" as user_list_url %}
-                        <a href="{{ user_list_url }}" class="nav-link {% if request.path == user_list_url %}active{% endif %}"><i class="fe fe-users"></i> Users</a>
+                        <a href="#" class="nav-link"><i class="fe fe-folder"></i> Projects</a>
                     </li>
+                    {% if request.user|has_role:"ADMIN" %}
+                        <li class="nav-item">
+                            {# TODO: The check should be startswith and not == #}
+                            {% url "users:user_list" as user_list_url %}
+                            <a href="{{ user_list_url }}" class="nav-link {% if request.path == user_list_url %}active{% endif %}"><i class="fe fe-users"></i> Users</a>
+                        </li>
+                    {% endif %}
                 </ul>
             </div>
         </div>
