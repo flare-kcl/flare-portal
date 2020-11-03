@@ -36,6 +36,16 @@ class UserAuthorizationTest(TestCase):
         )
         self.assertEqual(200, resp.status_code)
 
+    def test_superadmins_can_access_everything(self) -> None:
+        self.user.is_superuser = True
+        self.user.save()
+
+        resp = self.client.get(reverse("users:user_list"))
+        self.assertEqual(200, resp.status_code)
+
+        resp = self.client.get(reverse("users:user_create"))
+        self.assertEqual(200, resp.status_code)
+
 
 class UserIndexViewTest(TestCase):
     def setUp(self) -> None:

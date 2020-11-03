@@ -22,7 +22,9 @@ def role_required(
         def _wrapped_view(
             request: HttpRequest, *args: Any, **kwargs: Any
         ) -> HttpResponse:
-            if request.user.is_authenticated and request.user.has_role(role_name):
+            if request.user.is_authenticated and (
+                request.user.has_role(role_name) or request.user.is_superuser
+            ):
                 return view_func(request, *args, **kwargs)
             path = request.build_absolute_uri()
             resolved_login_url = resolve_url(login_url or settings.LOGIN_URL)
