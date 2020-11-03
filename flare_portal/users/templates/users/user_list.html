@@ -38,7 +38,7 @@
                                             {% if user.is_active %}
                                                 <span class="status-icon bg-success"></span> Active
                                             {% else %}
-                                                <span class="status-icon bg-secondary"></span> Inactive
+                                                <span class="status-icon bg-secondary"></span> Deactivated
                                             {% endif %}
                                         </td>
                                         <td><a class="icon" href="{% url "users:user_update" pk=user.pk %}"><i class="fe fe-edit"></i></a></td>
