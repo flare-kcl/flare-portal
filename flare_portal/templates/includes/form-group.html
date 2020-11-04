@@ -1,9 +1,17 @@
 {% load widget_tweaks %}
 <div class="form-group">
-    {{ field|add_label_class:"form-label" }}
+    {% if field|widget_type != 'checkboxinput' %}
+        {{ field|add_label_class:"form-label" }}
+    {% endif %}
 
-    {% if field.field.widget.input_type == 'checkbox' %}
-        {{ field|add_class:"custom-checkbox-group"|add_error_class:"is-invalid" }}
+    {% if field|widget_type == 'horizontalcheckboxselectmultiple' %}
+        {{ field|add_error_class:"is-invalid" }}
+    {% elif field|widget_type == 'checkboxinput' %}
+        <label class="custom-switch">
+            {{ field|add_class:"custom-switch-input" }}
+            <span class="custom-switch-indicator"></span>
+            <span class="custom-switch-description">{{ field.label }}</span>
+        </label>
     {% else %}
         {% with help_text_attr="placeholder:"|add:field.help_text %}
             {{ field|add_class:"form-control"|add_error_class:"is-invalid"|attr:help_text_attr }}

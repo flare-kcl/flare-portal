@@ -36,6 +36,16 @@ class UserAuthorizationTest(TestCase):
         )
         self.assertEqual(200, resp.status_code)
 
+    def test_superadmins_can_access_everything(self) -> None:
+        self.user.is_superuser = True
+        self.user.save()
+
+        resp = self.client.get(reverse("users:user_list"))
+        self.assertEqual(200, resp.status_code)
+
+        resp = self.client.get(reverse("users:user_create"))
+        self.assertEqual(200, resp.status_code)
+
 
 class UserIndexViewTest(TestCase):
     def setUp(self) -> None:
@@ -100,6 +110,7 @@ class UserUpdateViewTest(TestCase):
             "first_name": "John",
             "last_name": "Smith",
             "email": "john@smith.com",
+            "is_active": False,
             "password1": "",
             "password2": "",
             "roles": ["RESEARCHER"],
@@ -119,10 +130,37 @@ class UserUpdateViewTest(TestCase):
         self.assertEqual(user.last_name, form_data["last_name"])
         self.assertTrue(user.has_role("RESEARCHER"))
         self.assertEqual(1, len(user.roles))
+        self.assertFalse(user.is_active)
 
         # Password shouldn't change because the password fields are empty
         self.assertTrue(user.check_password("dontchangeme"))
 
         self.assertEqual(
             str(list(resp.context["messages"])[0]), f'Updated user "{user}"'
+        )
+
+
+class UserDeleteViewTest(TestCase):
+    def setUp(self) -> None:
+        self.user = UserFactory()
+        self.user.grant_role("ADMIN")
+        self.user.save()
+        self.client.force_login(self.user)
+
+    def test_delete_user(self) -> None:
+        user: User = UserFactory()
+        resp = self.client.get(reverse("users:user_delete", kwargs={"pk": user.pk}))
+
+        self.assertEqual(200, resp.status_code)
+
+        resp = self.client.post(
+            reverse("users:user_delete", kwargs={"pk": user.pk}), follow=True
+        )
+
+        self.assertRedirects(resp, reverse("users:user_list"))
+
+        self.assertEqual(0, User.objects.filter(pk=user.pk).count())
+
+        self.assertEqual(
+            str(list(resp.context["messages"])[0]), f'Deleted user "{user}"'
         )

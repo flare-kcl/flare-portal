@@ -119,6 +119,7 @@ class UserUpdateForm(UserForm):
             "first_name",
             "last_name",
             "email",
+            "is_active",
             "password1",
             "password2",
             "roles",
