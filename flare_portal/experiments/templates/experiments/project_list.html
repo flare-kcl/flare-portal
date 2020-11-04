@@ -29,11 +29,11 @@
                             <tbody>
                                 {% for project in projects %}
                                     <tr>
-                                        <td><a href="#" class="text-inherit">{{ project.name }}</a></td>
+                                        <td><a href="{% url "experiments:experiment_list" project_pk=project.pk %}" class="text-inherit">{{ project.name }}</a></td>
                                         <td>{{ project.owner }}</td>
                                         <td>{{ project.created_at }}</td>
                                         <td>{{ project.updated_at }}</td>
-                                        <td><a class="icon" href="#"><i class="fe fe-edit"></i></a></td>
+                                        <td><a class="icon" href="{% url "experiments:project_update" project_pk=project.pk %}"><i class="fe fe-edit"></i></a></td>
                                     </tr>
                                 {% endfor %}
                             </tbody>

@@ -63,3 +63,42 @@ class ProjectCreateViewTest(TestCase):
         self.assertEqual(
             str(list(resp.context["messages"])[0]), f'Added new project "{project}"'
         )
+
+
+class ProjectUpdateViewTest(TestCase):
+    def setUp(self) -> None:
+        self.user = UserFactory()
+        self.user.grant_role("ADMIN")
+        self.user.save()
+        self.client.force_login(self.user)
+
+    def test_update_user(self) -> None:
+        project: Project = ProjectFactory()
+
+        url = reverse("experiments:project_update", kwargs={"project_pk": project.pk})
+
+        resp = self.client.get(url)
+        self.assertEqual(200, resp.status_code)
+
+        form_data = {
+            "name": "My project",
+            "description": "This is my project",
+            "owner": str(self.user.pk),
+        }
+
+        resp = self.client.post(url, form_data, follow=True)
+
+        self.assertRedirects(
+            resp,
+            reverse("experiments:experiment_list", kwargs={"project_pk": project.pk}),
+        )
+
+        project.refresh_from_db()
+
+        self.assertEqual(project.name, form_data["name"])
+        self.assertEqual(project.description, form_data["description"])
+        self.assertTrue(project.owner, int(form_data["owner"]))
+
+        self.assertEqual(
+            str(list(resp.context["messages"])[0]), f'Updated project "{project}"'
+        )
