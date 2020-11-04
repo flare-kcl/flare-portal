@@ -6,7 +6,7 @@
             <div class="col-lg">
                 <ul class="nav nav-tabs border-0 flex-column flex-lg-row">
                     <li class="nav-item">
-                        <a href="#" class="nav-link"><i class="fe fe-folder"></i> Projects</a>
+                        <a href="{% url "experiments:project_list" %}" class="nav-link"><i class="fe fe-folder"></i> Projects</a>
                     </li>
                     {% if request.user|has_role:"ADMIN" %}
                         <li class="nav-item">
