@@ -1,8 +1,11 @@
+from typing import Any
+
 from django import forms
 from django.contrib import messages
-from django.http import HttpResponse
+from django.http import HttpRequest, HttpResponse
+from django.urls import reverse_lazy
 from django.views.generic import ListView
-from django.views.generic.edit import CreateView, UpdateView
+from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
 from .models import Experiment, Project
 
@@ -43,6 +46,22 @@ class ProjectUpdateView(UpdateView):
 
 
 project_update_view = ProjectUpdateView.as_view()
+
+
+class ProjectDeleteView(DeleteView):
+    context_object_name = "project"
+    model = Project
+    pk_url_kwarg = "project_pk"
+    success_url = reverse_lazy("experiments:project_list")
+
+    def delete(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        project = self.get_object()
+        response = super().delete(request, *args, **kwargs)
+        messages.success(self.request, f'Deleted project "{project}"')
+        return response
+
+
+project_delete_view = ProjectDeleteView.as_view()
 
 
 class ExperimentListView(ListView):

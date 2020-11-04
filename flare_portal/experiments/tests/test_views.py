@@ -102,3 +102,28 @@ class ProjectUpdateViewTest(TestCase):
         self.assertEqual(
             str(list(resp.context["messages"])[0]), f'Updated project "{project}"'
         )
+
+
+class ProjectDeleteViewTest(TestCase):
+    def setUp(self) -> None:
+        self.user = UserFactory()
+        self.user.grant_role("ADMIN")
+        self.user.save()
+        self.client.force_login(self.user)
+
+    def test_delete_user(self) -> None:
+        project: Project = ProjectFactory()
+
+        url = reverse("experiments:project_delete", kwargs={"project_pk": project.pk})
+        resp = self.client.get(url)
+        self.assertEqual(200, resp.status_code)
+
+        resp = self.client.post(url, follow=True)
+
+        self.assertRedirects(resp, reverse("experiments:project_list"))
+
+        self.assertEqual(0, Project.objects.all().count())
+
+        self.assertEqual(
+            str(list(resp.context["messages"])[0]), f'Deleted project "{project}"'
+        )

@@ -13,6 +13,11 @@ urlpatterns = [
         name="project_update",
     ),
     path(
+        "projects/<int:project_pk>/delete/",
+        views.project_delete_view,
+        name="project_delete",
+    ),
+    path(
         "projects/<int:project_pk>/", views.experiment_list_view, name="experiment_list"
     ),
 ]
