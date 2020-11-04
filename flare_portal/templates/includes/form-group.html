@@ -12,6 +12,8 @@
             <span class="custom-switch-indicator"></span>
             <span class="custom-switch-description">{{ field.label }}</span>
         </label>
+    {% elif field|widget_type == 'select' %}
+        {{ field|add_class:"form-control custom-select"|add_error_class:"is-invalid"|attr:"data-selectize" }}
     {% else %}
         {% with help_text_attr="placeholder:"|add:field.help_text %}
             {{ field|add_class:"form-control"|add_error_class:"is-invalid"|attr:help_text_attr }}

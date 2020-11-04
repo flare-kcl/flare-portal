@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.core import validators
 from django.db import models
+from django.urls import reverse
 
 
 class Project(models.Model):
@@ -10,6 +11,9 @@ class Project(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def get_absolute_url(self):
+        return reverse("experiments:experiment_list", kwargs={"project_pk": self.pk})
 
     def __str__(self) -> str:
         return self.name

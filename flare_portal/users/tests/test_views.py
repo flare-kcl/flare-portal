@@ -47,7 +47,7 @@ class UserAuthorizationTest(TestCase):
         self.assertEqual(200, resp.status_code)
 
 
-class UserIndexViewTest(TestCase):
+class UserListViewTest(TestCase):
     def setUp(self) -> None:
         self.user = UserFactory()
         self.user.grant_role("ADMIN")
