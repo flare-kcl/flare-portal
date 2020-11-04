@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.core import validators
 from django.db import models
 
 
@@ -17,6 +18,9 @@ class Project(models.Model):
 class Experiment(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField()
+    code = models.CharField(
+        max_length=6, unique=True, validators=[validators.RegexValidator(r"^[\w]+\Z")]
+    )
     owner = models.ForeignKey(get_user_model(), on_delete=models.PROTECT)
     project = models.ForeignKey("experiments.Project", on_delete=models.CASCADE)
 

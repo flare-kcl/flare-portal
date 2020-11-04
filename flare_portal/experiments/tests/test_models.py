@@ -35,12 +35,14 @@ class ExperimentTest(TestCase):
             experiment = ExperimentFactory(
                 name="My experiment",
                 description="My experiment description",
+                code="ABC123",
                 owner=user,
                 project=project,
             )
 
         self.assertEqual(experiment.name, "My experiment")
         self.assertEqual(experiment.description, "My experiment description")
+        self.assertEqual(experiment.code, "ABC123")
         self.assertEqual(experiment.owner, user)
         self.assertEqual(experiment.project, project)
 
