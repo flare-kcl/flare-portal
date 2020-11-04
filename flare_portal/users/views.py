@@ -1,9 +1,11 @@
+from typing import Any
+
 from django import forms
 from django.contrib import messages
 from django.db.models import QuerySet
-from django.http import HttpResponse
+from django.http import HttpRequest, HttpResponse
 from django.urls import reverse_lazy
-from django.views.generic.edit import CreateView, UpdateView
+from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.list import ListView
 
 from .decorators import role_required
@@ -49,3 +51,18 @@ class UserUpdateView(UpdateView):
 
 
 user_update_view = role_required(UserUpdateView.as_view(), "ADMIN")
+
+
+class UserDeleteView(DeleteView):
+    context_object_name = "user"
+    model = User
+    success_url = reverse_lazy("users:user_list")
+
+    def delete(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        user = self.get_object()
+        response = super().delete(request, *args, **kwargs)
+        messages.success(self.request, f'Deleted user "{user}"')
+        return response
+
+
+user_delete_view = role_required(UserDeleteView.as_view(), "ADMIN")

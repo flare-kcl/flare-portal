@@ -33,7 +33,7 @@ def decorate_urlpatterns(urlpatterns: list, decorator: Callable) -> list:
 private_urlpatterns = [
     path("django-admin/", admin.site.urls),
     path("users/", include(users_urls)),
-    path("", TemplateView.as_view(template_name="home.html")),
+    path("", TemplateView.as_view(template_name="home.html"), name="home"),
 ]
 
 private_urlpatterns = decorate_urlpatterns(private_urlpatterns, login_required)

@@ -23,6 +23,7 @@
                                     <th>Username</th>
                                     <th>Email</th>
                                     <th>Roles</th>
+                                    <th>Status</th>
                                     <th></th>
                                 </tr>
                             </thead>
@@ -33,6 +34,13 @@
                                         <td>{{ user.username }}</td>
                                         <td>{{ user.email }}</td>
                                         <td>{{ user.get_roles_display }}</td>
+                                        <td>
+                                            {% if user.is_active %}
+                                                <span class="status-icon bg-success"></span> Active
+                                            {% else %}
+                                                <span class="status-icon bg-secondary"></span> Deactivated
+                                            {% endif %}
+                                        </td>
                                         <td><a class="icon" href="{% url "users:user_update" pk=user.pk %}"><i class="fe fe-edit"></i></a></td>
                                     </tr>
                                 {% endfor %}
