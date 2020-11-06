@@ -15,6 +15,6 @@ public_urlpatterns = [
 urlpatterns = [
     path("users/", views.user_list_view, name="user_list"),
     path("users/add/", views.user_create_view, name="user_create"),
-    path("users/<int:pk>/", views.user_update_view, name="user_update"),
+    path("users/<int:pk>/edit/", views.user_update_view, name="user_update"),
     path("users/<int:pk>/delete/", views.user_delete_view, name="user_delete"),
 ]

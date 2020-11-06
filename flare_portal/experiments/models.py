@@ -12,7 +12,7 @@ class Project(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    def get_absolute_url(self):
+    def get_absolute_url(self) -> str:
         return reverse("experiments:experiment_list", kwargs={"project_pk": self.pk})
 
     def __str__(self) -> str:
@@ -30,6 +30,12 @@ class Experiment(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def get_absolute_url(self) -> str:
+        return reverse(
+            "experiments:experiment_detail",
+            kwargs={"project_pk": self.project_id, "experiment_pk": self.pk},
+        )
 
     def __str__(self) -> str:
         return self.name

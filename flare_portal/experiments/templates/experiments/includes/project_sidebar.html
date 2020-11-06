@@ -1,0 +1,26 @@
+<div class="card">
+    <div class="card-header">
+        <h1 class="page-title">{{ project.name }}</h1>
+    </div>
+    <div class="card-body">
+        <h6>Description</h6>
+        {{ project.description|linebreaks }}
+
+        <h6>Owner</h6>
+        <div class="d-flex align-items-center">
+            <span class="avatar">{{ project.owner.initials }}</span>
+            <span class="ml-2 text-default">{{ project.owner }}</span>
+        </div>
+    </div>
+</div>
+
+<div>
+    <div class="list-group list-group-transparent mb-0">
+        <a href="{% url "experiments:experiment_list" project_pk=project.pk %}" class="list-group-item list-group-item-action d-flex align-items-center{% if request.resolver_match.url_name == 'experiment_list' %} active{% endif %}">
+            <span class="icon mr-3"><i class="fe fe-zap"></i></span>Experiments
+        </a>
+        <a href="{% url "experiments:project_update" project_pk=project.pk %}" class="list-group-item list-group-item-action d-flex align-items-center{% if request.resolver_match.url_name == 'project_update' %} active{% endif %}">
+            <span class="icon mr-3"><i class="fe fe-sliders"></i></span>Project settings
+        </a>
+    </div>
+</div>

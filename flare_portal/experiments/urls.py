@@ -20,4 +20,24 @@ urlpatterns = [
     path(
         "projects/<int:project_pk>/", views.experiment_list_view, name="experiment_list"
     ),
+    path(
+        "projects/<int:project_pk>/experiment/add/",
+        views.experiment_create_view,
+        name="experiment_create",
+    ),
+    path(
+        "projects/<int:project_pk>/experiment/<int:experiment_pk>/",
+        views.experiment_detail_view,
+        name="experiment_detail",
+    ),
+    path(
+        "projects/<int:project_pk>/experiment/<int:experiment_pk>/edit/",
+        views.experiment_update_view,
+        name="experiment_update",
+    ),
+    path(
+        "projects/<int:project_pk>/experiment/<int:experiment_pk>/delete/",
+        views.experiment_delete_view,
+        name="experiment_delete",
+    ),
 ]
