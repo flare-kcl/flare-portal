@@ -106,7 +106,14 @@ class UserForm(forms.ModelForm):
 class UserCreateForm(UserForm):
     class Meta:
         model = User
-        fields = ["username", "first_name", "last_name", "email"]
+        fields = [
+            "username",
+            "first_name",
+            "last_name",
+            "email",
+            "job_title",
+            "affiliation",
+        ]
 
 
 class UserUpdateForm(UserForm):
@@ -119,6 +126,8 @@ class UserUpdateForm(UserForm):
             "first_name",
             "last_name",
             "email",
+            "job_title",
+            "affiliation",
             "is_active",
             "password1",
             "password2",
