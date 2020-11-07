@@ -2,7 +2,7 @@ import factory
 
 from flare_portal.users.factories import UserFactory
 
-from .models import Experiment, Project
+from .models import Experiment, FearConditioningModule, Project
 
 
 class ProjectFactory(factory.django.DjangoModelFactory):
@@ -23,3 +23,10 @@ class ExperimentFactory(factory.django.DjangoModelFactory):
     code = factory.Sequence(lambda n: f"CODE{n:02}")
     owner = factory.SubFactory(UserFactory)
     project = factory.SubFactory(ProjectFactory)
+
+
+class FearConditioningModuleFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = FearConditioningModule
+
+    experiment = factory.SubFactory(ExperimentFactory)
