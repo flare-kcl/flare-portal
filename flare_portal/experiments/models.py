@@ -6,7 +6,7 @@ from django.urls import reverse
 
 class Project(models.Model):
     name = models.CharField(max_length=255)
-    description = models.TextField()
+    description = models.TextField(blank=True)
     owner = models.ForeignKey(get_user_model(), on_delete=models.PROTECT)
 
     created_at = models.DateTimeField(auto_now_add=True)
@@ -21,7 +21,7 @@ class Project(models.Model):
 
 class Experiment(models.Model):
     name = models.CharField(max_length=255)
-    description = models.TextField()
+    description = models.TextField(blank=True)
     code = models.CharField(
         max_length=6, unique=True, validators=[validators.RegexValidator(r"^[\w]+\Z")]
     )

@@ -1,30 +1,37 @@
 {% load widget_tweaks %}
-{% if field|widget_type == 'hiddeninput' %}
-    {{ field }}
-{% else %}
-    <div class="form-group">
-        {% if field|widget_type != 'checkboxinput' %}
-            {{ field|add_label_class:"form-label" }}
-        {% endif %}
+{% with show_required=show_required|default:"show" %}
+    {% if field|widget_type == 'hiddeninput' %}
+        {{ field }}
+    {% else %}
+        <div class="form-group">
+            {% if field|widget_type != 'checkboxinput' %}
+                <label class="form-label" for="{{ field.id_for_label }}">
+                    {{ field.label }}
+                    {% if show_required == "show" and field.field.required %}
+                        <span class="form-required">*</span>
+                    {% endif %}
+                </label>
+            {% endif %}
 
-        {% if field|widget_type == 'horizontalcheckboxselectmultiple' %}
-            {{ field|add_error_class:"is-invalid" }}
-        {% elif field|widget_type == 'checkboxinput' %}
-            <label class="custom-switch">
-                {{ field|add_class:"custom-switch-input" }}
-                <span class="custom-switch-indicator"></span>
-                <span class="custom-switch-description">{{ field.label }}</span>
-            </label>
-        {% elif field|widget_type == 'select' %}
-            {{ field|add_class:"form-control custom-select"|add_error_class:"is-invalid"|attr:"data-selectize" }}
-        {% else %}
-            {% with help_text_attr="placeholder:"|add:field.help_text %}
-                {{ field|add_class:"form-control"|add_error_class:"is-invalid"|attr:help_text_attr }}
-            {% endwith %}
-        {% endif %}
+            {% if field|widget_type == 'horizontalcheckboxselectmultiple' %}
+                {{ field|add_error_class:"is-invalid" }}
+            {% elif field|widget_type == 'checkboxinput' %}
+                <label class="custom-switch">
+                    {{ field|add_class:"custom-switch-input" }}
+                    <span class="custom-switch-indicator"></span>
+                    <span class="custom-switch-description">{{ field.label }}</span>
+                </label>
+            {% elif field|widget_type == 'select' %}
+                {{ field|add_class:"form-control custom-select"|add_error_class:"is-invalid"|attr:"data-selectize" }}
+            {% else %}
+                {% with help_text_attr="placeholder:"|add:field.help_text %}
+                    {{ field|add_class:"form-control"|add_error_class:"is-invalid"|attr:help_text_attr }}
+                {% endwith %}
+            {% endif %}
 
-        {% for error in field.errors %}
-            <div class="invalid-feedback">{{ error }}</div>
-        {% endfor %}
-    </div>
-{% endif %}
+            {% for error in field.errors %}
+                <div class="invalid-feedback">{{ error }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endwith %}
