@@ -5,8 +5,18 @@ from freezegun import freeze_time
 
 from flare_portal.users.factories import UserFactory
 
-from ..factories import ExperimentFactory, FearConditioningModuleFactory, ProjectFactory
-from ..models import Experiment, FearConditioningModule
+from ..factories import (
+    ExperimentFactory,
+    FearConditioningModuleFactory,
+    ParticipantFactory,
+    ProjectFactory,
+)
+from ..models import (
+    Experiment,
+    FearConditioningData,
+    FearConditioningModule,
+    Participant,
+)
 
 
 class ProjectTest(TestCase):
@@ -61,8 +71,33 @@ class ExperimentTest(TestCase):
         )
 
 
+class ParticipantTest(TestCase):
+    def test_model(self) -> None:
+        participant: Participant = ParticipantFactory(participant_id="Flare.ABCDEF")
+
+        self.assertEqual(participant.participant_id, "Flare.ABCDEF")
+
+
 class FearConditioningModuleTest(TestCase):
     def test_validation(self) -> None:
         self.fail(
             "reinforcement_rate should be at most the same as trials per stimulus"
+        )
+
+
+class FearConditioningDataTest(TestCase):
+    def test_model(self) -> None:
+        participant: Participant = ParticipantFactory()
+        module: FearConditioningModule = FearConditioningModuleFactory()
+
+        FearConditioningData.objects.create(
+            participant=participant,
+            module=module,
+            trial=1,
+            rating=5,
+            conditional_stimulus="A",
+            unconditional_stimulus=True,
+            recorded_at=timezone.now(),
+            volume_level=78,
+            headphones=True,
         )
