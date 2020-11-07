@@ -106,10 +106,10 @@ experiment_create_view = ExperimentCreateView.as_view()
 
 
 class ExperimentUpdateView(UpdateView):
-    model = Experiment
-    object = None
     fields = ["name", "description", "code", "owner"]
+    object = None
     pk_url_kwarg = "experiment_pk"
+    queryset = Experiment.objects.select_related("project")
     template_name = "experiments/experiment_update_form.html"
 
     def form_valid(self, form: forms.BaseModelForm) -> HttpResponse:
@@ -144,8 +144,8 @@ experiment_delete_view = ExperimentDeleteView.as_view()
 
 class ExperimentDetailView(DetailView):
     context_object_name = "experiment"
-    model = Experiment
     pk_url_kwarg = "experiment_pk"
+    queryset = Experiment.objects.select_related("project")
 
 
 experiment_detail_view = ExperimentDetailView.as_view()

@@ -7,9 +7,20 @@
         {{ project.description|linebreaks }}
 
         <h6>Owner</h6>
-        <div class="d-flex align-items-center">
+        <div class="d-flex align-items-center mb-5">
             <span class="avatar">{{ project.owner.initials }}</span>
             <span class="ml-2 text-default">{{ project.owner }}</span>
+        </div>
+
+        <div class="row">
+            <div class="col-6">
+                <h6>Created</h6>
+                <p>{{ project.created_at }}</p>
+            </div>
+            <div class="col-6">
+                <h6>Last updated</h6>
+                <p>{{ project.updated_at }}</p>
+            </div>
         </div>
     </div>
 </div>
