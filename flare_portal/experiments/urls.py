@@ -1,5 +1,8 @@
 from django.urls import path
 
+from flare_portal.users.decorators import role_required
+from flare_portal.utils.urls import decorate_urlpatterns
+
 from . import views
 
 app_name = "experiments"
@@ -41,3 +44,5 @@ urlpatterns = [
         name="experiment_delete",
     ),
 ]
+
+urlpatterns = decorate_urlpatterns(urlpatterns, role_required, "RESEARCHER")

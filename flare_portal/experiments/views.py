@@ -25,6 +25,9 @@ class ProjectCreateView(CreateView):
     fields = ["name", "description", "owner"]
     object = None
 
+    def get_initial(self) -> dict:
+        return {"owner": self.request.user.pk}
+
     def form_valid(self, form: forms.BaseModelForm) -> HttpResponse:
         response = super().form_valid(form)
         messages.success(self.request, f'Added new project "{self.object}"')
@@ -86,7 +89,7 @@ class ExperimentCreateView(CreateView):
     object = None
 
     def get_initial(self) -> dict:
-        return {"project": self.kwargs["project_pk"]}
+        return {"project": self.kwargs["project_pk"], "owner": self.request.user.pk}
 
     def get_context_data(self, **kwargs: Any) -> dict:
         context = super().get_context_data(**kwargs)

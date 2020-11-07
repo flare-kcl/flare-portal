@@ -2,6 +2,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from flare_portal.users.factories import UserFactory
+from flare_portal.users.models import User
 
 from ..factories import ExperimentFactory, ProjectFactory
 from ..models import Experiment, Project
@@ -9,12 +10,58 @@ from ..models import Experiment, Project
 
 class ProjectAuthorizationTest(TestCase):
     def test_authorization(self) -> None:
-        self.fail()
+        user: User = UserFactory()
+        self.client.force_login(user)
+
+        project: Project = ProjectFactory()
+
+        self.assertEqual(
+            302, self.client.get(reverse("experiments:project_list")).status_code
+        )
+        self.assertEqual(
+            302, self.client.get(reverse("experiments:project_create")).status_code
+        )
+        self.assertEqual(
+            302,
+            self.client.get(
+                reverse("experiments:project_update", kwargs={"project_pk": project.pk})
+            ).status_code,
+        )
+        self.assertEqual(
+            302,
+            self.client.get(
+                reverse("experiments:project_delete", kwargs={"project_pk": project.pk})
+            ).status_code,
+        )
+
+        user.grant_role("RESEARCHER")
+        user.save()
+
+        self.assertEqual(
+            200, self.client.get(reverse("experiments:project_list")).status_code
+        )
+        self.assertEqual(
+            200, self.client.get(reverse("experiments:project_create")).status_code
+        )
+        self.assertEqual(
+            200,
+            self.client.get(
+                reverse("experiments:project_update", kwargs={"project_pk": project.pk})
+            ).status_code,
+        )
+        self.assertEqual(
+            200,
+            self.client.get(
+                reverse("experiments:project_delete", kwargs={"project_pk": project.pk})
+            ).status_code,
+        )
 
 
 class ProjectListViewTest(TestCase):
     def setUp(self) -> None:
-        self.user = UserFactory()
+        self.user: User = UserFactory()
+        self.user.grant_role("RESEARCHER")
+        self.user.save()
 
         self.client.force_login(self.user)
 
@@ -31,16 +78,17 @@ class ProjectListViewTest(TestCase):
 class ProjectCreateViewTest(TestCase):
     def setUp(self) -> None:
         self.user = UserFactory()
-        self.user.grant_role("ADMIN")
+        self.user.grant_role("RESEARCHER")
         self.user.save()
         self.client.force_login(self.user)
 
     def test_create_project(self) -> None:
-        self.fail("default owner should be the current user")
         url = reverse("experiments:project_create")
 
         resp = self.client.get(url)
         self.assertEqual(200, resp.status_code)
+
+        self.assertEqual(resp.context["form"].initial["owner"], self.user.pk)
 
         form_data = {
             "name": "My project",
@@ -69,7 +117,7 @@ class ProjectCreateViewTest(TestCase):
 class ProjectUpdateViewTest(TestCase):
     def setUp(self) -> None:
         self.user = UserFactory()
-        self.user.grant_role("ADMIN")
+        self.user.grant_role("RESEARCHER")
         self.user.save()
         self.client.force_login(self.user)
 
@@ -108,7 +156,7 @@ class ProjectUpdateViewTest(TestCase):
 class ProjectDeleteViewTest(TestCase):
     def setUp(self) -> None:
         self.user = UserFactory()
-        self.user.grant_role("ADMIN")
+        self.user.grant_role("RESEARCHER")
         self.user.save()
         self.client.force_login(self.user)
 
@@ -132,12 +180,110 @@ class ProjectDeleteViewTest(TestCase):
 
 class ExperimentAuthorizationTest(TestCase):
     def test_authorization(self) -> None:
-        self.fail()
+        user: User = UserFactory()
+        self.client.force_login(user)
+
+        project: Project = ProjectFactory()
+        experiment: Experiment = ExperimentFactory(project=project)
+
+        self.assertEqual(
+            302,
+            self.client.get(
+                reverse(
+                    "experiments:experiment_list", kwargs={"project_pk": project.pk}
+                )
+            ).status_code,
+        )
+        self.assertEqual(
+            302,
+            self.client.get(
+                reverse(
+                    "experiments:experiment_create", kwargs={"project_pk": project.pk}
+                )
+            ).status_code,
+        )
+        self.assertEqual(
+            302,
+            self.client.get(
+                reverse(
+                    "experiments:experiment_detail",
+                    kwargs={"project_pk": project.pk, "experiment_pk": experiment.pk},
+                )
+            ).status_code,
+        )
+        self.assertEqual(
+            302,
+            self.client.get(
+                reverse(
+                    "experiments:experiment_update",
+                    kwargs={"project_pk": project.pk, "experiment_pk": experiment.pk},
+                )
+            ).status_code,
+        )
+        self.assertEqual(
+            302,
+            self.client.get(
+                reverse(
+                    "experiments:experiment_delete",
+                    kwargs={"project_pk": project.pk, "experiment_pk": experiment.pk},
+                )
+            ).status_code,
+        )
+
+        user.grant_role("RESEARCHER")
+        user.save()
+
+        self.assertEqual(
+            200,
+            self.client.get(
+                reverse(
+                    "experiments:experiment_list", kwargs={"project_pk": project.pk}
+                )
+            ).status_code,
+        )
+        self.assertEqual(
+            200,
+            self.client.get(
+                reverse(
+                    "experiments:experiment_create", kwargs={"project_pk": project.pk}
+                )
+            ).status_code,
+        )
+        self.assertEqual(
+            200,
+            self.client.get(
+                reverse(
+                    "experiments:experiment_detail",
+                    kwargs={"project_pk": project.pk, "experiment_pk": experiment.pk},
+                )
+            ).status_code,
+        )
+        self.assertEqual(
+            200,
+            self.client.get(
+                reverse(
+                    "experiments:experiment_update",
+                    kwargs={"project_pk": project.pk, "experiment_pk": experiment.pk},
+                )
+            ).status_code,
+        )
+        self.assertEqual(
+            200,
+            self.client.get(
+                reverse(
+                    "experiments:experiment_delete",
+                    kwargs={"project_pk": project.pk, "experiment_pk": experiment.pk},
+                )
+            ).status_code,
+        )
 
 
 class ExperimentListViewTest(TestCase):
     def setUp(self) -> None:
-        self.user = UserFactory()
+        self.user: User = UserFactory()
+        self.user.grant_role("RESEARCHER")
+        self.user.save()
+
         self.client.force_login(self.user)
 
     def test_get(self) -> None:
@@ -157,14 +303,13 @@ class ExperimentListViewTest(TestCase):
 class ExperimentCreateViewTest(TestCase):
     def setUp(self) -> None:
         self.user = UserFactory()
-        self.user.grant_role("ADMIN")
+        self.user.grant_role("RESEARCHER")
         self.user.save()
         self.client.force_login(self.user)
 
         self.project = ProjectFactory()
 
     def test_create_experiment(self) -> None:
-        self.fail("default owner should be the current user")
         url = reverse(
             "experiments:experiment_create", kwargs={"project_pk": self.project.pk}
         )
@@ -173,6 +318,7 @@ class ExperimentCreateViewTest(TestCase):
         self.assertEqual(200, resp.status_code)
         self.assertEqual(resp.context["project"], self.project)
         self.assertEqual(resp.context["form"].initial["project"], self.project.pk)
+        self.assertEqual(resp.context["form"].initial["owner"], self.user.pk)
 
         form_data = {
             "name": "My experiment",
@@ -209,7 +355,7 @@ class ExperimentCreateViewTest(TestCase):
 class ExperimentUpdateViewTest(TestCase):
     def setUp(self) -> None:
         self.user = UserFactory()
-        self.user.grant_role("ADMIN")
+        self.user.grant_role("RESEARCHER")
         self.user.save()
         self.client.force_login(self.user)
 
@@ -290,7 +436,7 @@ class ExperimentUpdateViewTest(TestCase):
 class ExperimentDeleteViewTest(TestCase):
     def setUp(self) -> None:
         self.user = UserFactory()
-        self.user.grant_role("ADMIN")
+        self.user.grant_role("RESEARCHER")
         self.user.save()
         self.client.force_login(self.user)
 
@@ -322,7 +468,7 @@ class ExperimentDeleteViewTest(TestCase):
 class ExperimentDetailViewTest(TestCase):
     def setUp(self) -> None:
         self.user = UserFactory()
-        self.user.grant_role("ADMIN")
+        self.user.grant_role("RESEARCHER")
         self.user.save()
         self.client.force_login(self.user)
 

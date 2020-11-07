@@ -1,7 +1,10 @@
 from django.contrib.auth import views as auth_views
 from django.urls import path
 
+from flare_portal.utils.urls import decorate_urlpatterns
+
 from . import views
+from .decorators import role_required
 
 app_name = "users"
 
@@ -18,3 +21,5 @@ urlpatterns = [
     path("users/<int:pk>/edit/", views.user_update_view, name="user_update"),
     path("users/<int:pk>/delete/", views.user_delete_view, name="user_delete"),
 ]
+
+urlpatterns = decorate_urlpatterns(urlpatterns, role_required, "ADMIN")

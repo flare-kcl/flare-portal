@@ -6,13 +6,12 @@
             <div class="col-lg">
                 <ul class="nav nav-tabs border-0 flex-column flex-lg-row">
                     <li class="nav-item">
-                        <a href="{% url "experiments:project_list" %}" class="nav-link"><i class="fe fe-box"></i> Projects</a>
+                        <a href="{% url "experiments:project_list" %}" class="nav-link{% if request.resolver_match.url_name == 'project_list' %} active{% endif %}"><i class="fe fe-box"></i> Projects</a>
                     </li>
                     {% if request.user|has_role:"ADMIN" %}
                         <li class="nav-item">
                             {# TODO: The check should be startswith and not == #}
-                            {% url "users:user_list" as user_list_url %}
-                            <a href="{{ user_list_url }}" class="nav-link {% if request.path == user_list_url %}active{% endif %}"><i class="fe fe-users"></i> Users</a>
+                            <a href="{% url "users:user_list" %}" class="nav-link{% if request.resolver_match.url_name == 'user_list' %} active{% endif %}"><i class="fe fe-users"></i> Users</a>
                         </li>
                     {% endif %}
                 </ul>
