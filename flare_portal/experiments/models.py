@@ -47,7 +47,7 @@ class Experiment(models.Model):
 
 
 class Participant(models.Model):
-    participant_id = models.CharField(max_length=24)
+    participant_id = models.CharField(max_length=24, unique=True)
     experiment = models.ForeignKey(
         "experiments.Experiment", on_delete=models.CASCADE, related_name="participants"
     )

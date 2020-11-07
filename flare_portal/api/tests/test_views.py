@@ -25,7 +25,7 @@ class ConfigurationAPIViewTest(TestCase):
         experiment.modules.add(module2)
 
         resp = self.client.post(
-            reverse("api:configuration"), {"participant_id": "Flare.ABCDEF"}
+            reverse("api:configuration"), {"participant": "Flare.ABCDEF"}
         )
 
         self.assertEqual(200, resp.status_code)
@@ -60,3 +60,12 @@ class ConfigurationAPIViewTest(TestCase):
                 },
             ],
         )
+
+    def test_validation(self) -> None:
+        resp = self.client.post(
+            reverse("api:configuration"), {"participant": "Flare.ABCDEF"}
+        )
+
+        self.assertEqual(400, resp.status_code)
+
+        self.assertEqual(resp.json(), {"participant": ["Invalid participant"]})
