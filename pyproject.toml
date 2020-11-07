@@ -20,6 +20,7 @@ django-basic-auth-ip-whitelist = "~0.3.3"
 sentry-sdk = "^0.19.1"
 django-widget-tweaks = "^1.4.8"
 django-model-utils = "^4.0.0"
+djangorestframework = "^3.12.2"
 
 [tool.poetry.extras]
 gunicorn = ["gunicorn"]

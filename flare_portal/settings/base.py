@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     # According to the official docs, it's important that Scout is listed
     # first - http://help.apm.scoutapp.com/#django.
     "scout_apm.django",
+    "flare_portal.api",
     "flare_portal.experiments",
     "flare_portal.users",
     "django.contrib.admin",
