@@ -482,3 +482,53 @@ class ExperimentDetailViewTest(TestCase):
             )
         )
         self.assertEqual(200, resp.status_code)
+
+
+class ModuleCreateViewTest(TestCase):
+    def setUp(self) -> None:
+        self.user: User = UserFactory()
+        self.user.grant_role("RESEARCHER")
+        self.user.save()
+
+        self.client.force_login(self.user)
+
+        self.experiment: Experiment = ExperimentFactory()
+        self.project = self.experiment.project
+
+    def test_create_fear_conditioning_module(self) -> None:
+        url = reverse(
+            "experiments:modules:fear_conditioning_create",
+            kwargs={"project_pk": self.project.pk, "experiment_pk": self.experiment.pk},
+        )
+
+        resp = self.client.get(url)
+
+        self.assertEqual(200, resp.status_code)
+
+        form_data = {
+            "phase": "habituation",
+            "trials_per_stimulus": 12,
+            "reinforcement_rate": 12,
+            "rating_delay": 1.5,
+            "experiment": str(self.experiment.pk),
+        }
+
+        resp = self.client.post(url, form_data, follow=True)
+
+        module = self.experiment.modules.select_subclasses().get()  # type: ignore
+
+        self.assertRedirects(
+            resp,
+            reverse(
+                "experiments:experiment_detail",
+                kwargs={
+                    "project_pk": self.project.pk,
+                    "experiment_pk": self.experiment.pk,
+                },
+            ),
+        )
+
+        self.assertEqual(module.phase, form_data["phase"])
+        self.assertEqual(module.trials_per_stimulus, form_data["trials_per_stimulus"])
+        self.assertEqual(module.reinforcement_rate, form_data["reinforcement_rate"])
+        self.assertEqual(module.rating_delay, form_data["rating_delay"])
