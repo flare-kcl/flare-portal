@@ -27,7 +27,7 @@
                                 {% endif %}
 
                                 {% for field in form %}
-                                    {% include "includes/form-group.html" %}
+                                    {% include "includes/form-group.html" with show_required="hide" %}
                                 {% endfor %}
                                 <div class="form-footer">
                                     <button type="submit" class="btn btn-primary btn-block">Log in</button>

@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Experiments - {{ project.name }}{% endblock title %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4">
+                {% include "experiments/includes/project_sidebar.html" %}
+            </div>
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Experiments</h3>
+                        <div class="card-options">
+                            <a href="{% url "experiments:experiment_create" project_pk=project.pk %}" class="btn btn-sm btn-primary">
+                                Add new experiment
+                            </a>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table card-table table-striped table-vcenter">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Code</th>
+                                    <th>Owner</th>
+                                    <th>Created</th>
+                                    <th>Updated</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for experiment in experiments %}
+                                    <tr>
+                                        <td><a href="{% url "experiments:experiment_detail" project_pk=project.pk experiment_pk=experiment.pk %}" class="text-inherit">{{ experiment.name }}</a></td>
+                                        <td>{{ experiment.code }}</td>
+                                        <td>{{ experiment.owner }}</td>
+                                        <td>{{ experiment.created_at }}</td>
+                                        <td>{{ experiment.updated_at }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

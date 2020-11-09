@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}{{ experiment.name }}{% endblock title %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4">
+                {% include "experiments/includes/experiment_sidebar.html" %}
+            </div>
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Experiment settings</h3>
+                    </div>
+
+                    <form action="" method="POST">
+                        {% csrf_token %}
+
+                        <div class="card-body">
+                            {% if form.non_field_errors %}
+                                <div class="card-alert alert alert-danger my-3">
+                                    {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+
+                            {% for field in form %}
+                                {% include "includes/form-group.html" %}
+                            {% endfor %}
+
+                        </div>
+
+                        <div class="card-footer">
+                            <div class="d-flex">
+                                {% if experiment %}
+                                    <a href="{% url "experiments:experiment_detail" project_pk=experiment.project_id experiment_pk=experiment.pk %}" class="btn btn-link">Cancel</a>
+                                {% else %}
+                                    <a href="{% url "experiments:experiment_list" project_pk=view.kwargs.project_pk %}" class="btn btn-link">Cancel</a>
+                                {% endif %}
+                                <div class="btn-list ml-auto">
+                                    {% if experiment %}
+                                        <a href="{% url "experiments:experiment_delete" project_pk=experiment.project_id experiment_pk=experiment.pk %}" class="btn btn-link text-danger">Delete</a>
+                                    {% endif %}
+                                    <button type="submit" class="btn btn-primary ml-auto">{% if experiment %}Save{% else %}Add new experiment{% endif %}</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}Are you sure?{% endblock title %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="card">
+                    <form action="" method="POST">
+                        {% csrf_token %}
+
+                        <div class="card-status bg-red"></div>
+
+                        <div class="card-header">
+                            <h3 class="card-title">Are you sure?</h3>
+                        </div>
+
+                        <div class="card-body">
+                            Are you sure you want to delete the experiment "{{ experiment }}"?
+                        </div>
+
+                        <div class="card-footer">
+                            <div class="d-flex">
+                                <a href="{% url "experiments:experiment_update" project_pk=experiment.project_id experiment_pk=experiment.pk %}" class="btn btn-link">Cancel</a>
+                                <button type="submit" class="btn btn-danger ml-auto">Delete experiment</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

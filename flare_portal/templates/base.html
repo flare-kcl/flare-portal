@@ -20,15 +20,6 @@
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,300i,400,400i,500,500i,600,600i,700,700i&amp;subset=latin-ext">
 
         <link href="{% static "css/main.css" %}" rel="stylesheet" />
-
-        {# Tabler JavaScript #}
-        <script src="{% static "js/require.min.js" %}"></script>
-        <script>
-            requirejs.config({
-                baseUrl: '{% get_static_prefix %}'
-            });
-        </script>
-        <script src="{% static "js/dashboard.js" %}"></script>
     </head>
     <body>
         {% block base_content %}
@@ -53,5 +44,18 @@
                 {% include "includes/footer.html" %}
             </div>
         {% endblock base_content %}
+
+        {# Tabler JavaScript #}
+        <script src="{% static "js/require.min.js" %}"></script>
+        <script>
+            requirejs.config({
+                baseUrl: '{% get_static_prefix %}'
+            });
+        </script>
+        <script src="{% static "js/dashboard.js" %}"></script>
+        <script src="{% static "js/main.js" %}"></script>
+
+        {% block extra_scripts %}
+        {% endblock extra_scripts %}
     </body>
 </html>
