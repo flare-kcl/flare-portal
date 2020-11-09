@@ -80,6 +80,15 @@ class ParticipantTest(TestCase):
 
 
 class FearConditioningModuleTest(TestCase):
+    def test_display_names(self) -> None:
+        module: FearConditioningModule = FearConditioningModuleFactory()
+
+        self.assertEqual("fear conditioning", module.get_module_name())
+        self.assertEqual("FEAR_CONDITIONING", module.get_module_tag())
+        self.assertEqual("fear-conditioning", module.get_module_slug())
+        self.assertEqual("fear_conditioning", module.get_module_snake_case())
+        self.assertEqual("FearConditioning", module.get_module_camel_case())
+
     def test_validation(self) -> None:
         module: FearConditioningModule = FearConditioningModuleFactory.build(
             trials_per_stimulus=12, reinforcement_rate=13

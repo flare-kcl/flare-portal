@@ -1,7 +1,5 @@
-from typing import Literal, TypedDict
-
-ModuleType = Literal["FEAR_CONDITIONING"]
+from typing import TypedDict
 
 ModuleConfigType = TypedDict(
-    "ModuleConfigType", {"id": int, "type": ModuleType, "config": dict}
+    "ModuleConfigType", {"id": int, "type": str, "config": dict}
 )

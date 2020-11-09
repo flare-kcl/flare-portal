@@ -3,7 +3,6 @@ from typing import Any, Callable, Dict, List, Type
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.urls import URLPattern, path, reverse
-from django.utils.text import camel_case_to_spaces
 from django.views.generic.edit import CreateView
 
 from .models import BaseModule, Experiment
@@ -40,13 +39,13 @@ class ModuleRegistry:
         """
         Dynamically creates views for a module
         """
-        module_name = module_model.__name__.strip("Module")
-        module_underscores = camel_case_to_spaces(module_name).replace(" ", "_")
-        module_slug = module_underscores.replace("_", "-")
+        module_camel_case = module_model.get_module_camel_case()
+        module_slug = module_model.get_module_slug()
+        module_snake_case = module_model.get_module_snake_case()
 
         # Create the module's CreateView
         create_view_class: CreateView = type(  # type: ignore
-            f"{module_name}CreateView",
+            f"{module_camel_case}CreateView",
             (ModuleFormViewMixin, CreateView,),
             {
                 "fields": ["experiment"]
@@ -54,7 +53,7 @@ class ModuleRegistry:
                 "model": module_model,
             },
         )
-        create_view_name = f"{module_underscores}_create"
+        create_view_name = f"{module_snake_case}_create"
 
         self.views[create_view_name] = create_view_class.as_view()
         self.urls.append(

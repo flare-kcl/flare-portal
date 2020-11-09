@@ -1,5 +1,6 @@
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.utils.text import camel_case_to_spaces, slugify
 
 from model_utils import Choices
 from model_utils.managers import InheritanceManager
@@ -17,6 +18,26 @@ class BaseModule(models.Model):
 
     class Meta:
         ordering = ["sortorder"]
+
+    @classmethod
+    def get_module_camel_case(cls) -> str:
+        return cls.__name__.strip("Module")
+
+    @classmethod
+    def get_module_name(cls) -> str:
+        return camel_case_to_spaces(cls.get_module_camel_case())
+
+    @classmethod
+    def get_module_snake_case(cls) -> str:
+        return cls.get_module_name().replace(" ", "_")
+
+    @classmethod
+    def get_module_tag(cls) -> str:
+        return cls.get_module_snake_case().upper()
+
+    @classmethod
+    def get_module_slug(cls) -> str:
+        return slugify(cls.get_module_name())
 
     def get_module_config(self) -> constants.ModuleConfigType:
         raise NotImplementedError()
@@ -41,7 +62,7 @@ class FearConditioningModule(BaseModule):
     def get_module_config(self) -> constants.ModuleConfigType:
         return constants.ModuleConfigType(
             id=self.pk,
-            type="FEAR_CONDITIONING",
+            type=self.get_module_tag(),
             config={
                 "phase": self.phase,
                 "trials_per_stimulus": self.trials_per_stimulus,

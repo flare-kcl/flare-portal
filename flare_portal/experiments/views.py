@@ -23,7 +23,7 @@ project_list_view = ProjectListView.as_view()
 class ProjectCreateView(CreateView):
     model = Project
     fields = ["name", "description", "owner"]
-    object = None
+    object: Project
 
     def get_initial(self) -> dict:
         return {"owner": self.request.user.pk}
@@ -41,7 +41,7 @@ class ProjectUpdateView(UpdateView):
     context_object_name = "project"
     fields = ["name", "description", "owner"]
     model = Project
-    object = None
+    object: Project
     pk_url_kwarg = "project_pk"
     template_name = "experiments/project_update_form.html"
 
@@ -86,7 +86,7 @@ experiment_list_view = ExperimentListView.as_view()
 class ExperimentCreateView(CreateView):
     model = Experiment
     form_class = ExperimentForm
-    object = None
+    object: Experiment
 
     def get_initial(self) -> dict:
         return {"project": self.kwargs["project_pk"], "owner": self.request.user.pk}
@@ -107,7 +107,7 @@ experiment_create_view = ExperimentCreateView.as_view()
 
 class ExperimentUpdateView(UpdateView):
     fields = ["name", "description", "code", "owner"]
-    object = None
+    object: Experiment
     pk_url_kwarg = "experiment_pk"
     queryset = Experiment.objects.select_related("project")
     template_name = "experiments/experiment_update_form.html"
