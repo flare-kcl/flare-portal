@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.utils import timezone
 
@@ -80,9 +81,14 @@ class ParticipantTest(TestCase):
 
 class FearConditioningModuleTest(TestCase):
     def test_validation(self) -> None:
-        self.fail(
-            "reinforcement_rate should be at most the same as trials per stimulus"
+        module: FearConditioningModule = FearConditioningModuleFactory.build(
+            trials_per_stimulus=12, reinforcement_rate=13
         )
+
+        with self.assertRaises(ValidationError) as e:
+            module.clean()
+
+        self.assertIn("reinforcement_rate", e.exception.error_dict)
 
 
 class FearConditioningDataTest(TestCase):

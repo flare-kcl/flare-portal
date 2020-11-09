@@ -1,14 +1,14 @@
 from django.test import TestCase
 
-from ..models import FearConditioningData, FearConditioningModule
+from ..models import FearConditioningModule
 from ..registry import ModuleRegistry
 
 
 class ModuleRegistryTest(TestCase):
-    def test_register_module(self) -> None:
+    def test_register_module_create_view(self) -> None:
         registry = ModuleRegistry()
 
-        registry.register(FearConditioningModule, FearConditioningData)
+        registry.register(FearConditioningModule)
 
         self.assertEqual(
             registry.urls[0].pattern._route,

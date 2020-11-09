@@ -10,7 +10,7 @@ app_name = "experiments"
 
 registry = ModuleRegistry()
 
-registry.register(models.FearConditioningModule, models.FearConditioningData)
+registry.register(models.FearConditioningModule)
 
 urlpatterns = [
     path("projects/", views.project_list_view, name="project_list"),

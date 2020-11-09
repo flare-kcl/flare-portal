@@ -9,7 +9,7 @@ from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
 from .forms import ExperimentForm
-from .models import Experiment, FearConditioningModule, Project
+from .models import Experiment, Project
 
 
 class ProjectListView(ListView):
@@ -149,20 +149,3 @@ class ExperimentDetailView(DetailView):
 
 
 experiment_detail_view = ExperimentDetailView.as_view()
-
-
-class ModuleCreateView(CreateView):
-    fields = ["phase", "trials_per_stimulus", "reinforcement_rate", "rating_delay"]
-    model = FearConditioningModule
-    object = None
-    template_name = "experiments/module_form.html"
-
-    def get_context_data(self, **kwargs: Any) -> dict:
-        context = super().get_context_data(**kwargs)
-        context["experiment"] = get_object_or_404(
-            Experiment, pk=self.kwargs["experiment_pk"]
-        )
-        return context
-
-
-module_create_view = ModuleCreateView.as_view()

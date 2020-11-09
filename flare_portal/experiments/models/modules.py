@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.db import models
 
 from model_utils import Choices
@@ -48,6 +49,15 @@ class FearConditioningModule(BaseModule):
                 "rating_delay": self.rating_delay,
             },
         )
+
+    def clean(self) -> None:
+        if self.reinforcement_rate > self.trials_per_stimulus:
+            raise ValidationError(
+                {
+                    "reinforcement_rate": "Reinforcement rate cannot be greater than "
+                    "the number of trials per stimulus."
+                }
+            )
 
     def __str__(self) -> str:
         return "Fear conditioning - " + super().__str__()
