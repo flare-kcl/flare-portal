@@ -1,6 +1,4 @@
-logging: 30
-migrate_from_0_3_2: false
-project_name: flare_portal
-stellar_url: postgresql+psycopg2:///stellar_data
-tracked_databases: [flare_portal]
-url: postgresql+psycopg2:///template1
+project_name: 'flare_portal'
+tracked_databases: ['flare_portal']
+url: 'postgres://flare_portal:flare_portal@db:5432/template1'
+stellar_url: 'postgres://flare_portal:flare_portal@db:5432/stellar_data'

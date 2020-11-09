@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}{% if project %}Update project{% else %}Add new project{% endif %}{% endblock title %}
+
+{% block content %}
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">{% if project %}Update project{% else %}Add new project{% endif %}</h1>
+        </div>
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="card">
+                    <form action="" method="POST">
+                        {% csrf_token %}
+
+                        <div class="card-body">
+                            {% if form.non_field_errors %}
+                                <div class="card-alert alert alert-danger my-3">
+                                    {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+
+                            {% for field in form %}
+                                {% include "includes/form-group.html" %}
+                            {% endfor %}
+
+                        </div>
+
+                        <div class="card-footer">
+                            <div class="d-flex">
+                                {% if project %}
+                                    <a href="{% url "experiments:experiment_list" project_pk=project.pk %}" class="btn btn-link">Cancel</a>
+                                {% else %}
+                                    <a href="{% url "experiments:project_list" %}" class="btn btn-link">Cancel</a>
+                                {% endif %}
+                                <div class="btn-list ml-auto">
+                                    {% if project %}
+                                        <a href="{% url "experiments:project_delete" project_pk=project.pk %}" class="btn btn-link text-danger">Delete</a>
+                                    {% endif %}
+                                    <button type="submit" class="btn btn-primary ml-auto">{% if project %}Save{% else %}Add new project{% endif %}</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

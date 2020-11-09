@@ -19,6 +19,7 @@ scout-apm = "~2.10"
 django-basic-auth-ip-whitelist = "~0.3.3"
 sentry-sdk = "^0.19.1"
 django-widget-tweaks = "^1.4.8"
+django-model-utils = "^4.0.0"
 
 [tool.poetry.extras]
 gunicorn = ["gunicorn"]
@@ -47,6 +48,7 @@ pymdown-extensions = "~6.2"
 mypy = "^0.790"
 django-stubs = "^1.7.0"
 ipdb = "^0.13.4"
+freezegun = "^1.0.0"
 
 [build-system]
 requires = ["poetry>=1,<2"]

@@ -1,11 +1,7 @@
 from typing import Any
 
 from django import forms
-from django.contrib.auth.password_validation import (
-    password_validators_help_text_html,
-    validate_password,
-)
-from django.utils.safestring import mark_safe
+from django.contrib.auth.password_validation import validate_password
 
 from . import constants
 from .models import User
@@ -44,9 +40,6 @@ class UserForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
         if self.password_required:
-            self.fields["password1"].help_text = mark_safe(
-                password_validators_help_text_html()
-            )
             self.fields["password1"].required = True
             self.fields["password2"].required = True
 
@@ -106,7 +99,19 @@ class UserForm(forms.ModelForm):
 class UserCreateForm(UserForm):
     class Meta:
         model = User
-        fields = ["username", "first_name", "last_name", "email"]
+        fields = [
+            "username",
+            "first_name",
+            "last_name",
+            "email",
+            "job_title",
+            "affiliation",
+        ]
+
+    def __init__(self, *args: Any, **kwargs: Any):
+        super().__init__(*args, **kwargs)
+
+        self.fields["password1"].help_text = ""
 
 
 class UserUpdateForm(UserForm):
@@ -119,6 +124,8 @@ class UserUpdateForm(UserForm):
             "first_name",
             "last_name",
             "email",
+            "job_title",
+            "affiliation",
             "is_active",
             "password1",
             "password2",

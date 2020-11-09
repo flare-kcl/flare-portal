@@ -47,7 +47,7 @@ class UserAuthorizationTest(TestCase):
         self.assertEqual(200, resp.status_code)
 
 
-class UserIndexViewTest(TestCase):
+class UserListViewTest(TestCase):
     def setUp(self) -> None:
         self.user = UserFactory()
         self.user.grant_role("ADMIN")
@@ -72,6 +72,8 @@ class UserCreateViewTest(TestCase):
             "first_name": "John",
             "last_name": "Smith",
             "email": "john@smith.com",
+            "job_title": "Research assistant",
+            "affiliation": "Torchbox",
             "password1": "hunter2",
             "password2": "hunter2",
             "roles": ["RESEARCHER"],
@@ -85,6 +87,8 @@ class UserCreateViewTest(TestCase):
 
         self.assertEqual(user.first_name, form_data["first_name"])
         self.assertEqual(user.last_name, form_data["last_name"])
+        self.assertEqual(user.job_title, form_data["job_title"])
+        self.assertEqual(user.affiliation, form_data["affiliation"])
         self.assertTrue(user.has_role("RESEARCHER"))
 
         self.assertEqual(
@@ -110,6 +114,8 @@ class UserUpdateViewTest(TestCase):
             "first_name": "John",
             "last_name": "Smith",
             "email": "john@smith.com",
+            "job_title": "Research assistant",
+            "affiliation": "Torchbox",
             "is_active": False,
             "password1": "",
             "password2": "",
@@ -128,6 +134,8 @@ class UserUpdateViewTest(TestCase):
         self.assertEqual(user.username, form_data["username"])
         self.assertEqual(user.first_name, form_data["first_name"])
         self.assertEqual(user.last_name, form_data["last_name"])
+        self.assertEqual(user.job_title, form_data["job_title"])
+        self.assertEqual(user.affiliation, form_data["affiliation"])
         self.assertTrue(user.has_role("RESEARCHER"))
         self.assertEqual(1, len(user.roles))
         self.assertFalse(user.is_active)
