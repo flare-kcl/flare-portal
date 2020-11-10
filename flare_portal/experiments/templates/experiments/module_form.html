@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 
+{% load experiments_tags %}
+
 {% block title %}
     {% if module %}
         Edit {{ module_type.get_module_name }} module - {{ experiment.name }}
@@ -17,7 +19,13 @@
             <div class="col-lg-8">
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">Add fear conditioning module</h3>
+                        <h3 class="card-title">
+                            {% if module %}
+                                Edit {{ module_type.get_module_name }} module
+                            {% else %}
+                                Add {{ module_type.get_module_name }} module
+                            {% endif %}
+                        </h3>
                     </div>
                     <form action="" method="POST">
                         {% csrf_token %}
@@ -41,7 +49,7 @@
 
                                 <div class="btn-list ml-auto">
                                     {% if module %}
-                                        <a href="" class="btn btn-link text-danger">Delete</a>
+                                        <a href="{% get_module_delete_url module %}" class="btn btn-link text-danger">Delete</a>
                                     {% endif %}
                                     <button type="submit" class="btn btn-primary ml-auto">{% if module %}Save{% else %}Add {{ module_type.get_module_name }} module{% endif %}</button>
                                 </div>

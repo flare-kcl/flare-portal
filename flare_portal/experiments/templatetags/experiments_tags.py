@@ -36,3 +36,16 @@ def get_module_update_url(module: BaseModule) -> str:
             "module_pk": module.pk,
         },
     )
+
+
+@register.simple_tag
+def get_module_delete_url(module: BaseModule) -> str:
+    delete_path_name = module.get_delete_path_name()
+    return reverse(
+        f"experiments:modules:{delete_path_name}",
+        kwargs={
+            "project_pk": module.experiment.project_id,
+            "experiment_pk": module.experiment.pk,
+            "module_pk": module.pk,
+        },
+    )

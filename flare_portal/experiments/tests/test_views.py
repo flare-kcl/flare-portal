@@ -5,7 +5,7 @@ from flare_portal.users.factories import UserFactory
 from flare_portal.users.models import User
 
 from ..factories import ExperimentFactory, FearConditioningModuleFactory, ProjectFactory
-from ..models import Experiment, FearConditioningModule, Project
+from ..models import BaseModule, Experiment, FearConditioningModule, Project
 
 
 class ProjectAuthorizationTest(TestCase):
@@ -542,6 +542,10 @@ class ModuleCreateViewTest(TestCase):
         self.assertEqual(module.reinforcement_rate, form_data["reinforcement_rate"])
         self.assertEqual(module.rating_delay, form_data["rating_delay"])
 
+        self.assertEqual(
+            str(list(resp.context["messages"])[0]), "Added fear conditioning module",
+        )
+
 
 class ModuleUpdateViewTest(TestCase):
     def setUp(self) -> None:
@@ -554,7 +558,7 @@ class ModuleUpdateViewTest(TestCase):
         self.experiment: Experiment = ExperimentFactory()
         self.project = self.experiment.project
 
-    def test_create_fear_conditioning_module(self) -> None:
+    def test_update_fear_conditioning_module(self) -> None:
         module: FearConditioningModule = FearConditioningModuleFactory(
             experiment=self.experiment
         )
@@ -599,3 +603,49 @@ class ModuleUpdateViewTest(TestCase):
         self.assertEqual(module.trials_per_stimulus, form_data["trials_per_stimulus"])
         self.assertEqual(module.reinforcement_rate, form_data["reinforcement_rate"])
         self.assertEqual(module.rating_delay, form_data["rating_delay"])
+
+        self.assertEqual(
+            str(list(resp.context["messages"])[0]), "Updated fear conditioning module",
+        )
+
+
+class ModuleDeleteViewTest(TestCase):
+    def setUp(self) -> None:
+        self.user = UserFactory()
+        self.user.grant_role("RESEARCHER")
+        self.user.save()
+        self.client.force_login(self.user)
+
+    def test_delete_fear_conditioning_module(self) -> None:
+        project: Project = ProjectFactory()
+        experiment: Experiment = ExperimentFactory(project=project)
+        module: FearConditioningModule = FearConditioningModuleFactory(
+            experiment=experiment
+        )
+
+        url = reverse(
+            "experiments:modules:fear_conditioning_delete",
+            kwargs={
+                "project_pk": project.pk,
+                "experiment_pk": experiment.pk,
+                "module_pk": module.pk,
+            },
+        )
+        resp = self.client.get(url)
+        self.assertEqual(200, resp.status_code)
+
+        resp = self.client.post(url, follow=True)
+
+        self.assertRedirects(
+            resp,
+            reverse(
+                "experiments:experiment_detail",
+                kwargs={"project_pk": project.pk, "experiment_pk": experiment.pk},
+            ),
+        )
+
+        self.assertEqual(0, BaseModule.objects.all().count())
+
+        self.assertEqual(
+            str(list(resp.context["messages"])[0]), "Deleted fear conditioning module",
+        )

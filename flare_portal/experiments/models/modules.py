@@ -65,6 +65,19 @@ class BaseModule(models.Model):
             f"{module_slug}/<int:module_pk>/"
         )
 
+    @classmethod
+    def get_delete_path_name(cls) -> str:
+        module_snake_case = cls.get_module_snake_case()
+        return f"{module_snake_case}_delete"
+
+    @classmethod
+    def get_delete_path(cls) -> str:
+        module_slug = cls.get_module_slug()
+        return (
+            "projects/<int:project_pk>/experiments/<int:experiment_pk>/modules/"
+            f"{module_slug}/<int:module_pk>/delete/"
+        )
+
     def get_module_config(self) -> constants.ModuleConfigType:
         raise NotImplementedError()
 
