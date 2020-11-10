@@ -19,3 +19,4 @@ class ModuleRegistryTest(TestCase):
             registry.urls[0].callback, registry.views["fear_conditioning_create"]
         )
         self.assertEqual(registry.urls[0].name, "fear_conditioning_create")
+        self.assertEqual(registry.modules, [FearConditioningModule])

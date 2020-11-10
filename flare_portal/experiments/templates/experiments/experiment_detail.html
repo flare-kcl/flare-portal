@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 
+{% load experiments_tags %}
+
 {% block title %}{{ experiment.name }}{% endblock title %}
 
 {% block content %}
@@ -12,9 +14,37 @@
                 <div class="card">
                     <div class="card-header">
                         <h3 class="card-title">Modules</h3>
+                        <div class="ml-auto">
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
+                                    Add module
+                                </button>
+                                <div class="dropdown-menu">
+                                    {% get_module_types as module_types %}
+                                    {% for module_type in module_types %}
+                                        <a class="dropdown-item" href="{% get_module_create_url module_type experiment %}">
+                                            Add {{ module_type.get_module_name }} module
+                                        </a>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="card-body">
-                        Modules go here
+                        <ul class="timeline">
+                            {% for module in modules %}
+                                <li class="timeline-item">
+                                    <div class="timeline-badge"></div>
+                                    <div>
+                                        <strong>Fear conditioning</strong>
+                                        <small class="d-block text-muted">{{ module.get_module_description }}</small>
+                                    </div>
+                                    <div class="timeline-time">
+                                        <a href="{% get_module_update_url module %}"><i class="fe fe-edit"></i></a>
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        </ul>
                     </div>
                 </div>
             </div>

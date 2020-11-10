@@ -39,8 +39,38 @@ class BaseModule(models.Model):
     def get_module_slug(cls) -> str:
         return slugify(cls.get_module_name())
 
+    @classmethod
+    def get_create_path_name(cls) -> str:
+        module_snake_case = cls.get_module_snake_case()
+        return f"{module_snake_case}_create"
+
+    @classmethod
+    def get_create_path(cls) -> str:
+        module_slug = cls.get_module_slug()
+        return (
+            "projects/<int:project_pk>/experiments/<int:experiment_pk>/modules/"
+            f"{module_slug}/add/"
+        )
+
+    @classmethod
+    def get_update_path_name(cls) -> str:
+        module_snake_case = cls.get_module_snake_case()
+        return f"{module_snake_case}_update"
+
+    @classmethod
+    def get_update_path(cls) -> str:
+        module_slug = cls.get_module_slug()
+        return (
+            "projects/<int:project_pk>/experiments/<int:experiment_pk>/modules/"
+            f"{module_slug}/<int:module_pk>/"
+        )
+
     def get_module_config(self) -> constants.ModuleConfigType:
         raise NotImplementedError()
+
+    def get_module_description(self) -> str:
+        """Short description of module configuration"""
+        return ""
 
     def __str__(self) -> str:
         return f"PK: {self.pk} - Sort order: {self.sortorder}"
@@ -70,6 +100,15 @@ class FearConditioningModule(BaseModule):
                 "rating_delay": self.rating_delay,
             },
         )
+
+    def get_module_description(self) -> str:
+        details = [
+            self.get_phase_display(),
+            f"Trials per stimulus: {self.trials_per_stimulus}",
+            f"Reinforcement rate: {self.reinforcement_rate}",
+            f"Rating delay: {self.rating_delay}",
+        ]
+        return ", ".join(details)
 
     def clean(self) -> None:
         if self.reinforcement_rate > self.trials_per_stimulus:

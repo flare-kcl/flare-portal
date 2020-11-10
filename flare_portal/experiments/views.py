@@ -145,7 +145,19 @@ experiment_delete_view = ExperimentDeleteView.as_view()
 class ExperimentDetailView(DetailView):
     context_object_name = "experiment"
     pk_url_kwarg = "experiment_pk"
-    queryset = Experiment.objects.select_related("project")
+    queryset = Experiment.objects.select_related("project").prefetch_related("modules")
+    object: Experiment
+
+    def get_context_data(self, **kwargs: Any) -> dict:
+        context = super().get_context_data(**kwargs)
+        # fmt: off
+        context["modules"] = (
+            self.object.modules  # type: ignore
+            .select_subclasses()
+            .select_related("experiment")
+        )
+        # fmt: on
+        return context
 
 
 experiment_detail_view = ExperimentDetailView.as_view()

@@ -4,8 +4,8 @@ from django.urls import reverse
 from flare_portal.users.factories import UserFactory
 from flare_portal.users.models import User
 
-from ..factories import ExperimentFactory, ProjectFactory
-from ..models import Experiment, Project
+from ..factories import ExperimentFactory, FearConditioningModuleFactory, ProjectFactory
+from ..models import Experiment, FearConditioningModule, Project
 
 
 class ProjectAuthorizationTest(TestCase):
@@ -475,6 +475,7 @@ class ExperimentDetailViewTest(TestCase):
     def test_get(self) -> None:
         project: Project = ProjectFactory()
         experiment: Experiment = ExperimentFactory(project=project)
+        FearConditioningModuleFactory.create_batch(5, experiment=experiment)
         resp = self.client.get(
             reverse(
                 "experiments:experiment_detail",
@@ -482,6 +483,11 @@ class ExperimentDetailViewTest(TestCase):
             )
         )
         self.assertEqual(200, resp.status_code)
+
+        self.assertEqual(
+            list(experiment.modules.select_subclasses()),  # type: ignore
+            list(resp.context["modules"]),
+        )
 
 
 class ModuleCreateViewTest(TestCase):
@@ -505,12 +511,73 @@ class ModuleCreateViewTest(TestCase):
 
         self.assertEqual(200, resp.status_code)
 
+        self.assertEqual(FearConditioningModule, resp.context["module_type"])
+        self.assertEqual(self.experiment.pk, resp.context["form"].initial["experiment"])
+
         form_data = {
             "phase": "habituation",
             "trials_per_stimulus": 12,
             "reinforcement_rate": 12,
             "rating_delay": 1.5,
             "experiment": str(self.experiment.pk),
+        }
+
+        resp = self.client.post(url, form_data, follow=True)
+
+        module = self.experiment.modules.select_subclasses().get()  # type: ignore
+
+        self.assertRedirects(
+            resp,
+            reverse(
+                "experiments:experiment_detail",
+                kwargs={
+                    "project_pk": self.project.pk,
+                    "experiment_pk": self.experiment.pk,
+                },
+            ),
+        )
+
+        self.assertEqual(module.phase, form_data["phase"])
+        self.assertEqual(module.trials_per_stimulus, form_data["trials_per_stimulus"])
+        self.assertEqual(module.reinforcement_rate, form_data["reinforcement_rate"])
+        self.assertEqual(module.rating_delay, form_data["rating_delay"])
+
+
+class ModuleUpdateViewTest(TestCase):
+    def setUp(self) -> None:
+        self.user: User = UserFactory()
+        self.user.grant_role("RESEARCHER")
+        self.user.save()
+
+        self.client.force_login(self.user)
+
+        self.experiment: Experiment = ExperimentFactory()
+        self.project = self.experiment.project
+
+    def test_create_fear_conditioning_module(self) -> None:
+        module: FearConditioningModule = FearConditioningModuleFactory(
+            experiment=self.experiment
+        )
+
+        url = reverse(
+            "experiments:modules:fear_conditioning_update",
+            kwargs={
+                "project_pk": self.project.pk,
+                "experiment_pk": self.experiment.pk,
+                "module_pk": module.pk,
+            },
+        )
+
+        resp = self.client.get(url)
+
+        self.assertEqual(200, resp.status_code)
+        self.assertEqual(type(module), resp.context["module_type"])
+
+        form_data = {
+            "phase": "habituation",
+            "trials_per_stimulus": 12,
+            "reinforcement_rate": 12,
+            "rating_delay": 1.5,
         }
 
         resp = self.client.post(url, form_data, follow=True)

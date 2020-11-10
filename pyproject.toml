@@ -37,7 +37,7 @@ factory-boy = "^3.1.0"
 # Linters etc.
 black = "19.10b0"
 detect-secrets = "~0.13"
-flake8 = "3.7.7"
+flake8 = "3.8.4"
 isort = "4.3.21"
 pre-commit = "~2.0"
 seed-isort-config = "1.9.4"
