@@ -23,7 +23,13 @@ class Experiment(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     code = models.CharField(
-        max_length=6, unique=True, validators=[validators.RegexValidator(r"^[\w]+\Z")]
+        max_length=6,
+        unique=True,
+        validators=[
+            validators.RegexValidator(
+                r"^[\w]+\Z", message="Please only enter alphanumeric values."
+            )
+        ],
     )
     owner = models.ForeignKey(get_user_model(), on_delete=models.PROTECT)
     project = models.ForeignKey("experiments.Project", on_delete=models.CASCADE)

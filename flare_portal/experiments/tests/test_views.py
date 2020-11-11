@@ -299,6 +299,21 @@ class ExperimentListViewTest(TestCase):
         self.assertEqual(project, resp.context["project"])
         self.assertEqual(experiments, list(resp.context["experiments"]))
 
+    def test_get_experiments_only_for_the_current_project(self) -> None:
+        project_1 = ProjectFactory()
+        experiments_1 = ExperimentFactory.create_batch(5, project=project_1)
+        project_2 = ProjectFactory()
+        ExperimentFactory.create_batch(5, project=project_2)
+
+        resp = self.client.get(
+            reverse("experiments:experiment_list", kwargs={"project_pk": project_1.pk})
+        )
+
+        self.assertEqual(200, resp.status_code)
+
+        self.assertEqual(project_1, resp.context["project"])
+        self.assertEqual(experiments_1, list(resp.context["experiments"]))
+
 
 class ExperimentCreateViewTest(TestCase):
     def setUp(self) -> None:
@@ -349,6 +364,28 @@ class ExperimentCreateViewTest(TestCase):
         self.assertEqual(
             str(list(resp.context["messages"])[0]),
             f'Added new experiment "{experiment}"',
+        )
+
+    def test_code_validation(self) -> None:
+        url = reverse(
+            "experiments:experiment_create", kwargs={"project_pk": self.project.pk}
+        )
+
+        form_data = {
+            "name": "My experiment",
+            "description": "This is my experiment",
+            "code": "WHAT@1",
+            "owner": str(self.user.pk),
+            "project": str(self.project.pk),
+        }
+
+        resp = self.client.post(url, form_data, follow=True)
+
+        self.assertEqual(200, resp.status_code)
+
+        self.assertEqual(
+            resp.context["form"].errors["code"][0],
+            "Please only enter alphanumeric values.",
         )
 
 

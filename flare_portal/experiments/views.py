@@ -2,6 +2,7 @@ from typing import Any
 
 from django import forms
 from django.contrib import messages
+from django.db.models import QuerySet
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
@@ -74,9 +75,16 @@ class ExperimentListView(ListView):
     context_object_name = "experiments"
     model = Experiment
 
+    def dispatch(self, *args: Any, **kwargs: Any) -> HttpResponse:
+        self.project = get_object_or_404(Project, pk=kwargs["project_pk"])
+        return super().dispatch(*args, **kwargs)
+
+    def get_queryset(self) -> QuerySet[Experiment]:
+        return Experiment.objects.filter(project=self.project)
+
     def get_context_data(self, **kwargs: Any) -> dict:
         context = super().get_context_data(**kwargs)
-        context["project"] = get_object_or_404(Project, pk=self.kwargs["project_pk"])
+        context["project"] = self.project
         return context
 
 
