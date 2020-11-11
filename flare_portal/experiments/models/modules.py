@@ -101,6 +101,7 @@ class FearConditioningModule(BaseModule):
     trials_per_stimulus = models.PositiveIntegerField(default=0)
     reinforcement_rate = models.PositiveIntegerField(default=0)
     rating_delay = models.FloatField(default=1)
+    generalisation_stimuli_enabled = models.BooleanField(default=False)
 
     def get_module_config(self) -> constants.ModuleConfigType:
         return constants.ModuleConfigType(
@@ -111,6 +112,7 @@ class FearConditioningModule(BaseModule):
                 "trials_per_stimulus": self.trials_per_stimulus,
                 "reinforcement_rate": self.reinforcement_rate,
                 "rating_delay": self.rating_delay,
+                "generalisation_stimuli_enabled": self.generalisation_stimuli_enabled,
             },
         )
 
@@ -120,6 +122,7 @@ class FearConditioningModule(BaseModule):
             f"Trials per stimulus: {self.trials_per_stimulus}",
             f"Reinforcement rate: {self.reinforcement_rate}",
             f"Rating delay: {self.rating_delay}",
+            f"GS: {'Enabled' if self.generalisation_stimuli_enabled else 'Disabled'}",
         ]
         return ", ".join(details)
 

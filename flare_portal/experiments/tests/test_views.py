@@ -607,6 +607,7 @@ class ModuleCreateViewTest(TestCase):
             "trials_per_stimulus": 12,
             "reinforcement_rate": 12,
             "rating_delay": 1.5,
+            "generalisation_stimuli_enabled": True,
             "experiment": str(self.experiment.pk),
         }
 
@@ -629,6 +630,10 @@ class ModuleCreateViewTest(TestCase):
         self.assertEqual(module.trials_per_stimulus, form_data["trials_per_stimulus"])
         self.assertEqual(module.reinforcement_rate, form_data["reinforcement_rate"])
         self.assertEqual(module.rating_delay, form_data["rating_delay"])
+        self.assertEqual(
+            module.generalisation_stimuli_enabled,
+            form_data["generalisation_stimuli_enabled"],
+        )
 
         self.assertEqual(
             str(list(resp.context["messages"])[0]), "Added fear conditioning module",
@@ -670,6 +675,7 @@ class ModuleUpdateViewTest(TestCase):
             "trials_per_stimulus": 12,
             "reinforcement_rate": 12,
             "rating_delay": 1.5,
+            "generalisation_stimuli_enabled": True,
         }
 
         resp = self.client.post(url, form_data, follow=True)
@@ -691,6 +697,10 @@ class ModuleUpdateViewTest(TestCase):
         self.assertEqual(module.trials_per_stimulus, form_data["trials_per_stimulus"])
         self.assertEqual(module.reinforcement_rate, form_data["reinforcement_rate"])
         self.assertEqual(module.rating_delay, form_data["rating_delay"])
+        self.assertEqual(
+            module.generalisation_stimuli_enabled,
+            form_data["generalisation_stimuli_enabled"],
+        )
 
         self.assertEqual(
             str(list(resp.context["messages"])[0]), "Updated fear conditioning module",
