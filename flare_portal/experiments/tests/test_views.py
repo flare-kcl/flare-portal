@@ -341,6 +341,9 @@ class ExperimentCreateViewTest(TestCase):
             "code": "ABC123",
             "owner": str(self.user.pk),
             "project": str(self.project.pk),
+            "rating_scale_anchor_label_left": "Certain no beep",
+            "rating_scale_anchor_label_center": "Uncertain",
+            "rating_scale_anchor_label_right": "Certain beep",
         }
 
         resp = self.client.post(url, form_data, follow=True)
@@ -360,6 +363,18 @@ class ExperimentCreateViewTest(TestCase):
         self.assertEqual(experiment.code, form_data["code"])
         self.assertEqual(experiment.owner_id, int(form_data["owner"]))
         self.assertEqual(experiment.project, self.project)
+        self.assertEqual(
+            experiment.rating_scale_anchor_label_left,
+            form_data["rating_scale_anchor_label_left"],
+        )
+        self.assertEqual(
+            experiment.rating_scale_anchor_label_center,
+            form_data["rating_scale_anchor_label_center"],
+        )
+        self.assertEqual(
+            experiment.rating_scale_anchor_label_right,
+            form_data["rating_scale_anchor_label_right"],
+        )
 
         self.assertEqual(
             str(list(resp.context["messages"])[0]),
@@ -415,6 +430,9 @@ class ExperimentUpdateViewTest(TestCase):
             "description": "This is my experiment",
             "code": "ABC123",
             "owner": str(self.user.pk),
+            "rating_scale_anchor_label_left": "Certain no beep",
+            "rating_scale_anchor_label_center": "Uncertain",
+            "rating_scale_anchor_label_right": "Certain beep",
         }
 
         resp = self.client.post(url, form_data, follow=True)
@@ -436,6 +454,18 @@ class ExperimentUpdateViewTest(TestCase):
         self.assertEqual(experiment.description, form_data["description"])
         self.assertEqual(experiment.code, form_data["code"])
         self.assertEqual(experiment.owner_id, int(form_data["owner"]))
+        self.assertEqual(
+            experiment.rating_scale_anchor_label_left,
+            form_data["rating_scale_anchor_label_left"],
+        )
+        self.assertEqual(
+            experiment.rating_scale_anchor_label_center,
+            form_data["rating_scale_anchor_label_center"],
+        )
+        self.assertEqual(
+            experiment.rating_scale_anchor_label_right,
+            form_data["rating_scale_anchor_label_right"],
+        )
 
         self.assertEqual(
             str(list(resp.context["messages"])[0]),
