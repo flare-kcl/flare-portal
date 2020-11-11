@@ -34,6 +34,16 @@ class Experiment(models.Model):
     owner = models.ForeignKey(get_user_model(), on_delete=models.PROTECT)
     project = models.ForeignKey("experiments.Project", on_delete=models.CASCADE)
 
+    rating_scale_anchor_label_left = models.CharField(
+        max_length=255, default="Certain no scream"
+    )
+    rating_scale_anchor_label_center = models.CharField(
+        max_length=255, default="Uncertain"
+    )
+    rating_scale_anchor_label_right = models.CharField(
+        max_length=255, default="Certain scream"
+    )
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

@@ -1,0 +1,22 @@
+{% load widget_tweaks %}
+
+{{ form.project }}
+{% include "includes/form-group.html" with field=form.name %}
+{% include "includes/form-group.html" with field=form.description %}
+{% include "includes/form-group.html" with field=form.code %}
+{% include "includes/form-group.html" with field=form.owner %}
+
+<div class="form-group">
+    <label class="form-label">Rating scale anchors</label>
+    <div class="row gutter-xs">
+        <div class="col-4">
+            {% include "includes/form-group.html" with field=form.rating_scale_anchor_label_left|attr:"placeholder:Left" show_label="hide" %}
+        </div>
+        <div class="col-4">
+            {% include "includes/form-group.html" with field=form.rating_scale_anchor_label_center|attr:"placeholder:Center" show_label="hide" %}
+        </div>
+        <div class="col-4">
+            {% include "includes/form-group.html" with field=form.rating_scale_anchor_label_right|attr:"placeholder:Right" show_label="hide" %}
+        </div>
+    </div>
+</div>

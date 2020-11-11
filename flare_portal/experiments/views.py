@@ -114,7 +114,15 @@ experiment_create_view = ExperimentCreateView.as_view()
 
 
 class ExperimentUpdateView(UpdateView):
-    fields = ["name", "description", "code", "owner"]
+    fields = [
+        "name",
+        "description",
+        "code",
+        "owner",
+        "rating_scale_anchor_label_left",
+        "rating_scale_anchor_label_center",
+        "rating_scale_anchor_label_right",
+    ]
     object: Experiment
     pk_url_kwarg = "experiment_pk"
     queryset = Experiment.objects.select_related("project")
