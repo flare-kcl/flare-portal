@@ -526,6 +526,27 @@ class ExperimentDetailViewTest(TestCase):
             list(resp.context["modules"]),
         )
 
+    def test_get_modules_only_for_current_experiment(self) -> None:
+        project: Project = ProjectFactory()
+        experiment_1: Experiment = ExperimentFactory(project=project)
+        modules_1 = FearConditioningModuleFactory.create_batch(
+            5, experiment=experiment_1
+        )
+
+        experiment_2: Experiment = ExperimentFactory(project=project)
+        FearConditioningModuleFactory.create_batch(5, experiment=experiment_2)
+        resp = self.client.get(
+            reverse(
+                "experiments:experiment_detail",
+                kwargs={"project_pk": project.pk, "experiment_pk": experiment_1.pk},
+            )
+        )
+        self.assertEqual(200, resp.status_code)
+
+        self.assertEqual(
+            modules_1, list(resp.context["modules"]),
+        )
+
 
 class ModuleCreateViewTest(TestCase):
     def setUp(self) -> None:
