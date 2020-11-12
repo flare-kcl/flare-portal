@@ -46,6 +46,9 @@ class ConfigurationAPIViewTest(TestCase):
                         "trials_per_stimulus": module1.trials_per_stimulus,
                         "reinforcement_rate": module1.reinforcement_rate,
                         "rating_delay": module1.rating_delay,
+                        "generalisation_stimuli_enabled": (
+                            module1.generalisation_stimuli_enabled
+                        ),
                     },
                 },
                 {
@@ -56,6 +59,9 @@ class ConfigurationAPIViewTest(TestCase):
                         "trials_per_stimulus": module2.trials_per_stimulus,
                         "reinforcement_rate": module2.reinforcement_rate,
                         "rating_delay": module2.rating_delay,
+                        "generalisation_stimuli_enabled": (
+                            module2.generalisation_stimuli_enabled
+                        ),
                     },
                 },
             ],
