@@ -77,6 +77,10 @@ COPY --chown=flare_portal . .
 # will be served by the WSGI server.
 RUN SECRET_KEY=none python manage.py collectstatic --noinput --clear
 
+# Load shortcuts
+RUN mkdir /home/flare_portal
+RUN cat bin/shortcuts >> /home/flare_portal/.bashrc
+
 # Don't use the root user as it's an anti-pattern and Heroku does not run
 # containers as root either.
 # https://devcenter.heroku.com/articles/container-registry-and-runtime#dockerfile-commands-and-runtime

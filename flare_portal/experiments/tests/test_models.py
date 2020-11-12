@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.utils import timezone
 
@@ -5,7 +6,18 @@ from freezegun import freeze_time
 
 from flare_portal.users.factories import UserFactory
 
-from ..factories import ExperimentFactory, ProjectFactory
+from ..factories import (
+    ExperimentFactory,
+    FearConditioningModuleFactory,
+    ParticipantFactory,
+    ProjectFactory,
+)
+from ..models import (
+    Experiment,
+    FearConditioningData,
+    FearConditioningModule,
+    Participant,
+)
 
 
 class ProjectTest(TestCase):
@@ -48,3 +60,59 @@ class ExperimentTest(TestCase):
 
         self.assertEqual(experiment.created_at, now)
         self.assertEqual(experiment.updated_at, now)
+
+    def test_add_modules(self) -> None:
+        experiment: Experiment = ExperimentFactory()
+        module: FearConditioningModule = FearConditioningModuleFactory()
+
+        experiment.modules.add(module)
+
+        self.assertEqual(
+            experiment.modules.select_subclasses().first(), module  # type: ignore
+        )
+
+
+class ParticipantTest(TestCase):
+    def test_model(self) -> None:
+        participant: Participant = ParticipantFactory(participant_id="Flare.ABCDEF")
+
+        self.assertEqual(participant.participant_id, "Flare.ABCDEF")
+
+
+class FearConditioningModuleTest(TestCase):
+    def test_display_names(self) -> None:
+        module: FearConditioningModule = FearConditioningModuleFactory()
+
+        self.assertEqual("fear conditioning", module.get_module_name())
+        self.assertEqual("FEAR_CONDITIONING", module.get_module_tag())
+        self.assertEqual("fear-conditioning", module.get_module_slug())
+        self.assertEqual("fear_conditioning", module.get_module_snake_case())
+        self.assertEqual("FearConditioning", module.get_module_camel_case())
+
+    def test_validation(self) -> None:
+        module: FearConditioningModule = FearConditioningModuleFactory.build(
+            trials_per_stimulus=12, reinforcement_rate=13
+        )
+
+        with self.assertRaises(ValidationError) as e:
+            module.clean()
+
+        self.assertIn("reinforcement_rate", e.exception.error_dict)
+
+
+class FearConditioningDataTest(TestCase):
+    def test_model(self) -> None:
+        participant: Participant = ParticipantFactory()
+        module: FearConditioningModule = FearConditioningModuleFactory()
+
+        FearConditioningData.objects.create(
+            participant=participant,
+            module=module,
+            trial=1,
+            rating=5,
+            conditional_stimulus="A",
+            unconditional_stimulus=True,
+            recorded_at=timezone.now(),
+            volume_level=78,
+            headphones=True,
+        )

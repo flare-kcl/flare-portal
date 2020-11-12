@@ -23,10 +23,26 @@ class Experiment(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     code = models.CharField(
-        max_length=6, unique=True, validators=[validators.RegexValidator(r"^[\w]+\Z")]
+        max_length=6,
+        unique=True,
+        validators=[
+            validators.RegexValidator(
+                r"^[\w]+\Z", message="Please only enter alphanumeric values."
+            )
+        ],
     )
     owner = models.ForeignKey(get_user_model(), on_delete=models.PROTECT)
     project = models.ForeignKey("experiments.Project", on_delete=models.CASCADE)
+
+    rating_scale_anchor_label_left = models.CharField(
+        max_length=255, default="Certain no scream"
+    )
+    rating_scale_anchor_label_center = models.CharField(
+        max_length=255, default="Uncertain"
+    )
+    rating_scale_anchor_label_right = models.CharField(
+        max_length=255, default="Certain scream"
+    )
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -39,3 +55,13 @@ class Experiment(models.Model):
 
     def __str__(self) -> str:
         return self.name
+
+
+class Participant(models.Model):
+    participant_id = models.CharField(max_length=24, unique=True)
+    experiment = models.ForeignKey(
+        "experiments.Experiment", on_delete=models.CASCADE, related_name="participants"
+    )
+
+    def __str__(self) -> str:
+        return self.participant_id

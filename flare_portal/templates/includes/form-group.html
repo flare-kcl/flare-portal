@@ -1,10 +1,10 @@
 {% load widget_tweaks %}
-{% with show_required=show_required|default:"show" %}
+{% with show_required=show_required|default:"show" show_label=show_label|default:"show" %}
     {% if field|widget_type == 'hiddeninput' %}
         {{ field }}
     {% else %}
         <div class="form-group">
-            {% if field|widget_type != 'checkboxinput' %}
+            {% if show_label == "show" and field|widget_type != 'checkboxinput' %}
                 <label class="form-label" for="{{ field.id_for_label }}">
                     {{ field.label }}
                     {% if show_required == "show" and field.field.required %}

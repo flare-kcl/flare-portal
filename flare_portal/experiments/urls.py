@@ -1,11 +1,16 @@
-from django.urls import path
+from django.urls import include, path
 
 from flare_portal.users.decorators import role_required
 from flare_portal.utils.urls import decorate_urlpatterns
 
-from . import views
+from . import models, views
+from .registry import ModuleRegistry
 
 app_name = "experiments"
+
+registry = ModuleRegistry()
+
+registry.register(models.FearConditioningModule)
 
 urlpatterns = [
     path("projects/", views.project_list_view, name="project_list"),
@@ -24,25 +29,26 @@ urlpatterns = [
         "projects/<int:project_pk>/", views.experiment_list_view, name="experiment_list"
     ),
     path(
-        "projects/<int:project_pk>/experiment/add/",
+        "projects/<int:project_pk>/experiments/add/",
         views.experiment_create_view,
         name="experiment_create",
     ),
     path(
-        "projects/<int:project_pk>/experiment/<int:experiment_pk>/",
+        "projects/<int:project_pk>/experiments/<int:experiment_pk>/",
         views.experiment_detail_view,
         name="experiment_detail",
     ),
     path(
-        "projects/<int:project_pk>/experiment/<int:experiment_pk>/edit/",
+        "projects/<int:project_pk>/experiments/<int:experiment_pk>/edit/",
         views.experiment_update_view,
         name="experiment_update",
     ),
     path(
-        "projects/<int:project_pk>/experiment/<int:experiment_pk>/delete/",
+        "projects/<int:project_pk>/experiments/<int:experiment_pk>/delete/",
         views.experiment_delete_view,
         name="experiment_delete",
     ),
+    path("", include((registry.urls, "modules"))),
 ]
 
 urlpatterns = decorate_urlpatterns(urlpatterns, role_required, "RESEARCHER")

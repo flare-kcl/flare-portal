@@ -2,6 +2,7 @@ from typing import Any
 
 from django import forms
 from django.contrib import messages
+from django.db.models import QuerySet
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
@@ -23,7 +24,7 @@ project_list_view = ProjectListView.as_view()
 class ProjectCreateView(CreateView):
     model = Project
     fields = ["name", "description", "owner"]
-    object = None
+    object: Project
 
     def get_initial(self) -> dict:
         return {"owner": self.request.user.pk}
@@ -41,7 +42,7 @@ class ProjectUpdateView(UpdateView):
     context_object_name = "project"
     fields = ["name", "description", "owner"]
     model = Project
-    object = None
+    object: Project
     pk_url_kwarg = "project_pk"
     template_name = "experiments/project_update_form.html"
 
@@ -74,9 +75,16 @@ class ExperimentListView(ListView):
     context_object_name = "experiments"
     model = Experiment
 
+    def dispatch(self, *args: Any, **kwargs: Any) -> HttpResponse:
+        self.project = get_object_or_404(Project, pk=kwargs["project_pk"])
+        return super().dispatch(*args, **kwargs)
+
+    def get_queryset(self) -> QuerySet[Experiment]:
+        return Experiment.objects.filter(project=self.project)
+
     def get_context_data(self, **kwargs: Any) -> dict:
         context = super().get_context_data(**kwargs)
-        context["project"] = get_object_or_404(Project, pk=self.kwargs["project_pk"])
+        context["project"] = self.project
         return context
 
 
@@ -86,7 +94,7 @@ experiment_list_view = ExperimentListView.as_view()
 class ExperimentCreateView(CreateView):
     model = Experiment
     form_class = ExperimentForm
-    object = None
+    object: Experiment
 
     def get_initial(self) -> dict:
         return {"project": self.kwargs["project_pk"], "owner": self.request.user.pk}
@@ -106,8 +114,16 @@ experiment_create_view = ExperimentCreateView.as_view()
 
 
 class ExperimentUpdateView(UpdateView):
-    fields = ["name", "description", "code", "owner"]
-    object = None
+    fields = [
+        "name",
+        "description",
+        "code",
+        "owner",
+        "rating_scale_anchor_label_left",
+        "rating_scale_anchor_label_center",
+        "rating_scale_anchor_label_right",
+    ]
+    object: Experiment
     pk_url_kwarg = "experiment_pk"
     queryset = Experiment.objects.select_related("project")
     template_name = "experiments/experiment_update_form.html"
@@ -145,7 +161,19 @@ experiment_delete_view = ExperimentDeleteView.as_view()
 class ExperimentDetailView(DetailView):
     context_object_name = "experiment"
     pk_url_kwarg = "experiment_pk"
-    queryset = Experiment.objects.select_related("project")
+    queryset = Experiment.objects.select_related("project").prefetch_related("modules")
+    object: Experiment
+
+    def get_context_data(self, **kwargs: Any) -> dict:
+        context = super().get_context_data(**kwargs)
+        # fmt: off
+        context["modules"] = (
+            self.object.modules  # type: ignore
+            .select_subclasses()
+            .select_related("experiment")
+        )
+        # fmt: on
+        return context
 
 
 experiment_detail_view = ExperimentDetailView.as_view()

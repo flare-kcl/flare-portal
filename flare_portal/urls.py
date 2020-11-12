@@ -8,6 +8,7 @@ from django.urls import URLPattern, URLResolver, include, path
 from django.views.decorators.vary import vary_on_headers
 from django.views.generic import TemplateView
 
+from flare_portal.api import urls as api_urls
 from flare_portal.experiments import urls as experiment_urls
 from flare_portal.users import urls as users_urls
 from flare_portal.utils.cache import get_default_cache_control_decorator
@@ -24,7 +25,8 @@ private_urlpatterns = [
 private_urlpatterns = decorate_urlpatterns(private_urlpatterns, login_required)
 
 urlpatterns: List[Union[URLPattern, URLResolver]] = [
-    path("accounts/", include(users_urls.public_urlpatterns))
+    path("accounts/", include(users_urls.public_urlpatterns)),
+    path("api/v1/", include(api_urls)),
 ]
 
 
