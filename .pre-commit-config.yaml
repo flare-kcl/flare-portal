@@ -13,7 +13,7 @@ repos:
         language_version: python3
   - repo: https://gitlab.com/pycqa/flake8
     # flake8 config is in setup.cfg
-    rev: 3.7.7
+    rev: 3.8.4
     hooks:
       - id: flake8
         language_version: python3

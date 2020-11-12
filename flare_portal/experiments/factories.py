@@ -2,7 +2,7 @@ import factory
 
 from flare_portal.users.factories import UserFactory
 
-from .models import Experiment, Project
+from .models import Experiment, FearConditioningModule, Participant, Project
 
 
 class ProjectFactory(factory.django.DjangoModelFactory):
@@ -23,3 +23,26 @@ class ExperimentFactory(factory.django.DjangoModelFactory):
     code = factory.Sequence(lambda n: f"CODE{n:02}")
     owner = factory.SubFactory(UserFactory)
     project = factory.SubFactory(ProjectFactory)
+
+
+class ParticipantFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Participant
+
+    participant_id = factory.Sequence(lambda n: f"participant{n}")
+    experiment = factory.SubFactory(ExperimentFactory)
+
+
+class FearConditioningModuleFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = FearConditioningModule
+
+    experiment = factory.SubFactory(ExperimentFactory)
+    phase = factory.Faker(
+        "random_element", elements=dict(FearConditioningModule.PHASES).keys()
+    )
+    trials_per_stimulus = factory.Faker("random_int", min=1, max=24)
+    reinforcement_rate = factory.Faker("random_int", min=1, max=12)
+    rating_delay = factory.Faker(
+        "pyfloat", left_digits=1, right_digits=2, positive=True
+    )

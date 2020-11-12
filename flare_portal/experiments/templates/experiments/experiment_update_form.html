@@ -24,10 +24,7 @@
                                 </div>
                             {% endif %}
 
-                            {% for field in form %}
-                                {% include "includes/form-group.html" %}
-                            {% endfor %}
-
+                            {% include "experiments/includes/experiment_fields.html" %}
                         </div>
 
                         <div class="card-footer">

@@ -4,8 +4,8 @@ from django.urls import reverse
 from flare_portal.users.factories import UserFactory
 from flare_portal.users.models import User
 
-from ..factories import ExperimentFactory, ProjectFactory
-from ..models import Experiment, Project
+from ..factories import ExperimentFactory, FearConditioningModuleFactory, ProjectFactory
+from ..models import BaseModule, Experiment, FearConditioningModule, Project
 
 
 class ProjectAuthorizationTest(TestCase):
@@ -299,6 +299,21 @@ class ExperimentListViewTest(TestCase):
         self.assertEqual(project, resp.context["project"])
         self.assertEqual(experiments, list(resp.context["experiments"]))
 
+    def test_get_experiments_only_for_the_current_project(self) -> None:
+        project_1 = ProjectFactory()
+        experiments_1 = ExperimentFactory.create_batch(5, project=project_1)
+        project_2 = ProjectFactory()
+        ExperimentFactory.create_batch(5, project=project_2)
+
+        resp = self.client.get(
+            reverse("experiments:experiment_list", kwargs={"project_pk": project_1.pk})
+        )
+
+        self.assertEqual(200, resp.status_code)
+
+        self.assertEqual(project_1, resp.context["project"])
+        self.assertEqual(experiments_1, list(resp.context["experiments"]))
+
 
 class ExperimentCreateViewTest(TestCase):
     def setUp(self) -> None:
@@ -326,6 +341,9 @@ class ExperimentCreateViewTest(TestCase):
             "code": "ABC123",
             "owner": str(self.user.pk),
             "project": str(self.project.pk),
+            "rating_scale_anchor_label_left": "Certain no beep",
+            "rating_scale_anchor_label_center": "Uncertain",
+            "rating_scale_anchor_label_right": "Certain beep",
         }
 
         resp = self.client.post(url, form_data, follow=True)
@@ -345,10 +363,44 @@ class ExperimentCreateViewTest(TestCase):
         self.assertEqual(experiment.code, form_data["code"])
         self.assertEqual(experiment.owner_id, int(form_data["owner"]))
         self.assertEqual(experiment.project, self.project)
+        self.assertEqual(
+            experiment.rating_scale_anchor_label_left,
+            form_data["rating_scale_anchor_label_left"],
+        )
+        self.assertEqual(
+            experiment.rating_scale_anchor_label_center,
+            form_data["rating_scale_anchor_label_center"],
+        )
+        self.assertEqual(
+            experiment.rating_scale_anchor_label_right,
+            form_data["rating_scale_anchor_label_right"],
+        )
 
         self.assertEqual(
             str(list(resp.context["messages"])[0]),
             f'Added new experiment "{experiment}"',
+        )
+
+    def test_code_validation(self) -> None:
+        url = reverse(
+            "experiments:experiment_create", kwargs={"project_pk": self.project.pk}
+        )
+
+        form_data = {
+            "name": "My experiment",
+            "description": "This is my experiment",
+            "code": "WHAT@1",
+            "owner": str(self.user.pk),
+            "project": str(self.project.pk),
+        }
+
+        resp = self.client.post(url, form_data, follow=True)
+
+        self.assertEqual(200, resp.status_code)
+
+        self.assertEqual(
+            resp.context["form"].errors["code"][0],
+            "Please only enter alphanumeric values.",
         )
 
 
@@ -378,6 +430,9 @@ class ExperimentUpdateViewTest(TestCase):
             "description": "This is my experiment",
             "code": "ABC123",
             "owner": str(self.user.pk),
+            "rating_scale_anchor_label_left": "Certain no beep",
+            "rating_scale_anchor_label_center": "Uncertain",
+            "rating_scale_anchor_label_right": "Certain beep",
         }
 
         resp = self.client.post(url, form_data, follow=True)
@@ -399,6 +454,18 @@ class ExperimentUpdateViewTest(TestCase):
         self.assertEqual(experiment.description, form_data["description"])
         self.assertEqual(experiment.code, form_data["code"])
         self.assertEqual(experiment.owner_id, int(form_data["owner"]))
+        self.assertEqual(
+            experiment.rating_scale_anchor_label_left,
+            form_data["rating_scale_anchor_label_left"],
+        )
+        self.assertEqual(
+            experiment.rating_scale_anchor_label_center,
+            form_data["rating_scale_anchor_label_center"],
+        )
+        self.assertEqual(
+            experiment.rating_scale_anchor_label_right,
+            form_data["rating_scale_anchor_label_right"],
+        )
 
         self.assertEqual(
             str(list(resp.context["messages"])[0]),
@@ -475,6 +542,7 @@ class ExperimentDetailViewTest(TestCase):
     def test_get(self) -> None:
         project: Project = ProjectFactory()
         experiment: Experiment = ExperimentFactory(project=project)
+        FearConditioningModuleFactory.create_batch(5, experiment=experiment)
         resp = self.client.get(
             reverse(
                 "experiments:experiment_detail",
@@ -482,3 +550,200 @@ class ExperimentDetailViewTest(TestCase):
             )
         )
         self.assertEqual(200, resp.status_code)
+
+        self.assertEqual(
+            list(experiment.modules.select_subclasses()),  # type: ignore
+            list(resp.context["modules"]),
+        )
+
+    def test_get_modules_only_for_current_experiment(self) -> None:
+        project: Project = ProjectFactory()
+        experiment_1: Experiment = ExperimentFactory(project=project)
+        modules_1 = FearConditioningModuleFactory.create_batch(
+            5, experiment=experiment_1
+        )
+
+        experiment_2: Experiment = ExperimentFactory(project=project)
+        FearConditioningModuleFactory.create_batch(5, experiment=experiment_2)
+        resp = self.client.get(
+            reverse(
+                "experiments:experiment_detail",
+                kwargs={"project_pk": project.pk, "experiment_pk": experiment_1.pk},
+            )
+        )
+        self.assertEqual(200, resp.status_code)
+
+        self.assertEqual(
+            modules_1, list(resp.context["modules"]),
+        )
+
+
+class ModuleCreateViewTest(TestCase):
+    def setUp(self) -> None:
+        self.user: User = UserFactory()
+        self.user.grant_role("RESEARCHER")
+        self.user.save()
+
+        self.client.force_login(self.user)
+
+        self.experiment: Experiment = ExperimentFactory()
+        self.project = self.experiment.project
+
+    def test_create_fear_conditioning_module(self) -> None:
+        url = reverse(
+            "experiments:modules:fear_conditioning_create",
+            kwargs={"project_pk": self.project.pk, "experiment_pk": self.experiment.pk},
+        )
+
+        resp = self.client.get(url)
+
+        self.assertEqual(200, resp.status_code)
+
+        self.assertEqual(FearConditioningModule, resp.context["module_type"])
+        self.assertEqual(self.experiment.pk, resp.context["form"].initial["experiment"])
+
+        form_data = {
+            "phase": "habituation",
+            "trials_per_stimulus": 12,
+            "reinforcement_rate": 12,
+            "rating_delay": 1.5,
+            "generalisation_stimuli_enabled": True,
+            "experiment": str(self.experiment.pk),
+        }
+
+        resp = self.client.post(url, form_data, follow=True)
+
+        module = self.experiment.modules.select_subclasses().get()  # type: ignore
+
+        self.assertRedirects(
+            resp,
+            reverse(
+                "experiments:experiment_detail",
+                kwargs={
+                    "project_pk": self.project.pk,
+                    "experiment_pk": self.experiment.pk,
+                },
+            ),
+        )
+
+        self.assertEqual(module.phase, form_data["phase"])
+        self.assertEqual(module.trials_per_stimulus, form_data["trials_per_stimulus"])
+        self.assertEqual(module.reinforcement_rate, form_data["reinforcement_rate"])
+        self.assertEqual(module.rating_delay, form_data["rating_delay"])
+        self.assertEqual(
+            module.generalisation_stimuli_enabled,
+            form_data["generalisation_stimuli_enabled"],
+        )
+
+        self.assertEqual(
+            str(list(resp.context["messages"])[0]), "Added fear conditioning module",
+        )
+
+
+class ModuleUpdateViewTest(TestCase):
+    def setUp(self) -> None:
+        self.user: User = UserFactory()
+        self.user.grant_role("RESEARCHER")
+        self.user.save()
+
+        self.client.force_login(self.user)
+
+        self.experiment: Experiment = ExperimentFactory()
+        self.project = self.experiment.project
+
+    def test_update_fear_conditioning_module(self) -> None:
+        module: FearConditioningModule = FearConditioningModuleFactory(
+            experiment=self.experiment
+        )
+
+        url = reverse(
+            "experiments:modules:fear_conditioning_update",
+            kwargs={
+                "project_pk": self.project.pk,
+                "experiment_pk": self.experiment.pk,
+                "module_pk": module.pk,
+            },
+        )
+
+        resp = self.client.get(url)
+
+        self.assertEqual(200, resp.status_code)
+        self.assertEqual(type(module), resp.context["module_type"])
+
+        form_data = {
+            "phase": "habituation",
+            "trials_per_stimulus": 12,
+            "reinforcement_rate": 12,
+            "rating_delay": 1.5,
+            "generalisation_stimuli_enabled": True,
+        }
+
+        resp = self.client.post(url, form_data, follow=True)
+
+        module = self.experiment.modules.select_subclasses().get()  # type: ignore
+
+        self.assertRedirects(
+            resp,
+            reverse(
+                "experiments:experiment_detail",
+                kwargs={
+                    "project_pk": self.project.pk,
+                    "experiment_pk": self.experiment.pk,
+                },
+            ),
+        )
+
+        self.assertEqual(module.phase, form_data["phase"])
+        self.assertEqual(module.trials_per_stimulus, form_data["trials_per_stimulus"])
+        self.assertEqual(module.reinforcement_rate, form_data["reinforcement_rate"])
+        self.assertEqual(module.rating_delay, form_data["rating_delay"])
+        self.assertEqual(
+            module.generalisation_stimuli_enabled,
+            form_data["generalisation_stimuli_enabled"],
+        )
+
+        self.assertEqual(
+            str(list(resp.context["messages"])[0]), "Updated fear conditioning module",
+        )
+
+
+class ModuleDeleteViewTest(TestCase):
+    def setUp(self) -> None:
+        self.user = UserFactory()
+        self.user.grant_role("RESEARCHER")
+        self.user.save()
+        self.client.force_login(self.user)
+
+    def test_delete_fear_conditioning_module(self) -> None:
+        project: Project = ProjectFactory()
+        experiment: Experiment = ExperimentFactory(project=project)
+        module: FearConditioningModule = FearConditioningModuleFactory(
+            experiment=experiment
+        )
+
+        url = reverse(
+            "experiments:modules:fear_conditioning_delete",
+            kwargs={
+                "project_pk": project.pk,
+                "experiment_pk": experiment.pk,
+                "module_pk": module.pk,
+            },
+        )
+        resp = self.client.get(url)
+        self.assertEqual(200, resp.status_code)
+
+        resp = self.client.post(url, follow=True)
+
+        self.assertRedirects(
+            resp,
+            reverse(
+                "experiments:experiment_detail",
+                kwargs={"project_pk": project.pk, "experiment_pk": experiment.pk},
+            ),
+        )
+
+        self.assertEqual(0, BaseModule.objects.all().count())
+
+        self.assertEqual(
+            str(list(resp.context["messages"])[0]), "Deleted fear conditioning module",
+        )
