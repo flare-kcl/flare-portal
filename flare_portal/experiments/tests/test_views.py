@@ -341,6 +341,7 @@ class ExperimentCreateViewTest(TestCase):
             "code": "ABC123",
             "owner": str(self.user.pk),
             "project": str(self.project.pk),
+            "rating_delay": 1.5,
             "rating_scale_anchor_label_left": "Certain no beep",
             "rating_scale_anchor_label_center": "Uncertain",
             "rating_scale_anchor_label_right": "Certain beep",
@@ -363,6 +364,7 @@ class ExperimentCreateViewTest(TestCase):
         self.assertEqual(experiment.code, form_data["code"])
         self.assertEqual(experiment.owner_id, int(form_data["owner"]))
         self.assertEqual(experiment.project, self.project)
+        self.assertEqual(experiment.rating_delay, form_data["rating_delay"])
         self.assertEqual(
             experiment.rating_scale_anchor_label_left,
             form_data["rating_scale_anchor_label_left"],
@@ -430,6 +432,7 @@ class ExperimentUpdateViewTest(TestCase):
             "description": "This is my experiment",
             "code": "ABC123",
             "owner": str(self.user.pk),
+            "rating_delay": 1.5,
             "rating_scale_anchor_label_left": "Certain no beep",
             "rating_scale_anchor_label_center": "Uncertain",
             "rating_scale_anchor_label_right": "Certain beep",
@@ -454,6 +457,7 @@ class ExperimentUpdateViewTest(TestCase):
         self.assertEqual(experiment.description, form_data["description"])
         self.assertEqual(experiment.code, form_data["code"])
         self.assertEqual(experiment.owner_id, int(form_data["owner"]))
+        self.assertEqual(experiment.rating_delay, form_data["rating_delay"])
         self.assertEqual(
             experiment.rating_scale_anchor_label_left,
             form_data["rating_scale_anchor_label_left"],
@@ -606,7 +610,6 @@ class ModuleCreateViewTest(TestCase):
             "phase": "habituation",
             "trials_per_stimulus": 12,
             "reinforcement_rate": 12,
-            "rating_delay": 1.5,
             "generalisation_stimuli_enabled": True,
             "experiment": str(self.experiment.pk),
         }
@@ -629,7 +632,6 @@ class ModuleCreateViewTest(TestCase):
         self.assertEqual(module.phase, form_data["phase"])
         self.assertEqual(module.trials_per_stimulus, form_data["trials_per_stimulus"])
         self.assertEqual(module.reinforcement_rate, form_data["reinforcement_rate"])
-        self.assertEqual(module.rating_delay, form_data["rating_delay"])
         self.assertEqual(
             module.generalisation_stimuli_enabled,
             form_data["generalisation_stimuli_enabled"],
@@ -674,7 +676,6 @@ class ModuleUpdateViewTest(TestCase):
             "phase": "habituation",
             "trials_per_stimulus": 12,
             "reinforcement_rate": 12,
-            "rating_delay": 1.5,
             "generalisation_stimuli_enabled": True,
         }
 
@@ -696,7 +697,6 @@ class ModuleUpdateViewTest(TestCase):
         self.assertEqual(module.phase, form_data["phase"])
         self.assertEqual(module.trials_per_stimulus, form_data["trials_per_stimulus"])
         self.assertEqual(module.reinforcement_rate, form_data["reinforcement_rate"])
-        self.assertEqual(module.rating_delay, form_data["rating_delay"])
         self.assertEqual(
             module.generalisation_stimuli_enabled,
             form_data["generalisation_stimuli_enabled"],
