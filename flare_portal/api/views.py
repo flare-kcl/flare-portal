@@ -3,6 +3,8 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from flare_portal.experiments.models import Experiment
+
 from . import constants
 from .forms import ConfigurationForm
 
@@ -12,11 +14,22 @@ class ConfigurationAPIView(APIView):
         form = ConfigurationForm(request.data)
 
         if form.is_valid():
-            experiment = form.cleaned_data["participant"].experiment
+            experiment: Experiment = form.cleaned_data["participant"].experiment
             return Response(
                 constants.ConfigType(
                     experiment=constants.ExperimentType(
-                        id=experiment.pk, name=experiment.name,
+                        id=experiment.pk,
+                        name=experiment.name,
+                        rating_delay=experiment.rating_delay,
+                        rating_scale_anchor_label_left=(
+                            experiment.rating_scale_anchor_label_left
+                        ),
+                        rating_scale_anchor_label_center=(
+                            experiment.rating_scale_anchor_label_center
+                        ),
+                        rating_scale_anchor_label_right=(
+                            experiment.rating_scale_anchor_label_right
+                        ),
                     ),
                     modules=[
                         module.get_module_config()

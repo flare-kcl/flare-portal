@@ -32,9 +32,22 @@ class ConfigurationAPIViewTest(TestCase):
 
         data = resp.json()
 
-        # TODO: Add other experiment fields
         self.assertEqual(
-            data["experiment"], {"id": experiment.pk, "name": experiment.name},
+            data["experiment"],
+            {
+                "id": experiment.pk,
+                "name": experiment.name,
+                "rating_delay": experiment.rating_delay,
+                "rating_scale_anchor_label_left": (
+                    experiment.rating_scale_anchor_label_left
+                ),
+                "rating_scale_anchor_label_center": (
+                    experiment.rating_scale_anchor_label_center
+                ),
+                "rating_scale_anchor_label_right": (
+                    experiment.rating_scale_anchor_label_right
+                ),
+            },
         )
         self.assertEqual(
             data["modules"],
