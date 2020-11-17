@@ -366,7 +366,7 @@ class ExperimentCreateViewTest(TestCase):
         self.assertEqual(experiment.code, form_data["code"])
         self.assertEqual(experiment.owner_id, int(form_data["owner"]))
         self.assertEqual(experiment.project, self.project)
-        self.assertEqual(experiment.rating_delay, form_data["rating_delay"])
+        self.assertEqual(experiment.rating_delay, float(form_data["rating_delay"]))
         self.assertEqual(
             experiment.rating_scale_anchor_label_left,
             form_data["rating_scale_anchor_label_left"],
@@ -459,7 +459,7 @@ class ExperimentUpdateViewTest(TestCase):
         self.assertEqual(experiment.description, form_data["description"])
         self.assertEqual(experiment.code, form_data["code"])
         self.assertEqual(experiment.owner_id, int(form_data["owner"]))
-        self.assertEqual(experiment.rating_delay, form_data["rating_delay"])
+        self.assertEqual(experiment.rating_delay, float(form_data["rating_delay"]))
         self.assertEqual(
             experiment.rating_scale_anchor_label_left,
             form_data["rating_scale_anchor_label_left"],
