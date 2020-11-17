@@ -81,6 +81,10 @@ class BaseModule(models.Model):
     def get_module_config(self) -> constants.ModuleConfigType:
         raise NotImplementedError()
 
+    def get_module_title(self) -> str:
+        """Short title for this module"""
+        return self.get_module_name()
+
     def get_module_description(self) -> str:
         """Short description of module configuration"""
         return ""
@@ -116,11 +120,13 @@ class FearConditioningModule(BaseModule):
             },
         )
 
+    def get_module_title(self) -> str:
+        return self.get_phase_display()
+
     def get_module_description(self) -> str:
         details = [
-            self.get_phase_display(),
             f"Trials per stimulus: {self.trials_per_stimulus}",
-            f"Reinforcement rate: {self.reinforcement_rate}",
+            f"Number of reinforced CS+ trials: {self.reinforcement_rate}",
             f"GS: {'Enabled' if self.generalisation_stimuli_enabled else 'Disabled'}",
         ]
         return ", ".join(details)
@@ -129,8 +135,8 @@ class FearConditioningModule(BaseModule):
         if self.reinforcement_rate > self.trials_per_stimulus:
             raise ValidationError(
                 {
-                    "reinforcement_rate": "Reinforcement rate cannot be greater than "
-                    "the number of trials per stimulus."
+                    "reinforcement_rate": "Number of reinforced CS+ trials "
+                    "cannot be greater than the number of trials per stimulus."
                 }
             )
 

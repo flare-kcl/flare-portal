@@ -343,6 +343,7 @@ class ExperimentCreateViewTest(TestCase):
             "code": "ABC123",
             "owner": str(self.user.pk),
             "project": str(self.project.pk),
+            "trial_length": "5.0",
             "rating_delay": "1.5",
             "rating_scale_anchor_label_left": "Certain no beep",
             "rating_scale_anchor_label_center": "Uncertain",
@@ -366,6 +367,7 @@ class ExperimentCreateViewTest(TestCase):
         self.assertEqual(experiment.code, form_data["code"])
         self.assertEqual(experiment.owner_id, int(form_data["owner"]))
         self.assertEqual(experiment.project, self.project)
+        self.assertEqual(experiment.trial_length, float(form_data["trial_length"]))
         self.assertEqual(experiment.rating_delay, float(form_data["rating_delay"]))
         self.assertEqual(
             experiment.rating_scale_anchor_label_left,
@@ -385,7 +387,7 @@ class ExperimentCreateViewTest(TestCase):
             f'Added new experiment "{experiment}"',
         )
 
-    def test_code_validation(self) -> None:
+    def test_field_validation(self) -> None:
         url = reverse(
             "experiments:experiment_create", kwargs={"project_pk": self.project.pk}
         )
@@ -396,6 +398,8 @@ class ExperimentCreateViewTest(TestCase):
             "code": "WHAT@1",
             "owner": str(self.user.pk),
             "project": str(self.project.pk),
+            "trial_length": "10.0",
+            "rating_delay": "15.0",
         }
 
         resp = self.client.post(url, form_data, follow=True)
@@ -405,6 +409,11 @@ class ExperimentCreateViewTest(TestCase):
         self.assertEqual(
             resp.context["form"].errors["code"][0],
             "Please only enter alphanumeric values.",
+        )
+
+        self.assertEqual(
+            resp.context["form"].errors["rating_delay"][0],
+            "Rating delay cannot be longer than the trial length.",
         )
 
 
@@ -434,6 +443,7 @@ class ExperimentUpdateViewTest(TestCase):
             "description": "This is my experiment",
             "code": "ABC123",
             "owner": str(self.user.pk),
+            "trial_length": "5.0",
             "rating_delay": "1.5",
             "rating_scale_anchor_label_left": "Certain no beep",
             "rating_scale_anchor_label_center": "Uncertain",
@@ -459,6 +469,7 @@ class ExperimentUpdateViewTest(TestCase):
         self.assertEqual(experiment.description, form_data["description"])
         self.assertEqual(experiment.code, form_data["code"])
         self.assertEqual(experiment.owner_id, int(form_data["owner"]))
+        self.assertEqual(experiment.trial_length, float(form_data["trial_length"]))
         self.assertEqual(experiment.rating_delay, float(form_data["rating_delay"]))
         self.assertEqual(
             experiment.rating_scale_anchor_label_left,

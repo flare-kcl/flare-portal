@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.core import validators
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
 
@@ -33,6 +34,7 @@ class Experiment(models.Model):
     )
     owner = models.ForeignKey(get_user_model(), on_delete=models.PROTECT)
     project = models.ForeignKey("experiments.Project", on_delete=models.CASCADE)
+    trial_length = models.FloatField()
     rating_delay = models.FloatField(default=1)
 
     rating_scale_anchor_label_left = models.CharField(
@@ -53,6 +55,12 @@ class Experiment(models.Model):
             "experiments:experiment_detail",
             kwargs={"project_pk": self.project_id, "experiment_pk": self.pk},
         )
+
+    def clean(self) -> None:
+        if self.rating_delay > self.trial_length:
+            raise ValidationError(
+                {"rating_delay": "Rating delay cannot be longer than the trial length."}
+            )
 
     def __str__(self) -> str:
         return self.name
