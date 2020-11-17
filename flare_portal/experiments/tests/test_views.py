@@ -1,3 +1,5 @@
+from typing import Dict
+
 from django.test import TestCase
 from django.urls import reverse
 
@@ -335,13 +337,13 @@ class ExperimentCreateViewTest(TestCase):
         self.assertEqual(resp.context["form"].initial["project"], self.project.pk)
         self.assertEqual(resp.context["form"].initial["owner"], self.user.pk)
 
-        form_data = {
+        form_data: Dict[str, str] = {
             "name": "My experiment",
             "description": "This is my experiment",
             "code": "ABC123",
             "owner": str(self.user.pk),
             "project": str(self.project.pk),
-            "rating_delay": 1.5,
+            "rating_delay": "1.5",
             "rating_scale_anchor_label_left": "Certain no beep",
             "rating_scale_anchor_label_center": "Uncertain",
             "rating_scale_anchor_label_right": "Certain beep",
@@ -427,12 +429,12 @@ class ExperimentUpdateViewTest(TestCase):
         resp = self.client.get(url)
         self.assertEqual(200, resp.status_code)
 
-        form_data = {
+        form_data: Dict[str, str] = {
             "name": "My experiment",
             "description": "This is my experiment",
             "code": "ABC123",
             "owner": str(self.user.pk),
-            "rating_delay": 1.5,
+            "rating_delay": "1.5",
             "rating_scale_anchor_label_left": "Certain no beep",
             "rating_scale_anchor_label_center": "Uncertain",
             "rating_scale_anchor_label_right": "Certain beep",
