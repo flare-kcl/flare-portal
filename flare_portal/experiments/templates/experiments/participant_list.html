@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% load experiments_tags %}
+
+{% block title %}Participants - {{ experiment.name }}{% endblock title %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4">
+                {% include "experiments/includes/experiment_sidebar.html" %}
+            </div>
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Participants</h3>
+                        <div class="card-options">
+                            <a href="" class="btn btn-sm btn-primary">
+                                Add new participant
+                            </a>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table card-table table-striped table-vcenter">
+                            <thead>
+                                <tr>
+                                    <th>Login ID</th>
+                                    <th>Created</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for participant in participants %}
+                                    <tr>
+                                        <td><a href="" class="text-inherit">{{ participant.login_id }}</a></td>
+                                        <td>{{ participant.created_at }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

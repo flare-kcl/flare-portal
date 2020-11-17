@@ -10,7 +10,7 @@ from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
 from .forms import ExperimentForm
-from .models import Experiment, Project
+from .models import Experiment, Participant, Project
 
 
 class ProjectListView(ListView):
@@ -179,3 +179,22 @@ class ExperimentDetailView(DetailView):
 
 
 experiment_detail_view = ExperimentDetailView.as_view()
+
+
+class ParticipantListView(ListView):
+    context_object_name = "participants"
+
+    def dispatch(self, *args: Any, **kwargs: Any) -> HttpResponse:
+        self.experiment = get_object_or_404(Experiment, pk=kwargs["experiment_pk"])
+        return super().dispatch(*args, **kwargs)
+
+    def get_context_data(self, **kwargs: Any) -> dict:
+        context = super().get_context_data(**kwargs)
+        context["experiment"] = self.experiment
+        return context
+
+    def get_queryset(self) -> QuerySet[Participant]:
+        return self.experiment.participants.all()
+
+
+participant_list_view = ParticipantListView.as_view()

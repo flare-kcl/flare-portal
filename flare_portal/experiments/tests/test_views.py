@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, List
 
 from django.test import TestCase
 from django.urls import reverse
@@ -6,8 +6,19 @@ from django.urls import reverse
 from flare_portal.users.factories import UserFactory
 from flare_portal.users.models import User
 
-from ..factories import ExperimentFactory, FearConditioningModuleFactory, ProjectFactory
-from ..models import BaseModule, Experiment, FearConditioningModule, Project
+from ..factories import (
+    ExperimentFactory,
+    FearConditioningModuleFactory,
+    ParticipantFactory,
+    ProjectFactory,
+)
+from ..models import (
+    BaseModule,
+    Experiment,
+    FearConditioningModule,
+    Participant,
+    Project,
+)
 
 
 class ProjectAuthorizationTest(TestCase):
@@ -760,3 +771,28 @@ class ModuleDeleteViewTest(TestCase):
         self.assertEqual(
             str(list(resp.context["messages"])[0]), "Deleted fear conditioning module",
         )
+
+
+class ParticipantListViewTest(TestCase):
+    def setUp(self) -> None:
+        self.user = UserFactory()
+        self.user.grant_role("RESEARCHER")
+        self.user.save()
+        self.client.force_login(self.user)
+
+    def test_list_participants(self) -> None:
+        project: Project = ProjectFactory()
+        experiment: Experiment = ExperimentFactory(project=project)
+        particpants: List[Participant] = ParticipantFactory.create_batch(
+            10, experiment=experiment
+        )
+        url = reverse(
+            "experiments:participant_list",
+            kwargs={"project_pk": project.pk, "experiment_pk": experiment.pk},
+        )
+
+        resp = self.client.get(url)
+
+        self.assertEqual(200, resp.status_code)
+
+        self.assertEqual(particpants, list(resp.context["participants"]))
