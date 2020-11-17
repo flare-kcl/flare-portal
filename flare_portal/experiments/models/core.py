@@ -33,6 +33,7 @@ class Experiment(models.Model):
     )
     owner = models.ForeignKey(get_user_model(), on_delete=models.PROTECT)
     project = models.ForeignKey("experiments.Project", on_delete=models.CASCADE)
+    rating_delay = models.FloatField(default=1)
 
     rating_scale_anchor_label_left = models.CharField(
         max_length=255, default="Certain no scream"

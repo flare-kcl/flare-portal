@@ -33,7 +33,21 @@ class ConfigurationAPIViewTest(TestCase):
         data = resp.json()
 
         self.assertEqual(
-            data["experiment"], {"id": experiment.pk, "name": experiment.name},
+            data["experiment"],
+            {
+                "id": experiment.pk,
+                "name": experiment.name,
+                "rating_delay": experiment.rating_delay,
+                "rating_scale_anchor_label_left": (
+                    experiment.rating_scale_anchor_label_left
+                ),
+                "rating_scale_anchor_label_center": (
+                    experiment.rating_scale_anchor_label_center
+                ),
+                "rating_scale_anchor_label_right": (
+                    experiment.rating_scale_anchor_label_right
+                ),
+            },
         )
         self.assertEqual(
             data["modules"],
@@ -45,7 +59,6 @@ class ConfigurationAPIViewTest(TestCase):
                         "phase": module1.phase,
                         "trials_per_stimulus": module1.trials_per_stimulus,
                         "reinforcement_rate": module1.reinforcement_rate,
-                        "rating_delay": module1.rating_delay,
                         "generalisation_stimuli_enabled": (
                             module1.generalisation_stimuli_enabled
                         ),
@@ -58,7 +71,6 @@ class ConfigurationAPIViewTest(TestCase):
                         "phase": module2.phase,
                         "trials_per_stimulus": module2.trials_per_stimulus,
                         "reinforcement_rate": module2.reinforcement_rate,
-                        "rating_delay": module2.rating_delay,
                         "generalisation_stimuli_enabled": (
                             module2.generalisation_stimuli_enabled
                         ),
