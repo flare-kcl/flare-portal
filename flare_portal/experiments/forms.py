@@ -2,6 +2,7 @@ import random
 import string
 
 from django import forms
+from django.forms import inlineformset_factory
 
 from .models import Experiment, Participant
 
@@ -40,6 +41,7 @@ class ParticipantBatchForm(forms.Form):
         if not self.is_valid():
             raise ValueError("Form should be valid before calling .save()")
 
+        # TODO: Handle participant ID collissions
         Participant.objects.bulk_create(
             Participant(
                 participant_id=f"{experiment.code}.{generate_participant_id()}",
@@ -47,3 +49,8 @@ class ParticipantBatchForm(forms.Form):
             )
             for n in range(self.cleaned_data["participant_count"])
         )
+
+
+ParticipantFormSet = inlineformset_factory(
+    Experiment, Participant, fields=["participant_id"]
+)

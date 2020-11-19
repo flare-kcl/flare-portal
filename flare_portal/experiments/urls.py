@@ -50,7 +50,7 @@ urlpatterns = [
     ),
     path(
         "projects/<int:project_pk>/experiments/<int:experiment_pk>/participants/",
-        views.participant_list_view,
+        views.participant_formset_view,
         name="participant_list",
     ),
     path(

@@ -773,31 +773,6 @@ class ModuleDeleteViewTest(TestCase):
         )
 
 
-class ParticipantListViewTest(TestCase):
-    def setUp(self) -> None:
-        self.user = UserFactory()
-        self.user.grant_role("RESEARCHER")
-        self.user.save()
-        self.client.force_login(self.user)
-
-    def test_list_participants(self) -> None:
-        project: Project = ProjectFactory()
-        experiment: Experiment = ExperimentFactory(project=project)
-        particpants: List[Participant] = ParticipantFactory.create_batch(
-            10, experiment=experiment
-        )
-        url = reverse(
-            "experiments:participant_list",
-            kwargs={"project_pk": project.pk, "experiment_pk": experiment.pk},
-        )
-
-        resp = self.client.get(url)
-
-        self.assertEqual(200, resp.status_code)
-
-        self.assertEqual(particpants, list(resp.context["participants"]))
-
-
 class ParticipantCreateBatchViewTest(TestCase):
     def setUp(self) -> None:
         self.user = UserFactory()
@@ -843,3 +818,75 @@ class ParticipantCreateBatchViewTest(TestCase):
                 )
                 self.assertEqual(experiment_code, experiment.code)
                 self.assertEqual(6, len(participant_code))
+
+
+class ParticipantFormSetViewTest(TestCase):
+    def setUp(self) -> None:
+        self.user = UserFactory()
+        self.user.grant_role("RESEARCHER")
+        self.user.save()
+        self.client.force_login(self.user)
+
+    def test_update_participants(self) -> None:
+        project: Project = ProjectFactory()
+        experiment: Experiment = ExperimentFactory(project=project)
+        participants: List[Participant] = ParticipantFactory.create_batch(
+            3, experiment=experiment
+        )
+        url = reverse(
+            "experiments:participant_list",
+            kwargs={"project_pk": project.pk, "experiment_pk": experiment.pk},
+        )
+
+        resp = self.client.get(url)
+
+        self.assertEqual(200, resp.status_code)
+        self.assertEqual(resp.context["experiment"], experiment)
+        self.assertEqual(list(resp.context["participants"]), participants)
+
+        form_data = {
+            "participants-TOTAL_FORMS": "6",
+            "participants-INITIAL_FORMS": "3",
+            "participants-MIN_NUM_FORMS": "0",
+            "participants-MAX_NUM_FORMS": "1000",
+            "participants-0-id": str(participants[0].pk),
+            "participants-0-experiment": str(experiment.pk),
+            "participants-0-participant_id": participants[0].participant_id,
+            "participants-0-DELETE": "",
+            "participants-1-id": str(participants[1].pk),
+            "participants-1-experiment": str(experiment.pk),
+            "participants-1-participant_id": participants[1].participant_id,
+            "participants-1-DELETE": "on",
+            "participants-2-id": str(participants[2].pk),
+            "participants-2-experiment": str(experiment.pk),
+            "participants-2-participant_id": "change",
+            "participants-2-DELETE": "",
+            "participants-3-id": "",
+            "participants-3-experiment": str(experiment.pk),
+            "participants-3-participant_id": "new",
+            "participants-3-DELETE": "",
+            "participants-4-id": "",
+            "participants-4-experiment": str(experiment.pk),
+            "participants-4-participant_id": "",
+            "participants-4-DELETE": "",
+            "participants-5-id": "",
+            "participants-5-experiment": str(experiment.pk),
+            "participants-5-participant_id": "",
+            "participants-5-DELETE": "",
+        }
+
+        resp = self.client.post(url, form_data, follow=True)
+
+        self.assertRedirects(resp, url)
+
+        result = experiment.participants.all()
+
+        self.assertEqual(3, len(result))
+        self.assertEqual(result[0].participant_id, participants[0].participant_id)
+        self.assertEqual(result[1].participant_id, "change")
+        self.assertEqual(result[2].participant_id, "new")
+
+        self.assertEqual(
+            str(list(resp.context["messages"])[0]),
+            "Added 1 new participant. Changed 1 participant. Deleted 1 participant.",
+        )

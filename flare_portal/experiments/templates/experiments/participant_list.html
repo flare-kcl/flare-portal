@@ -1,49 +1,85 @@
 {% extends "base.html" %}
 
-{% load experiments_tags %}
+{% load experiments_tags widget_tweaks %}
 
 {% block title %}Participants - {{ experiment.name }}{% endblock title %}
 
 {% block content %}
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-4">
-                {% include "experiments/includes/experiment_sidebar.html" %}
-            </div>
-            <div class="col-lg-8">
-                <div class="card">
-                    <div class="card-header">
-                        <div class="d-flex align-items-baseline">
-                            <h3 class="card-title">Participants</h3>
-                            <p class="card-subtitle m-0 ml-2">{{ participants|length }} participants</p>
+    {% with formset=form %}
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4">
+                    {% include "experiments/includes/experiment_sidebar.html" %}
+                </div>
+                <div class="col-lg-8">
+                    <form class="card" method="POST" action="">
+                        {% csrf_token %}
+                        {{ formset.management_form }}
+                        <div class="card-header">
+                            <div class="d-flex align-items-baseline">
+                                <h3 class="card-title">Participants</h3>
+                                <p class="card-subtitle m-0 ml-2">{{ participants|length }} participant{{ participants|length|pluralize }}</p>
+                            </div>
+                            <div class="card-options">
+                                <a href="{% url "experiments:participant_create_batch" project_pk=view.kwargs.project_pk experiment_pk=view.kwargs.experiment_pk %}" class="btn btn-sm btn-secondary">
+                                    Add participants
+                                </a>
+                                <button class="btn btn-sm btn-primary ml-4" type="submit">Save changes</button>
+                            </div>
                         </div>
-                        <div class="card-options">
-                            <a href="{% url "experiments:participant_create_batch" project_pk=view.kwargs.project_pk experiment_pk=view.kwargs.experiment_pk %}" class="btn btn-sm btn-primary">
-                                Add participants
-                            </a>
-                        </div>
-                    </div>
 
-                    <div class="table-responsive">
-                        <table class="table card-table table-striped table-vcenter">
-                            <thead>
-                                <tr>
-                                    <th>Login ID</th>
-                                    <th>Created</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for participant in participants %}
+                        <div class="table-responsive">
+                            <table class="table card-table table-vcenter">
+                                <thead>
                                     <tr>
-                                        <td><a href="" class="text-inherit">{{ participant.participant_id }}</a></td>
-                                        <td>{{ participant.created_at }}</td>
+                                        <th>Login ID</th>
+                                        <th>Created</th>
+                                        <th>Delete</th>
                                     </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
+                                </thead>
+                                <tbody>
+                                    {% for form in formset %}
+                                        <tr>
+                                            <td>
+                                                {% if form.non_field_errors %}
+                                                    {% for error in form.non_field_errors %}
+                                                        <div class="text-danger small mb-2">{{ error }}</div>
+                                                    {% endfor %}
+                                                {% endif %}
+
+                                                {% if form.instance.pk %}
+                                                    {{ form.participant_id|add_class:"form-control"|add_error_class:"is-invalid" }}
+                                                {% else %}
+                                                    {{ form.participant_id|add_class:"form-control"|add_error_class:"is-invalid"|attr:"placeholder:Add new participant" }}
+                                                {% endif %}
+
+                                                {% for error in form.participant_id.errors %}
+                                                    <div class="invalid-feedback">{{ error }}</div>
+                                                {% endfor %}
+                                            </td>
+                                            <td>{{ form.instance.created_at|default:"" }}</td>
+                                            <td>
+                                                {% if form.instance.pk %}
+                                                    <label class="custom-control custom-checkbox" for="{{ form.DELETE.id_for_label }}">
+                                                        {{ form.DELETE|add_class:"custom-control-input" }}
+                                                        <span class="custom-control-label">Delete</span>
+                                                    </label>
+                                                {% endif %}
+                                                {{ form.id }}
+                                                {{ form.experiment }}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="card-footer text-right">
+                            <button class="btn btn-sm btn-primary" type="submit">Save changes</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
-    </div>
+    {% endwith %}
 {% endblock content %}

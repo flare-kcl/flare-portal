@@ -5,12 +5,13 @@ from django.contrib import messages
 from django.db.models import QuerySet
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404
+from django.template.defaultfilters import pluralize
 from django.urls import reverse, reverse_lazy
 from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateView
 
-from .forms import ExperimentForm, ParticipantBatchForm
-from .models import Experiment, Participant, Project
+from .forms import ExperimentForm, ParticipantBatchForm, ParticipantFormSet
+from .models import Experiment, Project
 
 
 class ProjectListView(ListView):
@@ -181,25 +182,6 @@ class ExperimentDetailView(DetailView):
 experiment_detail_view = ExperimentDetailView.as_view()
 
 
-class ParticipantListView(ListView):
-    context_object_name = "participants"
-
-    def dispatch(self, *args: Any, **kwargs: Any) -> HttpResponse:
-        self.experiment = get_object_or_404(Experiment, pk=kwargs["experiment_pk"])
-        return super().dispatch(*args, **kwargs)
-
-    def get_context_data(self, **kwargs: Any) -> dict:
-        context = super().get_context_data(**kwargs)
-        context["experiment"] = self.experiment
-        return context
-
-    def get_queryset(self) -> QuerySet[Participant]:
-        return self.experiment.participants.all()
-
-
-participant_list_view = ParticipantListView.as_view()
-
-
 class ParticipantCreateBatchView(FormView):
     form_class = ParticipantBatchForm
     template_name = "experiments/participant_create_batch_form.html"
@@ -228,3 +210,57 @@ class ParticipantCreateBatchView(FormView):
 
 
 participant_create_batch_view = ParticipantCreateBatchView.as_view()
+
+
+class ParticipantFormSetView(FormView):
+    form_class = ParticipantFormSet  # type: ignore
+    template_name = "experiments/participant_list.html"
+
+    def dispatch(self, *args: Any, **kwargs: Any) -> HttpResponse:
+        self.experiment = get_object_or_404(Experiment, pk=kwargs["experiment_pk"])
+        return super().dispatch(*args, **kwargs)
+
+    def get_form_kwargs(self) -> dict:
+        return {
+            **super().get_form_kwargs(),
+            "instance": self.experiment,
+        }
+
+    def get_success_url(self) -> str:
+        return reverse(
+            "experiments:participant_list",
+            kwargs={
+                "project_pk": self.kwargs["project_pk"],
+                "experiment_pk": self.kwargs["experiment_pk"],
+            },
+        )
+
+    def get_context_data(self, **kwargs: Any) -> dict:
+        context = super().get_context_data(**kwargs)
+        context["experiment"] = self.experiment
+        context["participants"] = self.experiment.participants.all()
+        return context
+
+    def form_valid(self, formset: ParticipantFormSet) -> HttpResponse:  # type: ignore
+        formset.save()  # type: ignore
+
+        changes = []
+
+        if new_count := len(formset.new_objects):  # type: ignore
+            changes.append(f"Added {new_count} new participant{pluralize(new_count)}.")
+
+        if changed_count := len(formset.changed_objects):  # type: ignore
+            changes.append(
+                f"Changed {changed_count} participant{pluralize(changed_count)}."
+            )
+
+        if deleted_count := len(formset.deleted_objects):  # type: ignore
+            changes.append(
+                f"Deleted {deleted_count} participant{pluralize(deleted_count)}."
+            )
+
+        messages.success(self.request, " ".join(changes))
+        return super().form_valid(formset)
+
+
+participant_formset_view = ParticipantFormSetView.as_view()
