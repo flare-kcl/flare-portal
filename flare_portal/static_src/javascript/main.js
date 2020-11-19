@@ -1,3 +1,4 @@
+import 'alpinejs';
 import '../sass/main.scss';
 
 // eslint-disable-next-line no-unused-vars
