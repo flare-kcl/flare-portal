@@ -13,13 +13,17 @@
             <div class="col-lg-8">
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">Participants</h3>
+                        <div class="d-flex align-items-baseline">
+                            <h3 class="card-title">Participants</h3>
+                            <p class="card-subtitle m-0 ml-2">{{ participants|length }} participants</p>
+                        </div>
                         <div class="card-options">
-                            <a href="" class="btn btn-sm btn-primary">
-                                Add new participant
+                            <a href="{% url "experiments:participant_create_batch" project_pk=view.kwargs.project_pk experiment_pk=view.kwargs.experiment_pk %}" class="btn btn-sm btn-primary">
+                                Add participants
                             </a>
                         </div>
                     </div>
+
                     <div class="table-responsive">
                         <table class="table card-table table-striped table-vcenter">
                             <thead>
@@ -31,7 +35,7 @@
                             <tbody>
                                 {% for participant in participants %}
                                     <tr>
-                                        <td><a href="" class="text-inherit">{{ participant.login_id }}</a></td>
+                                        <td><a href="" class="text-inherit">{{ participant.participant_id }}</a></td>
                                         <td>{{ participant.created_at }}</td>
                                     </tr>
                                 {% endfor %}

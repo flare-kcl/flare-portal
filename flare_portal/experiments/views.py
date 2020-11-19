@@ -7,9 +7,9 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.views.generic import DetailView, ListView
-from django.views.generic.edit import CreateView, DeleteView, UpdateView
+from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateView
 
-from .forms import ExperimentForm
+from .forms import ExperimentForm, ParticipantBatchForm
 from .models import Experiment, Participant, Project
 
 
@@ -198,3 +198,33 @@ class ParticipantListView(ListView):
 
 
 participant_list_view = ParticipantListView.as_view()
+
+
+class ParticipantCreateBatchView(FormView):
+    form_class = ParticipantBatchForm
+    template_name = "experiments/participant_create_batch_form.html"
+
+    def get_success_url(self) -> str:
+        return reverse(
+            "experiments:participant_list",
+            kwargs={
+                "project_pk": self.kwargs["project_pk"],
+                "experiment_pk": self.kwargs["experiment_pk"],
+            },
+        )
+
+    def dispatch(self, *args: Any, **kwargs: Any) -> HttpResponse:
+        self.experiment = get_object_or_404(Experiment, pk=kwargs["experiment_pk"])
+        return super().dispatch(*args, **kwargs)
+
+    def get_context_data(self, **kwargs: Any) -> dict:
+        context = super().get_context_data(**kwargs)
+        context["experiment"] = self.experiment
+        return context
+
+    def form_valid(self, form: ParticipantBatchForm) -> HttpResponse:  # type: ignore
+        form.save(experiment=self.experiment)
+        return super().form_valid(form)
+
+
+participant_create_batch_view = ParticipantCreateBatchView.as_view()
