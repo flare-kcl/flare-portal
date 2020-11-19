@@ -53,6 +53,12 @@ urlpatterns = [
         views.participant_list_view,
         name="participant_list",
     ),
+    path(
+        "projects/<int:project_pk>/experiments/<int:experiment_pk>/"
+        "participants/add-batch/",
+        views.participant_create_batch_view,
+        name="participant_create_batch",
+    ),
     path("", include((registry.urls, "modules"))),
 ]
 

@@ -796,3 +796,50 @@ class ParticipantListViewTest(TestCase):
         self.assertEqual(200, resp.status_code)
 
         self.assertEqual(particpants, list(resp.context["participants"]))
+
+
+class ParticipantCreateBatchViewTest(TestCase):
+    def setUp(self) -> None:
+        self.user = UserFactory()
+        self.user.grant_role("RESEARCHER")
+        self.user.save()
+        self.client.force_login(self.user)
+
+    def test_create_batch(self) -> None:
+        project: Project = ProjectFactory()
+        experiment: Experiment = ExperimentFactory(project=project)
+        url = reverse(
+            "experiments:participant_create_batch",
+            kwargs={"project_pk": project.pk, "experiment_pk": experiment.pk},
+        )
+
+        resp = self.client.get(url)
+
+        self.assertEqual(200, resp.status_code)
+        self.assertEqual(resp.context["experiment"], experiment)
+
+        form_data = {
+            "participant_count": "42",
+        }
+
+        resp = self.client.post(url, form_data)
+
+        self.assertRedirects(
+            resp,
+            reverse(
+                "experiments:participant_list",
+                kwargs={"project_pk": project.pk, "experiment_pk": experiment.pk},
+            ),
+        )
+
+        participants = Participant.objects.all()
+
+        self.assertEqual(42, len(participants))
+
+        for participant in participants:
+            with self.subTest(participant=participant):
+                experiment_code, participant_code = participant.participant_id.split(
+                    "."
+                )
+                self.assertEqual(experiment_code, experiment.code)
+                self.assertEqual(6, len(participant_code))
