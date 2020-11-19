@@ -101,6 +101,7 @@
   "dependencies": {
     "@babel/polyfill": "^7.12.1",
     "@glidejs/glide": "^3.4.1",
+    "alpinejs": "^2.7.3",
     "js-cookie": "^2.2.1",
     "prop-types": "^15.7.2",
     "react": "^17.0.0",
