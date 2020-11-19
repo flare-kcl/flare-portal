@@ -36,6 +36,7 @@
                             <table class="table card-table table-vcenter">
                                 <thead>
                                     <tr>
+                                        <th>No.</th>
                                         <th>Login ID</th>
                                         <th>Created</th>
                                         <th>Delete</th>
@@ -44,6 +45,7 @@
                                 <tbody>
                                     {% for form in formset %}
                                         <tr>
+                                            <td><span class="text-muted">{{ forloop.counter }}</span></td>
                                             <td>
                                                 {% if form.non_field_errors %}
                                                     {% for error in form.non_field_errors %}
@@ -76,6 +78,7 @@
                                     {% endfor %}
                                     <template x-for="(form, index) in forms" :key="index">
                                         <tr>
+                                            <td><span class="text-muted" x-text="index + startIndex + 1"></span></td>
                                             <td>
                                                 <input type="text" :name="`participants-${index + startIndex}-participant_id`" maxlength="24" placeholder="New participant" class="form-control" :id="`id_participants-${index + startIndex}-participant_id`" x-model="forms[index]">
                                             </td>
