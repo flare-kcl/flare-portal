@@ -52,5 +52,5 @@ class ParticipantBatchForm(forms.Form):
 
 
 ParticipantFormSet = inlineformset_factory(
-    Experiment, Participant, fields=["participant_id"]
+    Experiment, Participant, fields=["participant_id"], extra=0
 )
