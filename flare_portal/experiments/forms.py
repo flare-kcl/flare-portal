@@ -12,6 +12,7 @@ class ExperimentForm(forms.ModelForm):
             "code",
             "owner",
             "project",
+            "trial_length",
             "rating_delay",
             "rating_scale_anchor_label_left",
             "rating_scale_anchor_label_center",

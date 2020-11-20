@@ -6,7 +6,15 @@
 {% include "includes/form-group.html" with field=form.code %}
 {% include "includes/form-group.html" with field=form.owner %}
 
-{% include "includes/form-group.html" with field=form.rating_delay %}
+<div class="row gutter-xs">
+    <div class="col-6">
+        {% include "includes/form-group.html" with field=form.trial_length %}
+    </div>
+    <div class="col-6">
+        {% include "includes/form-group.html" with field=form.rating_delay %}
+    </div>
+</div>
+
 
 <div class="form-group">
     <label class="form-label">Rating scale anchors</label>
