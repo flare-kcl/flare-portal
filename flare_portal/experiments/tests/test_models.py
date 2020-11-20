@@ -112,7 +112,8 @@ class FearConditioningDataTest(TestCase):
             rating=5,
             conditional_stimulus="A",
             unconditional_stimulus=True,
-            recorded_at=timezone.now(),
+            trial_started_at=timezone.now(),
+            response_recorded_at=timezone.now(),
             volume_level=78,
             headphones=True,
         )
