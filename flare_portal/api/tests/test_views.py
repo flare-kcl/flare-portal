@@ -37,6 +37,7 @@ class ConfigurationAPIViewTest(TestCase):
             {
                 "id": experiment.pk,
                 "name": experiment.name,
+                "trial_length": experiment.trial_length,
                 "rating_delay": experiment.rating_delay,
                 "rating_scale_anchor_label_left": (
                     experiment.rating_scale_anchor_label_left

@@ -23,6 +23,8 @@ class ExperimentFactory(factory.django.DjangoModelFactory):
     code = factory.Sequence(lambda n: f"CODE{n:02}")
     owner = factory.SubFactory(UserFactory)
     project = factory.SubFactory(ProjectFactory)
+    trial_length = 10.0
+    rating_delay = 1.0
 
 
 class ParticipantFactory(factory.django.DjangoModelFactory):

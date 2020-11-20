@@ -7,6 +7,7 @@ ExperimentType = TypedDict(
     {
         "id": int,
         "name": str,
+        "trial_length": float,
         "rating_delay": float,
         "rating_scale_anchor_label_left": str,
         "rating_scale_anchor_label_center": str,
