@@ -809,7 +809,7 @@ class ParticipantCreateBatchViewTest(TestCase):
 
         participants = Participant.objects.all()
 
-        self.assertEqual(42, len(participants))
+        self.assertEqual(int(form_data["participant_count"]), len(participants))
 
         for participant in participants:
             with self.subTest(participant=participant):
