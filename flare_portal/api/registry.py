@@ -13,6 +13,16 @@ class DataSerializerMixin(serializers.ModelSerializer):
         slug_field="participant_id", queryset=Participant.objects.all()
     )
 
+    def validate(self, data: Dict) -> Dict:
+        if data["participant"].experiment_id != data["module"].experiment_id:
+            raise serializers.ValidationError(
+                {
+                    "participant": "This participant is not part of the "
+                    "module's experiment."
+                }
+            )
+        return data
+
 
 class DataRegistry:
     def __init__(self) -> None:

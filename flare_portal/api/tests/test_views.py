@@ -146,4 +146,36 @@ class ModuleDataAPIView(TestCase):
         self.assertEqual(data.volume_level, json_data["volume_level"])
         self.assertEqual(data.headphones, json_data["headphones"])
 
-        self.fail("Do validation")
+    def test_validation(self) -> None:
+        # Should not be able to add data for a participant that is not in the
+        # same experiment as the module
+        module: FearConditioningModule = FearConditioningModuleFactory()
+        participant: Participant = ParticipantFactory()
+
+        url = reverse("api:fear_conditioning_data")
+
+        json_data = {
+            "participant": participant.participant_id,
+            "module": module.pk,
+            "trial": 1,
+            "rating": 5,
+            "conditional_stimulus": "CSA",
+            "unconditional_stimulus": True,
+            "trial_started_at": parse_datetime("2020-01-01T00:00Z"),
+            "response_recorded_at": parse_datetime("2020-01-01T00:00Z"),
+            "volume_level": 50,
+            "headphones": True,
+        }
+
+        resp = self.client.post(url, json_data, content_type="application/json")
+
+        self.assertEqual(400, resp.status_code)
+
+        self.assertEqual(
+            resp.json(),
+            {
+                "participant": [
+                    "This participant is not part of the module's experiment."
+                ]
+            },
+        )
