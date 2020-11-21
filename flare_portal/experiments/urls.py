@@ -48,6 +48,17 @@ urlpatterns = [
         views.experiment_delete_view,
         name="experiment_delete",
     ),
+    path(
+        "projects/<int:project_pk>/experiments/<int:experiment_pk>/participants/",
+        views.participant_formset_view,
+        name="participant_list",
+    ),
+    path(
+        "projects/<int:project_pk>/experiments/<int:experiment_pk>/"
+        "participants/add-batch/",
+        views.participant_create_batch_view,
+        name="participant_create_batch",
+    ),
     path("", include((registry.urls, "modules"))),
 ]
 
