@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% load experiments_tags widget_tweaks %}
+
+{% block title %}Participants - {{ experiment.name }}{% endblock title %}
+
+{% block content %}
+    {% with formset=form %}
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4">
+                    {% include "experiments/includes/experiment_sidebar.html" %}
+                </div>
+                <div class="col-lg-8">
+                    <form class="card" method="POST" action="" x-data="{ forms: [], startIndex: {{ formset.management_form.TOTAL_FORMS.value }} }">
+                        {% csrf_token %}
+                        {{ formset.management_form.TOTAL_FORMS|attr:"x-bind::value:startIndex + forms.length" }}
+                        {{ formset.management_form.INITIAL_FORMS }}
+                        {{ formset.management_form.MIN_NUM_FORMS }}
+                        {{ formset.management_form.MAX_NUM_FORMS }}
+
+                        <div class="card-header">
+                            <div class="d-flex align-items-baseline">
+                                <h3 class="card-title">Participants</h3>
+                                <p class="card-subtitle m-0 ml-2">{{ participants|length }} participant{{ participants|length|pluralize }}</p>
+                            </div>
+                            <div class="card-options">
+                                <a href="{% url "experiments:participant_create_batch" project_pk=view.kwargs.project_pk experiment_pk=view.kwargs.experiment_pk %}" class="btn btn-sm btn-secondary">
+                                    Add batch
+                                </a>
+                                <button class="btn btn-sm btn-primary ml-4" type="submit">Save changes</button>
+                            </div>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table card-table table-vcenter">
+                                <thead>
+                                    <tr>
+                                        <th>No.</th>
+                                        <th>Login ID</th>
+                                        <th>Created</th>
+                                        <th>Delete</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for form in formset %}
+                                        <tr>
+                                            <td><span class="text-muted">{{ forloop.counter }}</span></td>
+                                            <td>
+                                                {% if form.non_field_errors %}
+                                                    {% for error in form.non_field_errors %}
+                                                        <div class="text-danger small mb-2">{{ error }}</div>
+                                                    {% endfor %}
+                                                {% endif %}
+
+                                                {% if form.instance.pk %}
+                                                    {{ form.participant_id|add_class:"form-control"|add_error_class:"is-invalid" }}
+                                                {% else %}
+                                                    {{ form.participant_id|add_class:"form-control"|add_error_class:"is-invalid"|attr:"placeholder:New participant" }}
+                                                {% endif %}
+
+                                                {% for error in form.participant_id.errors %}
+                                                    <div class="invalid-feedback">{{ error }}</div>
+                                                {% endfor %}
+                                            </td>
+                                            <td>{{ form.instance.created_at|default:"" }}</td>
+                                            <td>
+                                                {% if form.instance.pk %}
+                                                    <label class="custom-control custom-checkbox" for="{{ form.DELETE.id_for_label }}">
+                                                        {{ form.DELETE|add_class:"custom-control-input" }}
+                                                        <span class="custom-control-label">Delete</span>
+                                                    </label>
+                                                {% endif %}
+                                                {{ form.id }}
+                                                {{ form.experiment }}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                    <template x-for="(form, index) in forms" :key="index">
+                                        <tr>
+                                            <td><span class="text-muted" x-text="index + startIndex + 1"></span></td>
+                                            <td>
+                                                <input type="text" :name="`participants-${index + startIndex}-participant_id`" maxlength="24" placeholder="New participant" class="form-control" :id="`id_participants-${index + startIndex}-participant_id`" x-model="forms[index]">
+                                            </td>
+                                            <td></td>
+                                            <td>
+                                                <a class="icon" href="#" @click.prevent="forms.splice(index, 1)"><i class="fe fe-trash text-danger"></i></a>
+                                                <input type="hidden" :name="`participants-${index + startIndex}-id`" :id="`id_participants-${index + startIndex}-id`">
+                                                <input type="hidden" :name="`participants-${index + startIndex}-experiment`" value="{{ experiment.pk }}" :id="`id_participants-${index + startIndex}-experiment`">
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="card-footer d-flex">
+                            <button class="btn btn-sm btn-secondary" @click.prevent="forms.push('')">Add more participants</button>
+                            <button class="btn btn-sm btn-primary ml-auto" type="submit">Save changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    {% endwith %}
+{% endblock content %}

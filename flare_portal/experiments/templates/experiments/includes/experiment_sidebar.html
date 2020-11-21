@@ -44,8 +44,8 @@
         <a href="{% url "experiments:experiment_detail" project_pk=experiment.project_id experiment_pk=experiment.pk %}" class="list-group-item list-group-item-action d-flex align-items-center{% if request.resolver_match.url_name == 'experiment_detail' %} active{% endif %}">
             <span class="icon mr-3"><i class="fe fe-layers"></i></span>Modules
         </a>
-        <a href="#" class="list-group-item list-group-item-action d-flex align-items-center">
-            <span class="icon mr-3"><i class="fe fe-users"></i></span>Participants<span class="ml-auto badge badge-secondary">14</span>
+        <a href="{% url "experiments:participant_list" project_pk=experiment.project_id experiment_pk=experiment.pk %}" class="list-group-item list-group-item-action d-flex align-items-center{% if request.resolver_match.url_name == 'participant_list' %} active{% endif %}">
+            <span class="icon mr-3"><i class="fe fe-users"></i></span>Participants
         </a>
         <a href="{% url "experiments:experiment_update" project_pk=experiment.project_id experiment_pk=experiment.pk %}" class="list-group-item list-group-item-action d-flex align-items-center{% if request.resolver_match.url_name == 'experiment_update' %} active{% endif %}">
             <span class="icon mr-3"><i class="fe fe-sliders"></i></span>Experiment settings

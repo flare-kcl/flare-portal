@@ -72,5 +72,8 @@ class Participant(models.Model):
         "experiments.Experiment", on_delete=models.CASCADE, related_name="participants"
     )
 
+    created_at = models.DateTimeField(auto_now_add=True)
+    udpated_at = models.DateTimeField(auto_now=True)
+
     def __str__(self) -> str:
         return self.participant_id

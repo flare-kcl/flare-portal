@@ -1,6 +1,10 @@
-from django import forms
+import random
+import string
 
-from .models import Experiment
+from django import forms
+from django.forms import inlineformset_factory
+
+from .models import Experiment, Participant
 
 
 class ExperimentForm(forms.ModelForm):
@@ -19,3 +23,34 @@ class ExperimentForm(forms.ModelForm):
             "rating_scale_anchor_label_right",
         ]
         widgets = {"project": forms.HiddenInput()}
+
+
+def generate_participant_id() -> str:
+    alphabet = string.ascii_uppercase + string.digits
+    return "".join(random.choice(alphabet) for i in range(6))
+
+
+class ParticipantBatchForm(forms.Form):
+    participant_count = forms.IntegerField(min_value=1)
+
+    def save(self, *, experiment: Experiment) -> None:
+        """
+        Creates a batch of participants for an experiment
+        """
+
+        if not self.is_valid():
+            raise ValueError("Form should be valid before calling .save()")
+
+        # TODO: Handle participant ID collissions
+        Participant.objects.bulk_create(
+            Participant(
+                participant_id=f"{experiment.code}.{generate_participant_id()}",
+                experiment=experiment,
+            )
+            for n in range(self.cleaned_data["participant_count"])
+        )
+
+
+ParticipantFormSet = inlineformset_factory(
+    Experiment, Participant, fields=["participant_id"], extra=0
+)
