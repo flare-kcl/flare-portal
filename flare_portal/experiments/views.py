@@ -11,7 +11,7 @@ from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateView
 
 from .forms import ExperimentForm, ParticipantBatchForm, ParticipantFormSet
-from .models import Experiment, Project
+from .models import Experiment, FearConditioningData, Project
 
 
 class ProjectListView(ListView):
@@ -264,3 +264,48 @@ class ParticipantFormSetView(FormView):
 
 
 participant_formset_view = ParticipantFormSetView.as_view()
+
+
+class FearConditioningDataListView(ListView):
+    context_object_name = "data"
+    data_type = FearConditioningData
+    template_name = "experiments/data_list.html"
+
+    def dispatch(self, *args: Any, **kwargs: Any) -> HttpResponse:
+        self.experiment = get_object_or_404(Experiment, pk=kwargs["experiment_pk"])
+        return super().dispatch(*args, **kwargs)
+
+    def get_queryset(self) -> QuerySet[FearConditioningData]:
+        return FearConditioningData.objects.filter(
+            module__experiment=self.experiment
+        ).select_related("participant", "module")
+
+    def get_context_data(self, **kwargs: Any) -> dict:
+        context = super().get_context_data(**kwargs)
+        context["experiment"] = self.experiment
+        context["data_type"] = self.data_type
+        return context
+
+
+fear_conditioning_data_list_view = FearConditioningDataListView.as_view()
+
+
+class FearConditioningDataDetailView(DetailView):
+    context_object_name = "data"
+    data_type = FearConditioningData
+    pk_url_kwarg = "data_pk"
+    queryset = FearConditioningData.objects.select_related("participant")
+    template_name = "experiments/data_detail.html"
+
+    def dispatch(self, *args: Any, **kwargs: Any) -> HttpResponse:
+        self.experiment = get_object_or_404(Experiment, pk=kwargs["experiment_pk"])
+        return super().dispatch(*args, **kwargs)
+
+    def get_context_data(self, **kwargs: Any) -> dict:
+        context = super().get_context_data(**kwargs)
+        context["experiment"] = self.experiment
+        context["data_type"] = self.data_type
+        return context
+
+
+fear_conditioning_data_detail_view = FearConditioningDataDetailView.as_view()

@@ -1,15 +1,9 @@
 from django.urls import path
 
-from flare_portal.experiments.models import FearConditioningData
-
 from . import views
-from .registry import DataRegistry
-
-registry = DataRegistry()
-
-registry.register(FearConditioningData)
+from .registry import module_data_registry
 
 app_name = "api"
 urlpatterns = [
     path("configuration/", views.configuration_api_view, name="configuration"),
-] + registry.urls
+] + module_data_registry.urls

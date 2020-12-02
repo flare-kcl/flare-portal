@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}{{ data_type.get_module_name|capfirst }} data - {{ experiment.name }}{% endblock title %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4">
+                {% include "experiments/includes/experiment_sidebar.html" %}
+            </div>
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">{{ data_type.get_module_name|capfirst }}</h3>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table card-table table-striped table-vcenter">
+                            <thead>
+                                <tr>
+                                    <th>Participant</th>
+                                    <th>Phase</th>
+                                    <th>Trial no.</th>
+                                    <th>CS</th>
+                                    <th>US</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for row in data %}
+                                    <tr>
+                                        <td>{{ row.participant.participant_id }}</td>
+                                        <td>{{ row.module.get_phase_display }}</td>
+                                        <td>{{ row.trial }}</td>
+                                        <td>{{ row.conditional_stimulus }}</td>
+                                        <td>
+                                            {% if row.unconditional_stimulus %}
+                                                <span class="status-icon bg-success"></span> {{ row.unconditional_stimulus|yesno|title }}
+                                            {% else %}
+                                                <span class="status-icon bg-danger"></span>  {{ row.unconditional_stimulus|yesno|title }}
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

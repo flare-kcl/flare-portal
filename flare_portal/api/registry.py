@@ -5,7 +5,7 @@ from django.urls import URLPattern, path
 from rest_framework import serializers
 from rest_framework.generics import CreateAPIView
 
-from flare_portal.experiments.models import BaseData, Participant
+from flare_portal.experiments.models import BaseData, FearConditioningData, Participant
 
 
 class DataSerializerMixin(serializers.ModelSerializer):
@@ -51,3 +51,8 @@ class DataRegistry:
         )
         self.views[api_view_name] = api_view_class.as_view()
         self.urls.append(path(api_path, self.views[api_view_name], name=api_view_name))
+
+
+module_data_registry = DataRegistry()
+
+module_data_registry.register(FearConditioningData)

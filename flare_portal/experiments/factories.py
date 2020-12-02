@@ -1,8 +1,16 @@
+from django.utils import timezone
+
 import factory
 
 from flare_portal.users.factories import UserFactory
 
-from .models import Experiment, FearConditioningModule, Participant, Project
+from .models import (
+    Experiment,
+    FearConditioningData,
+    FearConditioningModule,
+    Participant,
+    Project,
+)
 
 
 class ProjectFactory(factory.django.DjangoModelFactory):
@@ -45,3 +53,19 @@ class FearConditioningModuleFactory(factory.django.DjangoModelFactory):
     )
     trials_per_stimulus = factory.Faker("random_int", min=1, max=24)
     reinforcement_rate = factory.Faker("random_int", min=1, max=12)
+
+
+class FearConditioningDataFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = FearConditioningData
+
+    participant = factory.SubFactory(ParticipantFactory)
+    module = factory.SubFactory(FearConditioningModuleFactory)
+    trial = factory.Sequence(lambda n: n)
+    rating = factory.Sequence(lambda n: n % 9 + 1)
+    conditional_stimulus = factory.Faker("random_element", elements=["CSA", "CSB"])
+    unconditional_stimulus = factory.Faker("random_element", elements=[True, False])
+    trial_started_at = factory.LazyFunction(lambda: timezone.now())
+    response_recorded_at = factory.LazyFunction(lambda: timezone.now())
+    volume_level = factory.Faker("random_int", min=1, max=100)
+    headphones = factory.Faker("random_element", elements=[True, False])

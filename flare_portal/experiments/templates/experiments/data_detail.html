@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}{{ data.participant }} - {{ data_type.get_module_name|capfirst }} data - {{ experiment.name }}{% endblock title %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4">
+                {% include "experiments/includes/experiment_sidebar.html" %}
+            </div>
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">{{ data_type.get_module_name|capfirst }}</h3>
+                    </div>
+                    <div class="card-body">
+                        data stuff goes here
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

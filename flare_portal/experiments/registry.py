@@ -7,7 +7,7 @@ from django.shortcuts import get_object_or_404
 from django.urls import URLPattern, path, reverse
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
-from .models import BaseModule, Experiment
+from .models import BaseModule, Experiment, FearConditioningModule
 
 
 class ModuleViewMixin:
@@ -166,3 +166,8 @@ class ModuleRegistry:
                 name=delete_view_name,
             )
         )
+
+
+module_registry = ModuleRegistry()
+
+module_registry.register(FearConditioningModule)
