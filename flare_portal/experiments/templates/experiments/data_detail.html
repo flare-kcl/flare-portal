@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 
-{% block title %}{{ data.participant }} - {{ data_type.get_module_name|capfirst }} data - {{ experiment.name }}{% endblock title %}
+{% load experiments_tags %}
+
+{% block title %}{{ data.participant }} - {{ data_type.get_module_name|capfirst }} - {{ experiment.name }}{% endblock title %}
 
 {% block content %}
     <div class="container">
@@ -11,10 +13,21 @@
             <div class="col-lg-8">
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">{{ data_type.get_module_name|capfirst }}</h3>
+                        <h3 class="card-title">{{ data.participant }} - {{ data_type.get_module_name|capfirst }}</h3>
                     </div>
                     <div class="card-body">
-                        data stuff goes here
+                        {% for name, value in data.get_data_values %}
+                            <div class="form-group">
+                                <label class="form-label">{{ name|capfirst }}</label>
+                                <div class="form-control-plaintext">
+                                    {% if value|is_boolean %}
+                                        <span class="status-icon {% if value %}bg-success{% else %}bg-danger{% endif %}"></span> {{ value|yesno|title }}
+                                    {% else %}
+                                        {{ value }}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
                     </div>
                 </div>
             </div>

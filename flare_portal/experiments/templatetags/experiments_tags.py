@@ -1,4 +1,4 @@
-from typing import List, Type
+from typing import Any, List, Type
 
 from django import template
 from django.template.context import RequestContext
@@ -79,5 +79,11 @@ def get_data_detail_url(data: BaseData) -> str:
         kwargs={
             "project_pk": data.module.experiment.project_id,
             "experiment_pk": data.module.experiment_id,
+            "data_pk": data.pk,
         },
     )
+
+
+@register.filter
+def is_boolean(value: Any) -> bool:
+    return isinstance(value, bool)

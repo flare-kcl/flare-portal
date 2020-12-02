@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 
+{% load experiments_tags %}
+
 {% block title %}{{ data_type.get_module_name|capfirst }} data - {{ experiment.name }}{% endblock title %}
 
 {% block content %}
@@ -22,6 +24,7 @@
                                     <th>Trial no.</th>
                                     <th>CS</th>
                                     <th>US</th>
+                                    <th></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -37,6 +40,9 @@
                                             {% else %}
                                                 <span class="status-icon bg-danger"></span>  {{ row.unconditional_stimulus|yesno|title }}
                                             {% endif %}
+                                        </td>
+                                        <td>
+                                            <a href="{% get_data_detail_url row %}">Details</a>
                                         </td>
                                     </tr>
                                 {% endfor %}
