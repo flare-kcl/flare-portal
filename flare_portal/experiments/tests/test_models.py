@@ -118,7 +118,7 @@ class FearConditioningDataTest(TestCase):
             headphones=True,
         )
 
-    def test_detail_values(self) -> None:
+    def test_data_values(self) -> None:
         participant: Participant = ParticipantFactory()
         module: FearConditioningModule = FearConditioningModuleFactory()
 
@@ -147,5 +147,41 @@ class FearConditioningDataTest(TestCase):
                 ("response recorded at", data.response_recorded_at),
                 ("volume level", data.volume_level),
                 ("headphones", data.headphones),
+            ],
+        )
+
+    def test_list_display_columns(self) -> None:
+        columns = FearConditioningData.get_list_display_columns()
+
+        self.assertEqual(
+            columns, ["participant", "phase", "trial", "CS", "US", "rating"]
+        )
+
+    def test_list_display_values(self) -> None:
+        participant: Participant = ParticipantFactory()
+        module: FearConditioningModule = FearConditioningModuleFactory()
+
+        data = FearConditioningData.objects.create(
+            participant=participant,
+            module=module,
+            trial=1,
+            rating=5,
+            conditional_stimulus="A",
+            unconditional_stimulus=True,
+            trial_started_at=timezone.now(),
+            response_recorded_at=timezone.now(),
+            volume_level=78,
+            headphones=True,
+        )
+
+        self.assertEqual(
+            data.get_list_display_values(),
+            [
+                ("participant", data.participant),
+                ("phase", module.get_phase_display()),
+                ("trial", data.trial),
+                ("CS", data.conditional_stimulus),
+                ("US", data.unconditional_stimulus),
+                ("rating", data.rating),
             ],
         )

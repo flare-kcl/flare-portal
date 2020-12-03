@@ -12,22 +12,23 @@
             </div>
             <div class="col-lg-8">
                 <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">{{ data.participant }} - {{ data_type.get_module_name|capfirst }}</h3>
+                    <div class="card-body">
+                        <h3 class="mb-1">{{ data_type.get_module_name|capfirst }}</h3>
+                        <div><i class="fe fe-user"></i> {{ data.participant }}</div>
                     </div>
                     <div class="card-body">
-                        {% for name, value in data.get_data_values %}
-                            <div class="form-group">
-                                <label class="form-label">{{ name|capfirst }}</label>
-                                <div class="form-control-plaintext">
+                        <div class="row">
+                            {% for name, value in data.get_data_values %}
+                                <dt class="col-3">{{ name|capfirst }}</dt>
+                                <dd class="col-9">
                                     {% if value|is_boolean %}
                                         <span class="status-icon {% if value %}bg-success{% else %}bg-danger{% endif %}"></span> {{ value|yesno|title }}
                                     {% else %}
                                         {{ value }}
                                     {% endif %}
-                                </div>
-                            </div>
-                        {% endfor %}
+                                </dd>
+                            {% endfor %}
+                        </div>
                     </div>
                 </div>
             </div>

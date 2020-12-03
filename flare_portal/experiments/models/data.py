@@ -1,4 +1,4 @@
-from typing import Any, List, Tuple, Union
+from typing import Any, List, Literal, Tuple, Union
 
 from django.contrib.admin.utils import get_fields_from_path
 from django.db import models
@@ -24,7 +24,8 @@ class BaseData(Nameable, models.Model):
     )
     module: BaseModule
 
-    fields: Union[str, List] = "__all__"
+    fields: Union[Literal["__all__"], List] = "__all__"
+    list_display: List = ["participant"]
 
     class Meta:
         abstract = True
@@ -55,22 +56,40 @@ class BaseData(Nameable, models.Model):
             f"{module_slug}/<int:data_pk>/"
         )
 
-    def get_data_values(self) -> List[Tuple]:
-        """Returns a list of tuples of fields and their values"""
-        if self.fields == "__all__":
-            return [
-                (f.verbose_name, get_field_value(self, f.name))  # type: ignore
-                for f in self._meta.get_fields()
-                if f.name not in ["id", "participant", "module"]
-            ]
-
+    def get_field_values(self, field_names: List[str]) -> List[Tuple[str, Any]]:
+        """Returns a tuple of field names and values for the given fields"""
         return [
             (
                 get_fields_from_path(self._meta.model, fname)[-1].verbose_name,
                 get_field_value(self, fname),
             )
-            for fname in self.fields
+            for fname in field_names
         ]
+
+    def get_data_values(self) -> List[Tuple[str, Any]]:
+        """Returns data for the data detail view"""
+        if self.fields == "__all__":
+            return self.get_field_values(
+                [
+                    f.name
+                    for f in self._meta.get_fields()
+                    if f.name not in ["id", "participant", "module"]
+                ]
+            )
+
+        return self.get_field_values(self.fields)
+
+    @classmethod
+    def get_list_display_columns(cls) -> List[str]:
+        """Returns the column names for this model for use in the table"""
+        return [
+            get_fields_from_path(cls, fname)[-1].verbose_name
+            for fname in cls.list_display
+        ]
+
+    def get_list_display_values(self) -> List[Tuple[str, Any]]:
+        """Returns a single row of data for the data list view"""
+        return self.get_field_values(self.list_display)
 
 
 class FearConditioningData(BaseData):
@@ -98,6 +117,14 @@ class FearConditioningData(BaseData):
         "response_recorded_at",
         "volume_level",
         "headphones",
+    ]
+    list_display = [
+        "participant",
+        "module__phase",
+        "trial",
+        "conditional_stimulus",
+        "unconditional_stimulus",
+        "rating",
     ]
 
     def __str__(self) -> str:
