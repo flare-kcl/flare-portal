@@ -4,8 +4,7 @@ from flare_portal.users.decorators import role_required
 from flare_portal.utils.urls import decorate_urlpatterns
 
 from . import views
-from .models import FearConditioningData
-from .registry import module_registry
+from .registry import data_viewset_registry, module_registry
 
 app_name = "experiments"
 
@@ -57,27 +56,8 @@ urlpatterns = [
         views.participant_create_batch_view,
         name="participant_create_batch",
     ),
-    path(
-        "",
-        include(
-            (
-                [
-                    path(
-                        FearConditioningData.get_list_path(),
-                        views.fear_conditioning_data_list_view,
-                        name=FearConditioningData.get_list_path_name(),
-                    ),
-                    path(
-                        FearConditioningData.get_detail_path(),
-                        views.fear_conditioning_data_detail_view,
-                        name=FearConditioningData.get_detail_path_name(),
-                    ),
-                ],
-                "data",
-            )
-        ),
-    ),
     path("", include((module_registry.urls, "modules"))),
+    path("", include((data_viewset_registry.urls, "data"))),
 ]
 
 urlpatterns = decorate_urlpatterns(urlpatterns, role_required, "RESEARCHER")

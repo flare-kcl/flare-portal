@@ -4,7 +4,7 @@ from django import template
 from django.template.context import RequestContext
 from django.urls import reverse
 
-from flare_portal.api.registry import module_data_registry
+from flare_portal.api.registry import data_api_registry
 
 from ..models import BaseData, BaseModule, Experiment
 from ..registry import module_registry
@@ -19,7 +19,7 @@ def get_module_types() -> List[Type[BaseModule]]:
 
 @register.simple_tag
 def get_module_data_types() -> List[Type[BaseData]]:
-    return module_data_registry.data_models
+    return data_api_registry.data_models
 
 
 @register.simple_tag

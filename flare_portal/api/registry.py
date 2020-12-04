@@ -24,13 +24,23 @@ class DataSerializerMixin(serializers.ModelSerializer):
         return data
 
 
-class DataRegistry:
+class DataAPIRegistry:
+    """
+    Registry for module data
+
+    Registering a module data model to this registry will generate a create API
+    endpoint for that model
+    """
+
     def __init__(self) -> None:
         self.data_models: List[Type[BaseData]] = []
         self.urls: List[URLPattern] = []
         self.views: Dict[str, Callable] = {}
 
     def register(self, data_class: Type[BaseData]) -> None:
+        """
+        Creates a CreateAPIView for the data class
+        """
         module_camel_case = data_class.get_module_camel_case()
         self.data_models.append(data_class)
 
@@ -53,6 +63,6 @@ class DataRegistry:
         self.urls.append(path(api_path, self.views[api_view_name], name=api_view_name))
 
 
-module_data_registry = DataRegistry()
+data_api_registry = DataAPIRegistry()
 
-module_data_registry.register(FearConditioningData)
+data_api_registry.register(FearConditioningData)

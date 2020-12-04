@@ -2,12 +2,12 @@ from django.test import TestCase
 
 from flare_portal.experiments.models import FearConditioningData
 
-from ..registry import DataRegistry
+from ..registry import DataAPIRegistry
 
 
 class DataRegistryTest(TestCase):
     def test_register(self) -> None:
-        registry = DataRegistry()
+        registry = DataAPIRegistry()
 
         registry.register(FearConditioningData)
 
