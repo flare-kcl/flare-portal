@@ -36,10 +36,11 @@
                             <table class="table card-table table-vcenter">
                                 <thead>
                                     <tr>
-                                        <th>No.</th>
+                                        <th></th>
                                         <th>Login ID</th>
                                         <th>Created</th>
                                         <th>Delete</th>
+                                        <th></th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -74,6 +75,17 @@
                                                 {{ form.id }}
                                                 {{ form.experiment }}
                                             </td>
+                                            <td class="dropdown">
+                                                <button type="button" class="btn btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown">
+                                                    View data
+                                                </button>
+                                                <div class="dropdown-menu">
+                                                    {% get_module_data_types as data_types %}
+                                                    {% for data_type in data_types %}
+                                                        <a class="dropdown-item" href="{% get_data_list_url data_type %}?participant={{ form.instance.participant_id }}">{{ data_type.get_module_name|capfirst }}</a>
+                                                    {% endfor %}
+                                                </div>
+                                            </td>
                                         </tr>
                                     {% endfor %}
                                     <template x-for="(form, index) in forms" :key="index">
@@ -88,6 +100,7 @@
                                                 <input type="hidden" :name="`participants-${index + startIndex}-id`" :id="`id_participants-${index + startIndex}-id`">
                                                 <input type="hidden" :name="`participants-${index + startIndex}-experiment`" value="{{ experiment.pk }}" :id="`id_participants-${index + startIndex}-experiment`">
                                             </td>
+                                            <td></td>
                                         </tr>
                                     </template>
                                 </tbody>

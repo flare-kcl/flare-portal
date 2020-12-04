@@ -923,7 +923,31 @@ class DataListViewTest(TestCase):
         self.assertEqual(list(resp.context["data"]), data)
 
     def test_filter(self) -> None:
-        self.fail()
+        # Can filter by participant
+        project: Project = ProjectFactory()
+        experiment: Experiment = ExperimentFactory(project=project)
+        module: FearConditioningModule = FearConditioningModuleFactory(
+            experiment=experiment
+        )
+        FearConditioningDataFactory.create_batch(10, module=module)
+
+        # Data for a single participant
+        participant: Participant = ParticipantFactory(experiment=experiment)
+        participant_data: List[
+            FearConditioningData
+        ] = FearConditioningDataFactory.create_batch(
+            10, module=module, participant=participant
+        )
+        url = reverse(
+            "experiments:data:fear_conditioning_data_list",
+            kwargs={"project_pk": project.pk, "experiment_pk": experiment.pk},
+        )
+
+        resp = self.client.get(url, {"participant": participant.participant_id})
+
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(participant, resp.context["participant"])
+        self.assertEqual(list(resp.context["data"]), participant_data)
 
 
 class DataDetailViewTest(TestCase):

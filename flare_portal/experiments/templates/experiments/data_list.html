@@ -15,7 +15,13 @@
                     <div class="card-body">
                         <div class="card-value float-right"><i class="fe fe-database"></i></div>
                         <h3 class="mb-1">{{ data_type.get_module_name|capfirst }}</h3>
-                        <div>All participants</div>
+                        {% if participant %}
+                            <div>
+                                <i class="fe fe-user"></i> {{ participant }}
+                            </div>
+                        {% else %}
+                            <div>All participants</div>
+                        {% endif %}
                     </div>
                     <div class="table-responsive">
                         <table class="table card-table table-striped table-vcenter">

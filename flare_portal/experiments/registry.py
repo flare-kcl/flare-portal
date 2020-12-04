@@ -1,4 +1,4 @@
-from typing import Any, Callable, Dict, List, Type
+from typing import Any, Callable, Dict, List, Optional, Type
 
 from django import forms
 from django.contrib import messages
@@ -15,6 +15,7 @@ from .models import (
     Experiment,
     FearConditioningData,
     FearConditioningModule,
+    Participant,
 )
 
 
@@ -189,7 +190,6 @@ module_registry.register(FearConditioningModule)
 
 
 class DataViewMixin:
-    context_object_name = "data"
     data_type: BaseData
 
     def dispatch(self, *args: Any, **kwargs: Any) -> HttpResponse:
@@ -197,9 +197,11 @@ class DataViewMixin:
         return super().dispatch(*args, **kwargs)  # type: ignore
 
     def get_queryset(self) -> QuerySet[BaseData]:
-        return self.data_type.objects.filter(
-            module__experiment=self.experiment
-        ).select_related("participant", "module")
+        return (
+            self.data_type.objects.filter(module__experiment=self.experiment)
+            .order_by("pk")
+            .select_related("participant", "module")
+        )
 
     def get_context_data(self, **kwargs: Any) -> dict:
         context = super().get_context_data(**kwargs)  # type: ignore
@@ -208,11 +210,41 @@ class DataViewMixin:
         return context
 
 
-class DataListViewMixin(DataViewMixin):
+class DataListView(DataViewMixin, ListView):
+    context_object_name = "data"
     template_name = "experiments/data_list.html"
+    participant: Optional[Participant] = None
+
+    def dispatch(self, *args: Any, **kwargs: Any) -> HttpResponse:
+        if participant_id := self.request.GET.get("participant"):
+            try:
+                self.participant = Participant.objects.get(
+                    participant_id=participant_id
+                )
+            except Participant.DoesNotExist:
+                pass
+
+        return super().dispatch(*args, **kwargs)
+
+    def get_queryset(self) -> QuerySet[BaseData]:
+        qs = super().get_queryset()
+
+        if self.participant:
+            return qs.filter(participant=self.participant)
+
+        return qs
+
+    def get_context_data(self, **kwargs: Any) -> dict:
+        context = super().get_context_data(**kwargs)
+
+        if self.participant:
+            context["participant"] = self.participant
+
+        return context
 
 
-class DataDetailViewMixin(DataViewMixin):
+class DataDetailView(DataViewMixin, DetailView):
+    context_object_name = "data"
     pk_url_kwarg = "data_pk"
     template_name = "experiments/data_detail.html"
 
@@ -237,9 +269,7 @@ class DataViewsetRegistry:
 
         # ListView
         list_view_class: ListView = type(  # type: ignore
-            f"{module_camel_case}ListView",
-            (DataListViewMixin, ListView),
-            {"data_type": data_model},
+            f"{module_camel_case}ListView", (DataListView,), {"data_type": data_model},
         )
         list_view_name = data_model.get_list_path_name()
 
@@ -255,7 +285,7 @@ class DataViewsetRegistry:
         # DetailView
         detail_view_class: ListView = type(  # type: ignore
             f"{module_camel_case}DetailView",
-            (DataDetailViewMixin, DetailView),
+            (DataDetailView,),
             {"data_type": data_model},
         )
         detail_view_name = data_model.get_detail_path_name()
