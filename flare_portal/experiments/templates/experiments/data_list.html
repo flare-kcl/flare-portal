@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% load experiments_tags %}
+
+{% block title %}{{ data_type.get_module_name|capfirst }} data - {{ experiment.name }}{% endblock title %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4">
+                {% include "experiments/includes/experiment_sidebar.html" %}
+            </div>
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="card-value float-right"><i class="fe fe-database"></i></div>
+                        <h3 class="mb-1">{{ data_type.get_module_name|capfirst }}</h3>
+                        {% if participant %}
+                            <div>
+                                <i class="fe fe-user"></i> {{ participant }}
+                            </div>
+                        {% else %}
+                            <div>All participants</div>
+                        {% endif %}
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table card-table table-striped table-vcenter">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    {% for column in data_type.get_list_display_columns %}
+                                        <th>{{ column|capfirst }}</th>
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for row in data %}
+                                    <tr>
+                                        <td>
+                                            <a href="{% get_data_detail_url row %}">
+                                                <span class="text-muted">
+                                                    {{ forloop.counter }}
+                                                </span>
+                                            </a>
+                                        </td>
+                                        {% for key, value in row.get_list_display_values %}
+                                            <td>
+                                                {% if value|is_boolean %}
+                                                    <span class="status-icon {% if value %}bg-success{% else %}bg-danger{% endif %}"></span> {{ value|yesno|title }}
+                                                {% else %}
+                                                    {{ value }}
+                                                {% endif %}
+                                            </td>
+                                        {% endfor %}
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

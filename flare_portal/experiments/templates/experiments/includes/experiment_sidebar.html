@@ -1,3 +1,5 @@
+{% load experiments_tags %}
+
 <div class="card">
     <div class="card-header">
         <h1 class="page-title">{{ experiment.name }}</h1>
@@ -44,6 +46,17 @@
         <a href="{% url "experiments:experiment_detail" project_pk=experiment.project_id experiment_pk=experiment.pk %}" class="list-group-item list-group-item-action d-flex align-items-center{% if request.resolver_match.url_name == 'experiment_detail' %} active{% endif %}">
             <span class="icon mr-3"><i class="fe fe-layers"></i></span>Modules
         </a>
+        <div class="dropdown">
+            <a href="#" class="list-group-item list-group-item-action d-flex align-items-center" data-toggle="dropdown">
+                <span class="icon mr-3"><i class="fe fe-database"></i></span>Data
+            </a>
+            <div class="dropdown-menu">
+                {% get_module_data_types as data_types %}
+                {% for data_type in data_types %}
+                    <a class="dropdown-item" href="{% get_data_list_url data_type %}">{{ data_type.get_module_name|capfirst }}</a>
+                {% endfor %}
+            </div>
+        </div>
         <a href="{% url "experiments:participant_list" project_pk=experiment.project_id experiment_pk=experiment.pk %}" class="list-group-item list-group-item-action d-flex align-items-center{% if request.resolver_match.url_name == 'participant_list' %} active{% endif %}">
             <span class="icon mr-3"><i class="fe fe-users"></i></span>Participants
         </a>

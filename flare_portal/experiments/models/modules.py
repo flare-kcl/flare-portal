@@ -1,14 +1,14 @@
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.utils.text import camel_case_to_spaces, slugify
 
 from model_utils import Choices
 from model_utils.managers import InheritanceManager
 
 from .. import constants
+from .core import Nameable
 
 
-class BaseModule(models.Model):
+class BaseModule(Nameable, models.Model):
     experiment = models.ForeignKey(
         "experiments.Experiment", on_delete=models.CASCADE, related_name="modules"
     )
@@ -22,22 +22,6 @@ class BaseModule(models.Model):
     @classmethod
     def get_module_camel_case(cls) -> str:
         return cls.__name__.strip("Module")
-
-    @classmethod
-    def get_module_name(cls) -> str:
-        return camel_case_to_spaces(cls.get_module_camel_case())
-
-    @classmethod
-    def get_module_snake_case(cls) -> str:
-        return cls.get_module_name().replace(" ", "_")
-
-    @classmethod
-    def get_module_tag(cls) -> str:
-        return cls.get_module_snake_case().upper()
-
-    @classmethod
-    def get_module_slug(cls) -> str:
-        return slugify(cls.get_module_name())
 
     @classmethod
     def get_create_path_name(cls) -> str:

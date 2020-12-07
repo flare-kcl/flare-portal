@@ -1,13 +1,22 @@
-from typing import Any, Callable, Dict, List, Type
+from typing import Any, Callable, Dict, List, Optional, Type
 
 from django import forms
 from django.contrib import messages
+from django.db.models import QuerySet
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404
 from django.urls import URLPattern, path, reverse
+from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
-from .models import BaseModule, Experiment
+from .models import (
+    BaseData,
+    BaseModule,
+    Experiment,
+    FearConditioningData,
+    FearConditioningModule,
+    Participant,
+)
 
 
 class ModuleViewMixin:
@@ -79,6 +88,13 @@ class ModuleDeleteViewMixin(ModuleViewMixin):
 
 
 class ModuleRegistry:
+    """
+    Registry for module types
+
+    Registering a module type to this registry will add it to the list of
+    module types that can be added to an experiment.
+    """
+
     def __init__(self) -> None:
         self.modules: List[Type[BaseModule]] = []
         self.urls: List[URLPattern] = []
@@ -166,3 +182,124 @@ class ModuleRegistry:
                 name=delete_view_name,
             )
         )
+
+
+module_registry = ModuleRegistry()
+
+module_registry.register(FearConditioningModule)
+
+
+class DataViewMixin:
+    data_type: BaseData
+
+    def dispatch(self, *args: Any, **kwargs: Any) -> HttpResponse:
+        self.experiment = get_object_or_404(Experiment, pk=kwargs["experiment_pk"])
+        return super().dispatch(*args, **kwargs)  # type: ignore
+
+    def get_queryset(self) -> QuerySet[BaseData]:
+        return (
+            self.data_type.objects.filter(module__experiment=self.experiment)
+            .order_by("pk")
+            .select_related("participant", "module")
+        )
+
+    def get_context_data(self, **kwargs: Any) -> dict:
+        context = super().get_context_data(**kwargs)  # type: ignore
+        context["experiment"] = self.experiment
+        context["data_type"] = self.data_type
+        return context
+
+
+class DataListView(DataViewMixin, ListView):
+    context_object_name = "data"
+    template_name = "experiments/data_list.html"
+    participant: Optional[Participant] = None
+
+    def dispatch(self, *args: Any, **kwargs: Any) -> HttpResponse:
+        if participant_id := self.request.GET.get("participant"):
+            try:
+                self.participant = Participant.objects.get(
+                    participant_id=participant_id
+                )
+            except Participant.DoesNotExist:
+                pass
+
+        return super().dispatch(*args, **kwargs)
+
+    def get_queryset(self) -> QuerySet[BaseData]:
+        qs = super().get_queryset()
+
+        if self.participant:
+            return qs.filter(participant=self.participant)
+
+        return qs
+
+    def get_context_data(self, **kwargs: Any) -> dict:
+        context = super().get_context_data(**kwargs)
+
+        if self.participant:
+            context["participant"] = self.participant
+
+        return context
+
+
+class DataDetailView(DataViewMixin, DetailView):
+    context_object_name = "data"
+    pk_url_kwarg = "data_pk"
+    template_name = "experiments/data_detail.html"
+
+
+class DataViewsetRegistry:
+    """
+    Registry for module data types
+
+    Registering a module data type to this registry will make its data viewable
+    on the portal.
+    """
+
+    def __init__(self) -> None:
+        self.data_models: List[Type[BaseData]] = []
+        self.urls: List[URLPattern] = []
+        self.views: Dict[str, Callable] = {}
+
+    def register(self, data_model: Type[BaseData]) -> None:
+        module_camel_case = data_model.get_module_camel_case()
+
+        self.data_models.append(data_model)
+
+        # ListView
+        list_view_class: ListView = type(  # type: ignore
+            f"{module_camel_case}ListView", (DataListView,), {"data_type": data_model},
+        )
+        list_view_name = data_model.get_list_path_name()
+
+        self.views[list_view_name] = list_view_class.as_view()
+        self.urls.append(
+            path(
+                data_model.get_list_path(),
+                self.views[list_view_name],
+                name=list_view_name,
+            )
+        )
+
+        # DetailView
+        detail_view_class: ListView = type(  # type: ignore
+            f"{module_camel_case}DetailView",
+            (DataDetailView,),
+            {"data_type": data_model},
+        )
+        detail_view_name = data_model.get_detail_path_name()
+
+        self.views[detail_view_name] = detail_view_class.as_view()
+        self.urls.append(
+            path(
+                data_model.get_detail_path(),
+                self.views[detail_view_name],
+                name=detail_view_name,
+            )
+        )
+
+
+data_viewset_registry = DataViewsetRegistry()
+
+data_viewset_registry.register(FearConditioningData)
