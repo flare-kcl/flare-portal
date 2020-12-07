@@ -3,14 +3,11 @@ from django.urls import include, path
 from flare_portal.users.decorators import role_required
 from flare_portal.utils.urls import decorate_urlpatterns
 
-from . import models, views
-from .registry import ModuleRegistry
+from . import views
+from .registry import data_viewset_registry, module_registry
 
 app_name = "experiments"
 
-registry = ModuleRegistry()
-
-registry.register(models.FearConditioningModule)
 
 urlpatterns = [
     path("projects/", views.project_list_view, name="project_list"),
@@ -59,7 +56,8 @@ urlpatterns = [
         views.participant_create_batch_view,
         name="participant_create_batch",
     ),
-    path("", include((registry.urls, "modules"))),
+    path("", include((module_registry.urls, "modules"))),
+    path("", include((data_viewset_registry.urls, "data"))),
 ]
 
 urlpatterns = decorate_urlpatterns(urlpatterns, role_required, "RESEARCHER")

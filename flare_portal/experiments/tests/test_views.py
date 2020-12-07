@@ -8,6 +8,7 @@ from flare_portal.users.models import User
 
 from ..factories import (
     ExperimentFactory,
+    FearConditioningDataFactory,
     FearConditioningModuleFactory,
     ParticipantFactory,
     ProjectFactory,
@@ -15,6 +16,7 @@ from ..factories import (
 from ..models import (
     BaseModule,
     Experiment,
+    FearConditioningData,
     FearConditioningModule,
     Participant,
     Project,
@@ -890,3 +892,91 @@ class ParticipantFormSetViewTest(TestCase):
             str(list(resp.context["messages"])[0]),
             "Added 1 new participant. Changed 1 participant. Deleted 1 participant.",
         )
+
+
+class DataListViewTest(TestCase):
+    def setUp(self) -> None:
+        self.user = UserFactory()
+        self.user.grant_role("RESEARCHER")
+        self.user.save()
+        self.client.force_login(self.user)
+
+    def test_get(self) -> None:
+        project: Project = ProjectFactory()
+        experiment: Experiment = ExperimentFactory(project=project)
+        module: FearConditioningModule = FearConditioningModuleFactory(
+            experiment=experiment
+        )
+        data: List[FearConditioningData] = FearConditioningDataFactory.create_batch(
+            10, module=module
+        )
+        url = reverse(
+            "experiments:data:fear_conditioning_data_list",
+            kwargs={"project_pk": project.pk, "experiment_pk": experiment.pk},
+        )
+
+        resp = self.client.get(url)
+
+        self.assertEqual(resp.status_code, 200)
+
+        self.assertEqual(resp.context["data_type"], FearConditioningData)
+        self.assertEqual(list(resp.context["data"]), data)
+
+    def test_filter(self) -> None:
+        # Can filter by participant
+        project: Project = ProjectFactory()
+        experiment: Experiment = ExperimentFactory(project=project)
+        module: FearConditioningModule = FearConditioningModuleFactory(
+            experiment=experiment
+        )
+        FearConditioningDataFactory.create_batch(10, module=module)
+
+        # Data for a single participant
+        participant: Participant = ParticipantFactory(experiment=experiment)
+        participant_data: List[
+            FearConditioningData
+        ] = FearConditioningDataFactory.create_batch(
+            10, module=module, participant=participant
+        )
+        url = reverse(
+            "experiments:data:fear_conditioning_data_list",
+            kwargs={"project_pk": project.pk, "experiment_pk": experiment.pk},
+        )
+
+        resp = self.client.get(url, {"participant": participant.participant_id})
+
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(participant, resp.context["participant"])
+        self.assertEqual(list(resp.context["data"]), participant_data)
+
+
+class DataDetailViewTest(TestCase):
+    def setUp(self) -> None:
+        self.user = UserFactory()
+        self.user.grant_role("RESEARCHER")
+        self.user.save()
+        self.client.force_login(self.user)
+
+    def test_get(self) -> None:
+        project: Project = ProjectFactory()
+        experiment: Experiment = ExperimentFactory(project=project)
+        module: FearConditioningModule = FearConditioningModuleFactory(
+            experiment=experiment
+        )
+        data: FearConditioningData = FearConditioningDataFactory(module=module)
+
+        url = reverse(
+            "experiments:data:fear_conditioning_data_detail",
+            kwargs={
+                "project_pk": project.pk,
+                "experiment_pk": experiment.pk,
+                "data_pk": data.pk,
+            },
+        )
+
+        resp = self.client.get(url)
+
+        self.assertEqual(resp.status_code, 200)
+
+        self.assertEqual(resp.context["data_type"], FearConditioningData)
+        self.assertEqual(resp.context["data"], data)

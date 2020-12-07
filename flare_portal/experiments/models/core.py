@@ -3,6 +3,7 @@ from django.core import validators
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
+from django.utils.text import camel_case_to_spaces, slugify
 
 
 class Project(models.Model):
@@ -77,3 +78,25 @@ class Participant(models.Model):
 
     def __str__(self) -> str:
         return self.participant_id
+
+
+class Nameable:
+    @classmethod
+    def get_module_camel_case(cls) -> str:
+        return cls.__name__
+
+    @classmethod
+    def get_module_name(cls) -> str:
+        return camel_case_to_spaces(cls.get_module_camel_case())
+
+    @classmethod
+    def get_module_snake_case(cls) -> str:
+        return cls.get_module_name().replace(" ", "_")
+
+    @classmethod
+    def get_module_tag(cls) -> str:
+        return cls.get_module_snake_case().upper()
+
+    @classmethod
+    def get_module_slug(cls) -> str:
+        return slugify(cls.get_module_name())
