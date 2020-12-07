@@ -114,7 +114,7 @@ class FearConditioningDataTest(TestCase):
             unconditional_stimulus=True,
             trial_started_at=timezone.now(),
             response_recorded_at=timezone.now(),
-            volume_level=78,
+            volume_level=0.78,
             headphones=True,
         )
 
@@ -131,7 +131,7 @@ class FearConditioningDataTest(TestCase):
             unconditional_stimulus=True,
             trial_started_at=timezone.now(),
             response_recorded_at=timezone.now(),
-            volume_level=78,
+            volume_level=0.78,
             headphones=True,
         )
 
@@ -170,7 +170,7 @@ class FearConditioningDataTest(TestCase):
             unconditional_stimulus=True,
             trial_started_at=timezone.now(),
             response_recorded_at=timezone.now(),
-            volume_level=78,
+            volume_level=0.78,
             headphones=True,
         )
 

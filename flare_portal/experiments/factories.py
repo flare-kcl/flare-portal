@@ -67,5 +67,5 @@ class FearConditioningDataFactory(factory.django.DjangoModelFactory):
     unconditional_stimulus = factory.Faker("random_element", elements=[True, False])
     trial_started_at = factory.LazyFunction(lambda: timezone.now())
     response_recorded_at = factory.LazyFunction(lambda: timezone.now())
-    volume_level = factory.Faker("random_int", min=1, max=100)
+    volume_level = factory.Faker("pydecimal", left_digits=1, right_digits=2)
     headphones = factory.Faker("random_element", elements=[True, False])

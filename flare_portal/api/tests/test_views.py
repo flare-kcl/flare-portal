@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.test import TestCase
 from django.urls import reverse
 from django.utils.dateparse import parse_datetime
@@ -95,7 +97,7 @@ class ConfigurationAPIViewTest(TestCase):
         self.assertEqual(resp.json(), {"participant": ["Invalid participant"]})
 
 
-class ModuleDataAPIView(TestCase):
+class ModuleDataAPIViewTest(TestCase):
     def test_post(self) -> None:
         experiment: Experiment = ExperimentFactory()
         module: FearConditioningModule = FearConditioningModuleFactory(
@@ -114,7 +116,7 @@ class ModuleDataAPIView(TestCase):
             "unconditional_stimulus": True,
             "trial_started_at": parse_datetime("2020-01-01T00:00Z"),
             "response_recorded_at": parse_datetime("2020-01-01T00:00Z"),
-            "volume_level": 50,
+            "volume_level": "0.50",
             "headphones": True,
         }
 
@@ -143,7 +145,7 @@ class ModuleDataAPIView(TestCase):
         )
         self.assertEqual(data.trial_started_at, json_data["trial_started_at"])
         self.assertEqual(data.response_recorded_at, json_data["response_recorded_at"])
-        self.assertEqual(data.volume_level, json_data["volume_level"])
+        self.assertEqual(data.volume_level, Decimal(json_data["volume_level"]))
         self.assertEqual(data.headphones, json_data["headphones"])
 
     def test_validation(self) -> None:
@@ -163,7 +165,7 @@ class ModuleDataAPIView(TestCase):
             "unconditional_stimulus": True,
             "trial_started_at": parse_datetime("2020-01-01T00:00Z"),
             "response_recorded_at": parse_datetime("2020-01-01T00:00Z"),
-            "volume_level": 50,
+            "volume_level": 0.50,
             "headphones": True,
         }
 
