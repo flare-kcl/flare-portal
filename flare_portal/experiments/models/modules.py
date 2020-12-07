@@ -1,5 +1,8 @@
+import re
+
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.utils.text import get_text_list
 
 from model_utils import Choices
 from model_utils.managers import InheritanceManager
@@ -21,7 +24,7 @@ class BaseModule(Nameable, models.Model):
 
     @classmethod
     def get_module_camel_case(cls) -> str:
-        return cls.__name__.strip("Module")
+        return re.sub("Module$", "", cls.__name__)
 
     @classmethod
     def get_create_path_name(cls) -> str:
@@ -126,3 +129,25 @@ class FearConditioningModule(BaseModule):
 
     def __str__(self) -> str:
         return "Fear conditioning - " + super().__str__()
+
+
+class BasicInfoModule(BaseModule):
+    collect_date_of_birth = models.BooleanField(default=False)
+    collect_gender = models.BooleanField(default=False)
+    collect_headphone_make = models.BooleanField(default=False)
+    collect_headphone_model = models.BooleanField(default=False)
+
+    def get_module_description(self) -> str:
+        collecting = {
+            "date of birth": self.collect_date_of_birth,
+            "gender": self.collect_gender,
+            "headphone make": self.collect_headphone_make,
+            "headphone model": self.collect_headphone_model,
+            "device make": True,
+            "device model": True,
+        }
+        text = get_text_list([key for key, value in collecting.items() if value], "and")
+        return "Collecting " + text
+
+    def __str__(self) -> str:
+        return "Basic info - " + super().__str__()

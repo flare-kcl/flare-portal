@@ -1,7 +1,10 @@
+import re
 from typing import Any, List, Literal, Tuple, Union
 
 from django.contrib.admin.utils import get_fields_from_path
 from django.db import models
+
+from model_utils import Choices
 
 from .core import Nameable
 from .modules import BaseModule
@@ -30,6 +33,12 @@ class BaseData(Nameable, models.Model):
     class Meta:
         abstract = True
 
+    def __str__(self) -> str:
+        return (
+            f"Participant: {self.participant_id} - "  # type:ignore
+            f"Module: {self.module_id}"
+        )
+
     @classmethod
     def get_list_path_name(cls) -> str:
         module_snake_case = cls.get_module_snake_case()
@@ -37,7 +46,7 @@ class BaseData(Nameable, models.Model):
 
     @classmethod
     def get_list_path(cls) -> str:
-        module_slug = cls.get_module_slug().strip("-data")
+        module_slug = re.sub("-data$", "", cls.get_module_slug())
         return (
             "projects/<int:project_pk>/experiments/<int:experiment_pk>/data/"
             f"{module_slug}/"
@@ -50,7 +59,7 @@ class BaseData(Nameable, models.Model):
 
     @classmethod
     def get_detail_path(cls) -> str:
-        module_slug = cls.get_module_slug().strip("-data")
+        module_slug = re.sub("-data$", "", cls.get_module_slug())
         return (
             "projects/<int:project_pk>/experiments/<int:experiment_pk>/data/"
             f"{module_slug}/<int:data_pk>/"
@@ -127,5 +136,19 @@ class FearConditioningData(BaseData):
         "rating",
     ]
 
-    def __str__(self) -> str:
-        return f"Participant: {self.participant_id} - Module: {self.module_id}"
+
+class BasicInfoData(BaseData):
+    GENDERS = Choices(("male", "Male"), ("female", "Female"),)
+
+    module = models.ForeignKey(  # type: ignore
+        "experiments.BasicInfoModule", on_delete=models.PROTECT, related_name="data",
+    )
+
+    date_of_birth = models.DateField(null=True)
+    gender = models.CharField(
+        max_length=24, choices=GENDERS, default=GENDERS.male, blank=True
+    )
+    headphone_make = models.CharField(max_length=255, blank=True)
+    headphone_model = models.CharField(max_length=255, blank=True)
+    device_make = models.CharField(max_length=255, blank=True)
+    device_model = models.CharField(max_length=255, blank=True)
