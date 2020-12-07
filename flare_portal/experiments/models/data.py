@@ -138,17 +138,61 @@ class FearConditioningData(BaseData):
 
 
 class BasicInfoData(BaseData):
-    GENDERS = Choices(("male", "Male"), ("female", "Female"),)
+    GENDERS = Choices(
+        ("male", "Male"),
+        ("female", "Female"),
+        ("non_binary", "Non-binary"),
+        ("self_define", "Prefer to self-define"),
+        ("dont_know", "Don't know"),
+        ("no_answer", "Prefer not to answer"),
+    )
+    HEADPHONE_TYPES = Choices(
+        ("in_ear", "In-ear"), ("on_ear", "On-ear"), ("over_ear", "Over-ear"),
+    )
+
+    fields = [
+        "date_of_birth",
+        "gender",
+        "headphone_type",
+        "headphone_make",
+        "headphone_model",
+        "headphone_label",
+        "device_make",
+        "device_model",
+        "os_name",
+        "os_version",
+    ]
+    list_display = [
+        "participant",
+        "date_of_birth",
+        "gender",
+        "headphone_type",
+        "device_make",
+        "os_name",
+        "os_version",
+    ]
 
     module = models.ForeignKey(  # type: ignore
         "experiments.BasicInfoModule", on_delete=models.PROTECT, related_name="data",
     )
 
+    # Optional
     date_of_birth = models.DateField(null=True)
     gender = models.CharField(
         max_length=24, choices=GENDERS, default=GENDERS.male, blank=True
     )
     headphone_make = models.CharField(max_length=255, blank=True)
     headphone_model = models.CharField(max_length=255, blank=True)
-    device_make = models.CharField(max_length=255, blank=True)
-    device_model = models.CharField(max_length=255, blank=True)
+    headphone_label = models.CharField(max_length=255, blank=True)
+
+    # Mandatory
+    device_make = models.CharField(max_length=255)
+    device_model = models.CharField(max_length=255)
+    headphone_type = models.CharField(max_length=8, choices=HEADPHONE_TYPES)
+    os_name = models.CharField(max_length=255)
+    os_version = models.CharField(max_length=255)
+
+    def get_date_of_birth_display(self) -> str:
+        if self.date_of_birth:
+            return self.date_of_birth.strftime("%Y-%m")
+        return ""

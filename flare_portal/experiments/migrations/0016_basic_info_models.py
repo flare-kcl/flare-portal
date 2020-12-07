@@ -9,7 +9,7 @@ import flare_portal.experiments.models.core
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("experiments", "0014_stimulus_verbose_name"),
+        ("experiments", "0015_volume_level_decimal_field"),
     ]
 
     operations = [
