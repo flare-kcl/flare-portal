@@ -3,6 +3,8 @@ from typing import Dict, List
 from django.test import TestCase
 from django.urls import reverse
 
+from rest_framework.test import APITestCase
+
 from flare_portal.users.factories import UserFactory
 from flare_portal.users.models import User
 
@@ -980,3 +982,42 @@ class DataDetailViewTest(TestCase):
 
         self.assertEqual(resp.context["data_type"], FearConditioningData)
         self.assertEqual(resp.context["data"], data)
+
+
+class ModuleSortViewTest(APITestCase):
+    def setUp(self) -> None:
+        self.user = UserFactory()
+        self.user.grant_role("RESEARCHER")
+        self.user.save()
+        self.client.force_login(self.user)
+
+    def test_sort_modules(self) -> None:
+        project: Project = ProjectFactory()
+        experiment: Experiment = ExperimentFactory(project=project)
+        modules = FearConditioningModuleFactory.create_batch(5, experiment=experiment)
+
+        # Reverse the sorting
+        json_data = {
+            modules[0].pk: 5,
+            modules[1].pk: 4,
+            modules[2].pk: 3,
+            modules[3].pk: 2,
+            modules[4].pk: 1,
+        }
+
+        url = reverse(
+            "experiments:module_sort",
+            kwargs={"project_pk": project.pk, "experiment_pk": experiment.pk},
+        )
+
+        resp = self.client.post(url, json_data, format="json")
+
+        self.assertEqual(200, resp.status_code)
+
+        sorted_modules = experiment.modules.order_by("sortorder")
+
+        self.assertEqual(sorted_modules[0].pk, modules[4].pk)
+        self.assertEqual(sorted_modules[1].pk, modules[3].pk)
+        self.assertEqual(sorted_modules[2].pk, modules[2].pk)
+        self.assertEqual(sorted_modules[3].pk, modules[1].pk)
+        self.assertEqual(sorted_modules[4].pk, modules[0].pk)
