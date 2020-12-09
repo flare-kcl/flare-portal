@@ -11,7 +11,7 @@
                 {% include "experiments/includes/experiment_sidebar.html" %}
             </div>
             <div class="col-lg-8">
-                <div class="card">
+                <div class="card" x-data="moduleList()" x-init="() => draggable()">
                     <div class="card-header">
                         <h3 class="card-title">Modules</h3>
                         <div class="ml-auto">
@@ -31,10 +31,12 @@
                         </div>
                     </div>
                     <div class="card-body">
+                        {# Ensure the csrf token cookie is set on this page because it's required by the module sort API #}
+                        {% csrf_token %}
                         {% if modules %}
-                            <ul class="timeline" x-data x-init="() => draggable($el)">
+                            <ul class="timeline" x-ref="modules">
                                 {% for module in modules %}
-                                    <li class="timeline-item">
+                                    <li class="timeline-item" data-module-id="{{ module.pk }}">
                                         <div class="timeline-badge"></div>
                                         <div>
                                             <strong>{{ module.get_module_title|capfirst }}</strong>
@@ -53,7 +55,11 @@
                         {% endif %}
                     </div>
                     <div class="card-footer d-flex">
-                        <div class="d-flex align-items-center text-success"><i class="fe fe-check mr-2"></i> Updated module order</div>
+                        <div class="d-flex align-items-center text-success">
+                            <span x-show.transition.out.opacity.duration.1000ms="showSuccessMessage">
+                                <i class="fe fe-check mr-2"></i> Saved ordering
+                            </span>
+                        </div>
                         <div class="ml-auto">
                             <div class="dropdown">
                                 <button class="btn btn-sm btn-primary dropdown-toggle" type="button" data-toggle="dropdown">

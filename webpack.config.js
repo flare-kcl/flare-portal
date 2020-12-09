@@ -8,10 +8,12 @@ const sass = require('sass');
 
 const projectRoot = 'flare_portal';
 
+const polyfills = ['core-js/stable', 'regenerator-runtime/runtime'];
+
 const options = {
     entry: {
         // multiple entries can be added here
-        main: `./${projectRoot}/static_src/javascript/main.js`,
+        main: [...polyfills, `./${projectRoot}/static_src/javascript/main.js`],
     },
     output: {
         path: path.resolve(`./${projectRoot}/static_compiled/`),
