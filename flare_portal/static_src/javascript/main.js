@@ -23,7 +23,10 @@ window.moduleList = () => {
         showSuccessMessage: false,
         draggable() {
             const $el = this.$refs.modules;
-            const sortable = new Sortable($el, { draggable: 'li' });
+            const sortable = new Sortable($el, {
+                draggable: 'tr',
+                handle: 'i.fe-menu',
+            });
 
             sortable.on('sortable:stop', async () => {
                 // Get the module order based on the DOM order
@@ -32,7 +35,7 @@ window.moduleList = () => {
                         // Only include elements that weren't moved plus the element
                         // that was moved to a new position
                         ($moduleEl) =>
-                            $moduleEl.className === 'timeline-item' ||
+                            !$moduleEl.className.includes('draggable') ||
                             $moduleEl.classList.contains('draggable--over'),
                     )
                     .map(($moduleEl) => $moduleEl.dataset.moduleId);

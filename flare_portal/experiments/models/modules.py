@@ -136,15 +136,18 @@ class BasicInfoModule(BaseModule):
     collect_gender = models.BooleanField(default=False)
     collect_headphone_make = models.BooleanField(default=False)
     collect_headphone_model = models.BooleanField(default=False)
+    collect_headphone_label = models.BooleanField(default=False)
 
     def get_module_description(self) -> str:
         collecting = {
             "date of birth": self.collect_date_of_birth,
             "gender": self.collect_gender,
+            "headphone type": True,
             "headphone make": self.collect_headphone_make,
             "headphone model": self.collect_headphone_model,
-            "device make": True,
-            "device model": True,
+            "headphone label": self.collect_headphone_label,
+            "device make and model": True,
+            "OS name and version": True,
         }
         text = get_text_list([key for key, value in collecting.items() if value], "and")
         return "Collecting " + text

@@ -30,30 +30,32 @@
                             </div>
                         </div>
                     </div>
-                    <div class="card-body">
-                        {# Ensure the csrf token cookie is set on this page because it's required by the module sort API #}
+                    {% if modules %}
                         {% csrf_token %}
-                        {% if modules %}
-                            <ul class="timeline" x-ref="modules">
-                                {% for module in modules %}
-                                    <li class="timeline-item" data-module-id="{{ module.pk }}">
-                                        <div class="timeline-badge"></div>
-                                        <div>
-                                            <strong>{{ module.get_module_title|capfirst }}</strong>
-                                            <small class="d-block text-muted">{{ module.get_module_description }}</small>
-                                        </div>
-                                        <div class="timeline-time">
-                                            <a href="{% get_module_update_url module %}"><i class="fe fe-edit"></i></a>
-                                        </div>
-                                    </li>
-                                {% endfor %}
-                            </ul>
-                        {% else %}
-                            <div class="alert alert-info" role="alert">
-                                You haven't added any modules yet.
-                            </div>
-                        {% endif %}
-                    </div>
+                        <div class="table-responsive">
+                            <table class="table table-vcenter card-table">
+                                <tbody x-ref="modules">
+                                    {% for module in modules %}
+                                        <tr class="bg-white" data-module-id="{{ module.pk }}">
+                                            <td><i class="fe fe-menu" style="cursor: grab"></i></td>
+                                            <td>
+                                                <strong>{{ module.get_module_title|capfirst }}</strong>
+                                                <div class="small text-muted">{{ module.get_module_description }}</div>
+                                            </td>
+                                            <td>
+                                                <a href="{% get_module_update_url module %}"><i class="fe fe-edit"></i></a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="card-body">
+                            <div class="alert alert-info" role="alert">You haven't added any modules yet.</div>
+                        </div>
+                    {% endif %}
+
                     <div class="card-footer d-flex">
                         <div class="d-flex align-items-center text-success">
                             <span x-show.transition.out.opacity.duration.1000ms="showSuccessMessage">
