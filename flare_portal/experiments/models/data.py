@@ -116,6 +116,9 @@ class FearConditioningData(BaseData):
     volume_level = models.DecimalField(max_digits=3, decimal_places=2)
     headphones = models.BooleanField()
 
+    class Meta:
+        unique_together = ("trial", "module", "participant")
+
     fields = [
         "module__phase",
         "trial",

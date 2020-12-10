@@ -181,3 +181,45 @@ class ModuleDataAPIViewTest(TestCase):
                 ]
             },
         )
+
+
+class FearConditioningDataAPIViewTest(TestCase):
+    def test_unique_trial(self) -> None:
+        experiment: Experiment = ExperimentFactory()
+        module: FearConditioningModule = FearConditioningModuleFactory(
+            experiment=experiment
+        )
+        participant: Participant = ParticipantFactory(experiment=experiment)
+
+        url = reverse("api:fear_conditioning_data")
+
+        json_data = {
+            "participant": participant.participant_id,
+            "module": module.pk,
+            "trial": 1,
+            "rating": 5,
+            "conditional_stimulus": "CSA",
+            "unconditional_stimulus": True,
+            "trial_started_at": parse_datetime("2020-01-01T00:00Z"),
+            "response_recorded_at": parse_datetime("2020-01-01T00:00Z"),
+            "volume_level": "0.50",
+            "headphones": True,
+        }
+
+        resp = self.client.post(url, json_data, content_type="application/json")
+
+        self.assertEqual(201, resp.status_code)
+
+        # Send the same data again (same trial, participant, and module)
+        resp = self.client.post(url, json_data, content_type="application/json")
+
+        self.assertEqual(400, resp.status_code)
+
+        self.assertEqual(
+            resp.json(),
+            {
+                "non_field_errors": [
+                    "The fields trial, module, participant must make a unique set."
+                ]
+            },
+        )
