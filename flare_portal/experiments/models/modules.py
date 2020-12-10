@@ -2,6 +2,7 @@ import re
 
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.template.defaultfilters import pluralize
 from django.utils.text import get_text_list
 
 from model_utils import Choices
@@ -167,3 +168,32 @@ class BasicInfoModule(BaseModule):
 
     def __str__(self) -> str:
         return "Basic info - " + super().__str__()
+
+
+class CriterionQuestion(models.Model):
+    question_text = models.CharField(max_length=255)
+    help_text = models.TextField(blank=True)
+    required_answer = models.BooleanField(default=False)
+
+    module = models.ForeignKey(
+        "experiments.CriterionModule",
+        on_delete=models.CASCADE,
+        related_name="questions",
+    )
+    sortorder = models.PositiveIntegerField(default=0)
+
+    def __str__(self) -> str:
+        return self.question_text
+
+
+class CriterionModule(BaseModule):
+    intro_text = models.TextField(blank=True)
+
+    inlines = ["questions"]
+
+    def get_module_description(self) -> str:
+        question_count = self.questions.count()
+        return f"{question_count} question{pluralize(question_count)}"
+
+    def __str__(self) -> str:
+        return "Criterion - " + super().__str__()

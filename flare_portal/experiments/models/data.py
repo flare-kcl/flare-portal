@@ -205,3 +205,14 @@ class BasicInfoData(BaseData):
         if self.date_of_birth:
             return self.date_of_birth.strftime("%Y-%m")
         return ""
+
+
+class CriterionData(BaseData):
+    question = models.ForeignKey(
+        "experiments.CriterionQuestion", on_delete=models.CASCADE
+    )
+    answer = models.BooleanField()
+
+    module = models.ForeignKey(  # type: ignore
+        "experiments.CriterionModule", on_delete=models.PROTECT, related_name="data",
+    )

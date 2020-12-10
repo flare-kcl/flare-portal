@@ -17,6 +17,7 @@ from ..factories import (
 )
 from ..models import (
     BaseModule,
+    CriterionModule,
     Experiment,
     FearConditioningData,
     FearConditioningModule,
@@ -680,6 +681,46 @@ class ModuleCreateViewTest(TestCase):
         self.assertEqual(
             str(list(resp.context["messages"])[0]),
             "Added fear conditioning module",
+        )
+
+    def test_create_criterion_module(self) -> None:
+        # Criterion module should have a formset for the questions
+        url = reverse(
+            "experiments:modules:criterion_create",
+            kwargs={"project_pk": self.project.pk, "experiment_pk": self.experiment.pk},
+        )
+
+        resp = self.client.get(url)
+
+        self.assertEqual(200, resp.status_code)
+
+        self.assertEqual(CriterionModule, resp.context["module_type"])
+        self.assertEqual(self.experiment.pk, resp.context["form"].initial["experiment"])
+
+        form_data = {
+            "intro_text": "Intro 123",
+            "experiment": str(self.experiment.pk),
+        }
+
+        resp = self.client.post(url, form_data, follow=True)
+
+        module = self.experiment.modules.select_subclasses().get()  # type: ignore
+
+        self.assertRedirects(
+            resp,
+            reverse(
+                "experiments:experiment_detail",
+                kwargs={
+                    "project_pk": self.project.pk,
+                    "experiment_pk": self.experiment.pk,
+                },
+            ),
+        )
+
+        self.assertEqual(module.intro_text, form_data["intro_text"])
+
+        self.assertEqual(
+            str(list(resp.context["messages"])[0]), "Added criterion module",
         )
 
 

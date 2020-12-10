@@ -8,6 +8,7 @@ from rest_framework.generics import CreateAPIView
 from flare_portal.experiments.models import (
     BaseData,
     BasicInfoData,
+    CriterionData,
     FearConditioningData,
     Participant,
 )
@@ -71,4 +72,5 @@ class DataAPIRegistry:
 data_api_registry = DataAPIRegistry()
 
 data_api_registry.register(BasicInfoData)
+data_api_registry.register(CriterionData)
 data_api_registry.register(FearConditioningData)

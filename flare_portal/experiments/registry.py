@@ -14,6 +14,8 @@ from .models import (
     BaseModule,
     BasicInfoData,
     BasicInfoModule,
+    CriterionData,
+    CriterionModule,
     Experiment,
     FearConditioningData,
     FearConditioningModule,
@@ -195,6 +197,7 @@ class ModuleRegistry:
 module_registry = ModuleRegistry()
 
 module_registry.register(BasicInfoModule)
+module_registry.register(CriterionModule)
 module_registry.register(FearConditioningModule)
 
 
@@ -334,6 +337,7 @@ class FearConditioningDataListView(DataListView):
 data_viewset_registry = DataViewsetRegistry()
 
 data_viewset_registry.register(BasicInfoData)
+data_viewset_registry.register(CriterionData)
 data_viewset_registry.register(
     FearConditioningData, list_view_class=FearConditioningDataListView
 )

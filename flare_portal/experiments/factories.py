@@ -5,6 +5,8 @@ import factory
 from flare_portal.users.factories import UserFactory
 
 from .models import (
+    CriterionModule,
+    CriterionQuestion,
     Experiment,
     FearConditioningData,
     FearConditioningModule,
@@ -72,3 +74,22 @@ class FearConditioningDataFactory(factory.django.DjangoModelFactory):
     volume_level = factory.Faker("pydecimal", left_digits=1, right_digits=2)
     calibrated_volume_level = factory.Faker("pydecimal", left_digits=1, right_digits=2)
     headphones = factory.Faker("random_element", elements=[True, False])
+
+
+class CriterionModuleFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = CriterionModule
+
+    experiment = factory.SubFactory(ExperimentFactory)
+    intro_text = factory.Faker("paragraph")
+
+
+class CriterionQuestionFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = CriterionQuestion
+
+    question_text = factory.Faker("sentence")
+    help_text = factory.Faker("paragraph")
+    required_answer = factory.Faker("random_element", elements=[True, False])
+
+    module = factory.SubFactory(CriterionModuleFactory)

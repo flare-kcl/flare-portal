@@ -5,6 +5,8 @@ from django.urls import reverse
 from django.utils.dateparse import parse_datetime
 
 from flare_portal.experiments.factories import (
+    CriterionModuleFactory,
+    CriterionQuestionFactory,
     ExperimentFactory,
     FearConditioningModuleFactory,
     ParticipantFactory,
@@ -232,3 +234,51 @@ class FearConditioningDataAPIViewTest(TestCase):
                 ]
             },
         )
+
+
+class CriterionDataAPIViewTest(TestCase):
+    def test_post(self) -> None:
+        experiment = ExperimentFactory()
+        participant = ParticipantFactory(experiment=experiment)
+        module = CriterionModuleFactory(experiment=experiment)
+
+        question_1 = CriterionQuestionFactory()
+        question_2 = CriterionQuestionFactory()
+
+        url = reverse("api:criterion_data")
+
+        json_data = {
+            "participant": participant.participant_id,
+            "module": module.pk,
+            "question": question_1.pk,
+            "answer": True,
+        }
+
+        resp = self.client.post(url, json_data, content_type="application/json")
+
+        self.assertEqual(201, resp.status_code)
+
+        json_data = {
+            "participant": participant.participant_id,
+            "module": module.pk,
+            "question": question_2.pk,
+            "answer": False,
+        }
+
+        resp = self.client.post(url, json_data, content_type="application/json")
+
+        self.assertEqual(201, resp.status_code)
+
+        answers = module.data.all()
+
+        self.assertEqual(answers[0].question, question_1)
+        self.assertEqual(answers[0].answer, True)
+
+        self.assertEqual(answers[1].question, question_2)
+        self.assertEqual(answers[1].answer, False)
+
+    def test_unique_answer(self) -> None:
+        self.fail()
+
+    def test_question_validation(self) -> None:
+        self.fail()
