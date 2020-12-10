@@ -5,7 +5,12 @@ from django.urls import URLPattern, path
 from rest_framework import serializers
 from rest_framework.generics import CreateAPIView
 
-from flare_portal.experiments.models import BaseData, FearConditioningData, Participant
+from flare_portal.experiments.models import (
+    BaseData,
+    BasicInfoData,
+    FearConditioningData,
+    Participant,
+)
 
 
 class DataSerializerMixin(serializers.ModelSerializer):
@@ -65,4 +70,5 @@ class DataAPIRegistry:
 
 data_api_registry = DataAPIRegistry()
 
+data_api_registry.register(BasicInfoData)
 data_api_registry.register(FearConditioningData)

@@ -11,7 +11,7 @@
                 {% include "experiments/includes/experiment_sidebar.html" %}
             </div>
             <div class="col-lg-8">
-                <div class="card">
+                <div class="card" x-data="moduleList()" x-init="() => draggable()">
                     <div class="card-header">
                         <h3 class="card-title">Modules</h3>
                         <div class="ml-auto">
@@ -30,27 +30,53 @@
                             </div>
                         </div>
                     </div>
-                    <div class="card-body">
-                        {% if modules %}
-                            <ul class="timeline">
-                                {% for module in modules %}
-                                    <li class="timeline-item">
-                                        <div class="timeline-badge"></div>
-                                        <div>
-                                            <strong>{{ module.get_module_title|capfirst }}</strong>
-                                            <small class="d-block text-muted">{{ module.get_module_description }}</small>
-                                        </div>
-                                        <div class="timeline-time">
-                                            <a href="{% get_module_update_url module %}"><i class="fe fe-edit"></i></a>
-                                        </div>
-                                    </li>
-                                {% endfor %}
-                            </ul>
-                        {% else %}
-                            <div class="alert alert-info" role="alert">
-                                You haven't added any modules yet.
+                    {% if modules %}
+                        {% csrf_token %}
+                        <div class="table-responsive">
+                            <table class="table table-vcenter card-table">
+                                <tbody x-ref="modules">
+                                    {% for module in modules %}
+                                        <tr class="bg-white" data-module-id="{{ module.pk }}">
+                                            <td><i class="fe fe-menu" style="cursor: grab"></i></td>
+                                            <td>
+                                                <strong>{{ module.get_module_title|capfirst }}</strong>
+                                                <div class="small text-muted">{{ module.get_module_description }}</div>
+                                            </td>
+                                            <td>
+                                                <a href="{% get_module_update_url module %}"><i class="fe fe-edit"></i></a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="card-body">
+                            <div class="alert alert-info" role="alert">You haven't added any modules yet.</div>
+                        </div>
+                    {% endif %}
+
+                    <div class="card-footer d-flex">
+                        <div class="d-flex align-items-center text-success">
+                            <span x-show.transition.out.opacity.duration.1000ms="showSuccessMessage">
+                                <i class="fe fe-check mr-2"></i> Saved ordering
+                            </span>
+                        </div>
+                        <div class="ml-auto">
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
+                                    Add module
+                                </button>
+                                <div class="dropdown-menu">
+                                    {% get_module_types as module_types %}
+                                    {% for module_type in module_types %}
+                                        <a class="dropdown-item" href="{% get_module_create_url module_type experiment %}">
+                                            Add {{ module_type.get_module_name }} module
+                                        </a>
+                                    {% endfor %}
+                                </div>
                             </div>
-                        {% endif %}
+                        </div>
                     </div>
                 </div>
             </div>

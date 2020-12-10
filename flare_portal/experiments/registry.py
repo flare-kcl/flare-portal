@@ -12,6 +12,8 @@ from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from .models import (
     BaseData,
     BaseModule,
+    BasicInfoData,
+    BasicInfoModule,
     Experiment,
     FearConditioningData,
     FearConditioningModule,
@@ -186,6 +188,7 @@ class ModuleRegistry:
 
 module_registry = ModuleRegistry()
 
+module_registry.register(BasicInfoModule)
 module_registry.register(FearConditioningModule)
 
 
@@ -302,4 +305,5 @@ class DataViewsetRegistry:
 
 data_viewset_registry = DataViewsetRegistry()
 
+data_viewset_registry.register(BasicInfoData)
 data_viewset_registry.register(FearConditioningData)

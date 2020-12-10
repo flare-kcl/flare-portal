@@ -46,6 +46,11 @@ urlpatterns = [
         name="experiment_delete",
     ),
     path(
+        "projects/<int:project_pk>/experiments/<int:experiment_pk>/sort-modules/",
+        views.module_sort_view,
+        name="module_sort",
+    ),
+    path(
         "projects/<int:project_pk>/experiments/<int:experiment_pk>/participants/",
         views.participant_formset_view,
         name="participant_list",

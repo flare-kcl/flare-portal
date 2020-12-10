@@ -137,6 +137,7 @@ There is a folder inside `images` called `cssBackgrounds` where you should place
 
 ## React specific packages
 
-- **babel-polyfill** - IE11 fallbacks for some js functions https://www.npmjs.com/package/babel-polyfill
 - **babel-preset-react** - babel preset for react. https://www.npmjs.com/package/babel-preset-react https://babeljs.io/env/ https://babeljs.io/docs/plugins/
+- **core-js** - IE11 fallbacks for some js functions https://www.npmjs.com/package/core-js
 - **eslint-plugin-react** - linting for react and jsx https://www.npmjs.com/package/eslint-plugin-react
+- **regenerator-runtime** - So we can use `async/await`

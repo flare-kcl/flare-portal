@@ -8,6 +8,7 @@ This project contains technical documentation written in Markdown in the `/docs`
 - deployment
 - git branching
 - project conventions
+- Flare portal API endpoints
 
 You can view it using `mkdocs` by running:
 

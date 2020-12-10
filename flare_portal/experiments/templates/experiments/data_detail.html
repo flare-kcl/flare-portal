@@ -24,7 +24,7 @@
                                     {% if value|is_boolean %}
                                         <span class="status-icon {% if value %}bg-success{% else %}bg-danger{% endif %}"></span> {{ value|yesno|title }}
                                     {% else %}
-                                        {{ value }}
+                                        {{ value|default:"-" }}
                                     {% endif %}
                                 </dd>
                             {% endfor %}
