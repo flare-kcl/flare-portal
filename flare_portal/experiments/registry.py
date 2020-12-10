@@ -9,6 +9,8 @@ from django.urls import URLPattern, path, reverse
 from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
+from extra_views import CreateWithInlinesView
+
 from .models import (
     BaseData,
     BaseModule,
@@ -50,14 +52,14 @@ class ModuleViewMixin:
         return context
 
 
-class ModuleCreateViewMixin(ModuleViewMixin):
+class ModuleCreateViewMixin(ModuleViewMixin, CreateWithInlinesView):
     template_name = "experiments/module_form.html"
 
     def get_initial(self) -> dict:
         return {"experiment": self.experiment.pk}
 
-    def form_valid(self, form: forms.BaseModelForm) -> HttpResponse:
-        response = super().form_valid(form)  # type:ignore
+    def forms_valid(self, form: forms.BaseModelForm, inlines: Any) -> HttpResponse:
+        response = super().forms_valid(form, inlines)  # type:ignore
         messages.success(
             self.request,  # type:ignore
             f"Added {self.object.get_module_name()} module",  # type:ignore
@@ -131,11 +133,12 @@ class ModuleRegistry:
 
         create_view_class: CreateView = type(  # type: ignore
             f"{module_camel_case}CreateView",
-            (
-                ModuleCreateViewMixin,
-                CreateView,
-            ),
-            {"form_class": form_class},
+            (ModuleCreateViewMixin,),
+            {
+                "model": module_class,
+                "form_class": form_class,
+                "inlines": module_class.inlines,
+            },
         )
         create_view_name = module_class.get_create_path_name()
 

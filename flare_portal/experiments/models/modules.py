@@ -1,10 +1,12 @@
 import re
+from typing import List
 
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.template.defaultfilters import pluralize
 from django.utils.text import get_text_list
 
+from extra_views import InlineFormSetFactory
 from model_utils import Choices
 from model_utils.managers import InheritanceManager
 
@@ -19,6 +21,8 @@ class BaseModule(Nameable, models.Model):
     sortorder = models.PositiveIntegerField(default=0)
 
     objects = InheritanceManager()
+
+    inlines: List[InlineFormSetFactory] = []
 
     class Meta:
         ordering = ["sortorder"]
@@ -186,10 +190,15 @@ class CriterionQuestion(models.Model):
         return self.question_text
 
 
+class CriterionQuestionInline(InlineFormSetFactory):
+    model = CriterionQuestion
+    fields = ["question_text", "help_text", "required_answer", "sortorder"]
+
+
 class CriterionModule(BaseModule):
     intro_text = models.TextField(blank=True)
 
-    inlines = ["questions"]
+    inlines = [CriterionQuestionInline]
 
     def get_module_description(self) -> str:
         question_count = self.questions.count()
