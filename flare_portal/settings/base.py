@@ -459,7 +459,8 @@ USE_X_FORWARDED_PORT = env.get("USE_X_FORWARDED_PORT", "true").lower().strip() =
 # When set to True, client-side JavaScript will not to be able to access the
 # CSRF cookie.
 # https://docs.djangoproject.com/en/stable/ref/settings/#csrf-cookie-httponly
-CSRF_COOKIE_HTTPONLY = True
+# We need the cookie to be accessible by javascript so this is set to False
+CSRF_COOKIE_HTTPONLY = False
 
 # Force HTTPS redirect
 # https://docs.djangoproject.com/en/stable/ref/settings/#secure-ssl-redirect

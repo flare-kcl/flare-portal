@@ -10,6 +10,11 @@ from django.urls import reverse, reverse_lazy
 from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateView
 
+from rest_framework.exceptions import ParseError, ValidationError
+from rest_framework.request import Request
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
 from .forms import ExperimentForm, ParticipantBatchForm, ParticipantFormSet
 from .models import Experiment, Project
 
@@ -264,3 +269,35 @@ class ParticipantFormSetView(FormView):
 
 
 participant_formset_view = ParticipantFormSetView.as_view()
+
+
+class ModuleSortView(APIView):
+    """
+    API Endpoint to handle module sorting
+    """
+
+    def post(
+        self, request: Request, project_pk: int, experiment_pk: int, format: str = None
+    ) -> Response:
+        experiment = get_object_or_404(
+            Experiment.objects.prefetch_related("modules"), pk=experiment_pk
+        )
+        all_modules = {mod.pk: mod for mod in experiment.modules.all()}
+
+        module_mapping = request.data
+
+        for module_pk, sortorder in module_mapping.items():
+            try:
+                all_modules[int(module_pk)].sortorder = sortorder
+                all_modules[int(module_pk)].save()
+            except ValueError:
+                raise ParseError()
+            except KeyError:
+                raise ValidationError(
+                    f"Module with id {module_pk} not found in experiment with "
+                    f"id {experiment_pk}."
+                )
+        return Response(module_mapping)
+
+
+module_sort_view = ModuleSortView.as_view()
