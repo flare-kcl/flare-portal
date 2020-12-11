@@ -151,7 +151,7 @@ python-versions = "*"
 name = "cffi"
 version = "1.14.3"
 description = "Foreign Function Interface for Python calling C code."
-category = "dev"
+category = "main"
 optional = false
 python-versions = "*"
 
@@ -170,7 +170,7 @@ python-versions = ">=3.6.1"
 name = "chardet"
 version = "3.0.4"
 description = "Universal encoding detector for Python 2 and 3"
-category = "main"
+category = "dev"
 optional = false
 python-versions = "*"
 
@@ -202,7 +202,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 name = "cryptography"
 version = "3.1.1"
 description = "cryptography is a package which provides cryptographic recipes and primitives to Python developers."
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*"
 
@@ -890,7 +890,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 name = "pycparser"
 version = "2.20"
 description = "C parser in Python"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
@@ -937,6 +937,22 @@ six = "*"
 [package.extras]
 docs = ["sphinx (>=1.6.5)", "sphinx-rtd-theme"]
 tests = ["pytest (>=3.2.1,!=3.3.0)", "hypothesis (>=3.27.0)"]
+
+[[package]]
+name = "pyopenssl"
+version = "19.1.0"
+description = "Python wrapper module around the OpenSSL library"
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+cryptography = ">=2.8"
+six = ">=1.5.2"
+
+[package.extras]
+docs = ["sphinx", "sphinx-rtd-theme"]
+test = ["flaky", "pretend", "pytest (>=3.0.1)"]
 
 [[package]]
 name = "python-dateutil"
@@ -988,7 +1004,7 @@ python-versions = "*"
 name = "requests"
 version = "2.24.0"
 description = "Python HTTP for Humans."
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 
@@ -1026,7 +1042,7 @@ contextlib2 = ">=0.5.5"
 
 [[package]]
 name = "scout-apm"
-version = "2.10.0"
+version = "2.17.0"
 description = "Scout Application Performance Monitoring Agent"
 category = "main"
 optional = false
@@ -1035,7 +1051,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, <4"
 [package.dependencies]
 asgiref = {version = "*", markers = "python_version >= \"3.5\""}
 psutil = ">=5,<6"
-requests = ">=2,<3"
+urllib3 = {version = "<2", extras = ["secure"], markers = "python_version >= \"3.5\""}
 wrapt = ">=1.10,<2.0"
 
 [[package]]
@@ -1218,6 +1234,12 @@ category = "main"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, <4"
 
+[package.dependencies]
+certifi = {version = "*", optional = true, markers = "extra == \"secure\""}
+cryptography = {version = ">=1.3.4", optional = true, markers = "extra == \"secure\""}
+idna = {version = ">=2.0.0", optional = true, markers = "extra == \"secure\""}
+pyOpenSSL = {version = ">=0.14", optional = true, markers = "extra == \"secure\""}
+
 [package.extras]
 brotli = ["brotlipy (>=0.6.0)"]
 secure = ["pyOpenSSL (>=0.14)", "cryptography (>=1.3.4)", "idna (>=2.0.0)", "certifi", "ipaddress"]
@@ -1287,7 +1309,7 @@ gunicorn = ["gunicorn"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "828f39d167c432743cda84204a2322e4c413e6bf70bda21c13e58ed7b9346e0c"
+content-hash = "4d208fea0acb5a15e308b740217d993a891f54895c5d2650797ced2c5b61f8e8"
 
 [metadata.files]
 appdirs = [
@@ -1753,6 +1775,10 @@ pynacl = [
     {file = "PyNaCl-1.4.0-cp38-cp38-win_amd64.whl", hash = "sha256:7c6092102219f59ff29788860ccb021e80fffd953920c4a8653889c029b2d420"},
     {file = "PyNaCl-1.4.0.tar.gz", hash = "sha256:54e9a2c849c742006516ad56a88f5c74bf2ce92c9f67435187c3c5953b346505"},
 ]
+pyopenssl = [
+    {file = "pyOpenSSL-19.1.0-py2.py3-none-any.whl", hash = "sha256:621880965a720b8ece2f1b2f54ea2071966ab00e2970ad2ce11d596102063504"},
+    {file = "pyOpenSSL-19.1.0.tar.gz", hash = "sha256:9a24494b2602aaf402be5c9e30a0b82d4a5c67528fe8fb475e3f3bc00dd69507"},
+]
 python-dateutil = [
     {file = "python-dateutil-2.8.1.tar.gz", hash = "sha256:73ebfe9dbf22e832286dafa60473e4cd239f8592f699aa5adaf10050e6e1823c"},
     {file = "python_dateutil-2.8.1-py2.py3-none-any.whl", hash = "sha256:75bb3f31ea686f1197762692a9ee6a7550b59fc6ca3a1f4b5d7e32fb98e2da2a"},
@@ -1822,24 +1848,25 @@ schema = [
     {file = "schema-0.7.3.tar.gz", hash = "sha256:4cf529318cfd1e844ecbe02f41f7e5aa027463e7403666a52746f31f04f47a5e"},
 ]
 scout-apm = [
-    {file = "scout_apm-2.10.0-cp35-cp35m-manylinux1_i686.whl", hash = "sha256:b7898eabf51adeba924912c64624f603eed0874175f2ea5b28ddd579a667c109"},
-    {file = "scout_apm-2.10.0-cp35-cp35m-manylinux1_x86_64.whl", hash = "sha256:899e81682e1dc6177054199eb128eb1a3c5f3814f29751eb261883dba1a6cbee"},
-    {file = "scout_apm-2.10.0-cp35-cp35m-manylinux2010_i686.whl", hash = "sha256:3711522ec5d30d22f5921492466034dfab604ebbe17ec10f2dedade4b4950921"},
-    {file = "scout_apm-2.10.0-cp35-cp35m-manylinux2010_x86_64.whl", hash = "sha256:b5c8160845b7906c885ef84546e494c0a889d947e82687e7d42ecdc988795e84"},
-    {file = "scout_apm-2.10.0-cp36-cp36m-manylinux1_i686.whl", hash = "sha256:c3c9010a2577121522a3bf6ea721bff5551627d5f394f861937608ea520dc201"},
-    {file = "scout_apm-2.10.0-cp36-cp36m-manylinux1_x86_64.whl", hash = "sha256:e29f5c4c99303fdf779f5da18ed68a80b64eb930daccb58f65b3d5dd08e6f413"},
-    {file = "scout_apm-2.10.0-cp36-cp36m-manylinux2010_i686.whl", hash = "sha256:dd87ebf434ea4391aaf1574300d1d5a7f552397a0b551830778cfa43c05607c4"},
-    {file = "scout_apm-2.10.0-cp36-cp36m-manylinux2010_x86_64.whl", hash = "sha256:12d5d703a33f2acf3c2e6bc9c0ad759ad97407fffcf4effeb69028f29cf98fa0"},
-    {file = "scout_apm-2.10.0-cp37-cp37m-manylinux1_i686.whl", hash = "sha256:09e552e001f8bdeb271f98744def2eb5ea6e4adb3e67cdf0cbe17c76711e860b"},
-    {file = "scout_apm-2.10.0-cp37-cp37m-manylinux1_x86_64.whl", hash = "sha256:2d5f6f1887de14dfa190278340053ba6ee3e528375cdc63f9580380e505dede8"},
-    {file = "scout_apm-2.10.0-cp37-cp37m-manylinux2010_i686.whl", hash = "sha256:891ceaca64fa5c7cb963f5580a8a983f6caf9a803cb1cfc62f2dcbed50675838"},
-    {file = "scout_apm-2.10.0-cp37-cp37m-manylinux2010_x86_64.whl", hash = "sha256:fba7ed1b6432d1c5d1903dd2d28a45f635a8dedd8e8d2d6650f0abc1fa0254c6"},
-    {file = "scout_apm-2.10.0-cp38-cp38-manylinux1_i686.whl", hash = "sha256:0342195f38751b732ef8994d00ae7d274ba5d6f71d47f68ba7734748a9bcb02c"},
-    {file = "scout_apm-2.10.0-cp38-cp38-manylinux1_x86_64.whl", hash = "sha256:79915e6c3df8857116c8995c9e84d677fd04c07dce7972f3dffe830fa70a2584"},
-    {file = "scout_apm-2.10.0-cp38-cp38-manylinux2010_i686.whl", hash = "sha256:340df4fb984092023fcef7cd36408756165c9fcddebb43f83de1b6ed5a704cec"},
-    {file = "scout_apm-2.10.0-cp38-cp38-manylinux2010_x86_64.whl", hash = "sha256:bd79f14b71838cbdca2e1646c005ad6b7fbba949b577037645af7bb657bec322"},
-    {file = "scout_apm-2.10.0-py2-none-any.whl", hash = "sha256:1871f7aa54dedff7a2d84d9c04dbe3f21b0ded1d3a4d0f49bd517ea92d389e38"},
-    {file = "scout_apm-2.10.0.tar.gz", hash = "sha256:6675b1905bed43ed5c74c0f450462acb52933375b90c9989551f978e0dde2ed6"},
+    {file = "scout_apm-2.17.0-cp35-cp35m-manylinux1_i686.whl", hash = "sha256:23ecc92d852c4c7adc7340701f8787ed119b06ed072e610f0324ae904e032b77"},
+    {file = "scout_apm-2.17.0-cp35-cp35m-manylinux1_x86_64.whl", hash = "sha256:381c65e04b97581d70d9a5d405dd5cb95c3c3cc6908450f72ebde84b138ceffb"},
+    {file = "scout_apm-2.17.0-cp35-cp35m-manylinux2010_i686.whl", hash = "sha256:299967150693911105d1de067b3ff7c179437457aa565db81c3f9cb32026b7d7"},
+    {file = "scout_apm-2.17.0-cp35-cp35m-manylinux2010_x86_64.whl", hash = "sha256:2444802b43b1191666978787b435e804b66850046614419c835d242a97a909dd"},
+    {file = "scout_apm-2.17.0-cp36-cp36m-manylinux1_i686.whl", hash = "sha256:56fb2da6d070f06717870d8bd5cd0a97e47988fe9a960ceb7211602f3b233016"},
+    {file = "scout_apm-2.17.0-cp36-cp36m-manylinux1_x86_64.whl", hash = "sha256:64f1ee0633a7ac6c99e11afeaac4ebf950ceca5542780975960a7f1f535cd246"},
+    {file = "scout_apm-2.17.0-cp36-cp36m-manylinux2010_i686.whl", hash = "sha256:1b69c7a1355f8dc07fa32a2d93de00ec8a8bc1b4006d631838ea5030676f46fa"},
+    {file = "scout_apm-2.17.0-cp36-cp36m-manylinux2010_x86_64.whl", hash = "sha256:8966b16667c13466e246ab8ef0b2620464bd7707eb49d4d07609aaf943900fba"},
+    {file = "scout_apm-2.17.0-cp37-cp37m-manylinux1_i686.whl", hash = "sha256:46d5574b357aab2bf11ef0cc20481a2d4cc0df8a292ed2ee76304e4b90391033"},
+    {file = "scout_apm-2.17.0-cp37-cp37m-manylinux1_x86_64.whl", hash = "sha256:70e6438c868bf5e013ffacba066518cd678ed44ee4ff0aa5917358b7b8ba1bf1"},
+    {file = "scout_apm-2.17.0-cp37-cp37m-manylinux2010_i686.whl", hash = "sha256:b89b9e68710290db7d25dc00402fb1d3d28bb7fc0f1dbd3c8e21d61d7a2ff992"},
+    {file = "scout_apm-2.17.0-cp37-cp37m-manylinux2010_x86_64.whl", hash = "sha256:1247ac71ab797956ff3bb64af056168de76b9fc0b086bd492cb2b5cf8cd436e8"},
+    {file = "scout_apm-2.17.0-cp38-cp38-manylinux1_i686.whl", hash = "sha256:553e1897ce4d5e180a2257abf5d9964d7d7d62a6320e63dae4cc8bb12802bc6b"},
+    {file = "scout_apm-2.17.0-cp38-cp38-manylinux1_x86_64.whl", hash = "sha256:da3e1f3d991caf2a5e6a06a3e07099d62c4496613ae397420690adaa368597c2"},
+    {file = "scout_apm-2.17.0-cp38-cp38-manylinux2010_i686.whl", hash = "sha256:c246d9e751a91725a2fecc5e6bfa48c1c1fb17e3667d0668d124158525db0865"},
+    {file = "scout_apm-2.17.0-cp38-cp38-manylinux2010_x86_64.whl", hash = "sha256:9cbf8f207e057d6e5e857b03087e596d18aca927b080c8b2b4993cc62e343423"},
+    {file = "scout_apm-2.17.0-py2-none-any.whl", hash = "sha256:17627aa62065fa2ef92e66cb81d1bdfccaa695363b324ebeb63edd6be9dd500e"},
+    {file = "scout_apm-2.17.0-py3-none-any.whl", hash = "sha256:2679c61ce19f436fbf1d6baf805fec1cc185175dba06598a5d82b8e196bf5fe6"},
+    {file = "scout_apm-2.17.0.tar.gz", hash = "sha256:6b91c5649ba6e141666279abf225b0623ae31e44e52b079aed9e6790b09c4c33"},
 ]
 seed-isort-config = [
     {file = "seed_isort_config-1.9.4-py2.py3-none-any.whl", hash = "sha256:81f7adf8dd0bc24e03d0f5eef87561e170757fc7a36050c01e4c29d150757783"},
