@@ -12,7 +12,7 @@ gunicorn = {version = "~20.0", optional = true}
 whitenoise = "~5.0"
 dj-database-url = "~0.5"
 django-redis = "~4.11"
-django-storages = { version ="~1.9", extras = ["boto3"] }
+django-storages = { version ="~1.10", extras = ["boto3"] }
 django-referrer-policy = "~1.0"
 django-csp = "~3.6"
 scout-apm = "~2.17"
