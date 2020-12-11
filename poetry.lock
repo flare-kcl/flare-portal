@@ -289,7 +289,7 @@ lint = ["isort (==4.3.21)", "flake8 (==3.8.3)", "black (==19.10b0)"]
 
 [[package]]
 name = "django-csp"
-version = "3.6"
+version = "3.7"
 description = "Django Content Security Policy support."
 category = "main"
 optional = false
@@ -1309,7 +1309,7 @@ gunicorn = ["gunicorn"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "2570d24f3d1fceb4b101ddbd31d59b5e6eca95ba7ac437cb7fc5f582001bd7b2"
+content-hash = "e6ff40311d61907cf20560f276d3cf140fabdeba55d3a1651e2b60a1dcc0ea9c"
 
 [metadata.files]
 appdirs = [
@@ -1476,8 +1476,8 @@ django-basic-auth-ip-whitelist = [
     {file = "django_basic_auth_ip_whitelist-0.3.4-py3-none-any.whl", hash = "sha256:9d20210755b4a2db069326cedafa589453386cebe147ed0a9f1f9b55da927b02"},
 ]
 django-csp = [
-    {file = "django_csp-3.6-py2.py3-none-any.whl", hash = "sha256:d9ee5a8c6442aa54854e8de627c2826786208ed38fb4ea8ced08c42332673eb1"},
-    {file = "django_csp-3.6.tar.gz", hash = "sha256:0a38aa9618c675cbf5f5e517e20d5846a3e100ef7b307e32e7fb18c58aa47723"},
+    {file = "django_csp-3.7-py2.py3-none-any.whl", hash = "sha256:01443a07723f9a479d498bd7bb63571aaa771e690f64bde515db6cdb76e8041a"},
+    {file = "django_csp-3.7.tar.gz", hash = "sha256:01eda02ad3f10261c74131cdc0b5a6a62b7c7ad4fd017fbefb7a14776e0a9727"},
 ]
 django-extensions = [
     {file = "django-extensions-2.2.9.tar.gz", hash = "sha256:2f81b618ba4d1b0e58603e25012e5c74f88a4b706e0022a3b21f24f0322a6ce6"},
