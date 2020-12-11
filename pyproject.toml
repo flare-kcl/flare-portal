@@ -14,7 +14,7 @@ dj-database-url = "~0.5"
 django-redis = "~4.11"
 django-storages = { version ="~1.10", extras = ["boto3"] }
 django-referrer-policy = "~1.0"
-django-csp = "~3.6"
+django-csp = "~3.7"
 scout-apm = "~2.17"
 django-basic-auth-ip-whitelist = "~0.3.3"
 sentry-sdk = "^0.19.1"
