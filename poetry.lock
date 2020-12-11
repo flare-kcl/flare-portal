@@ -1056,11 +1056,11 @@ wrapt = ">=1.10,<2.0"
 
 [[package]]
 name = "seed-isort-config"
-version = "1.9.4"
+version = "2.2.0"
 description = "Statically populate the `known_third_party` `isort` setting."
 category = "dev"
 optional = false
-python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,>=2.7"
+python-versions = ">=3.6.1"
 
 [package.dependencies]
 "aspy.refactor-imports" = "*"
@@ -1309,7 +1309,7 @@ gunicorn = ["gunicorn"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "0380fed792f4d24bb02dca584e26706fca3ef6e42b859aeb93eaf0d5f2398300"
+content-hash = "d7767d63a88ab9491316770811efc7971a1b3f4b331cd271a02d4ed9a7609099"
 
 [metadata.files]
 appdirs = [
@@ -1869,8 +1869,8 @@ scout-apm = [
     {file = "scout_apm-2.17.0.tar.gz", hash = "sha256:6b91c5649ba6e141666279abf225b0623ae31e44e52b079aed9e6790b09c4c33"},
 ]
 seed-isort-config = [
-    {file = "seed_isort_config-1.9.4-py2.py3-none-any.whl", hash = "sha256:81f7adf8dd0bc24e03d0f5eef87561e170757fc7a36050c01e4c29d150757783"},
-    {file = "seed_isort_config-1.9.4.tar.gz", hash = "sha256:cecccb911b8d01ecdca16e17d083bf4cd78e928db4d7906125b0373b81f1c7ec"},
+    {file = "seed_isort_config-2.2.0-py2.py3-none-any.whl", hash = "sha256:8601fb715a5a4aac39256bbf73c2da6a81f964da9c9d9897ab9074db3663526f"},
+    {file = "seed_isort_config-2.2.0.tar.gz", hash = "sha256:be4cfef8f9a3fe8ea1817069c6b624538ac0b429636ec746edeb27e98ed628c8"},
 ]
 sentry-sdk = [
     {file = "sentry-sdk-0.19.1.tar.gz", hash = "sha256:5cf36eb6b1dc62d55f3c64289792cbaebc8ffa5a9da14474f49b46d20caa7fc8"},
