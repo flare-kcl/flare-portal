@@ -951,6 +951,57 @@ class DataListViewTest(TestCase):
         self.assertEqual(participant, resp.context["participant"])
         self.assertEqual(list(resp.context["data"]), participant_data)
 
+    def test_data_list_view_override(self) -> None:
+        # Should be able to override the pregenerated DataListView with the one
+        # specified in the data model's `data_list_view_class` attribute
+        project: Project = ProjectFactory()
+        experiment: Experiment = ExperimentFactory(project=project)
+        module: FearConditioningModule = FearConditioningModuleFactory(
+            experiment=experiment
+        )
+        participant_1: Participant = ParticipantFactory(experiment=experiment)
+        participant_2: Participant = ParticipantFactory(experiment=experiment)
+        data = sorted(
+            [
+                FearConditioningDataFactory(
+                    trial=4, module=module, participant=participant_1
+                ),
+                FearConditioningDataFactory(
+                    trial=2, module=module, participant=participant_1
+                ),
+                FearConditioningDataFactory(
+                    trial=3, module=module, participant=participant_1
+                ),
+                FearConditioningDataFactory(
+                    trial=1, module=module, participant=participant_1
+                ),
+                FearConditioningDataFactory(
+                    trial=4, module=module, participant=participant_2
+                ),
+                FearConditioningDataFactory(
+                    trial=2, module=module, participant=participant_2
+                ),
+                FearConditioningDataFactory(
+                    trial=3, module=module, participant=participant_2
+                ),
+                FearConditioningDataFactory(
+                    trial=1, module=module, participant=participant_2
+                ),
+            ],
+            key=lambda d: (d.participant_id, d.trial),
+        )
+        url = reverse(
+            "experiments:data:fear_conditioning_data_list",
+            kwargs={"project_pk": project.pk, "experiment_pk": experiment.pk},
+        )
+
+        resp = self.client.get(url)
+
+        self.assertEqual(resp.status_code, 200)
+
+        self.assertEqual(resp.context["data_type"], FearConditioningData)
+        self.assertEqual(list(resp.context["data"]), data)
+
 
 class DataDetailViewTest(TestCase):
     def setUp(self) -> None:

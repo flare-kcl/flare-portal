@@ -109,7 +109,7 @@ class FearConditioningData(BaseData):
     )
     trial = models.PositiveIntegerField()
     rating = models.PositiveIntegerField()
-    conditional_stimulus = models.CharField(max_length=24, verbose_name="CS")
+    conditional_stimulus = models.CharField(max_length=24, verbose_name="CS/GS")
     unconditional_stimulus = models.BooleanField(verbose_name="US")
     trial_started_at = models.DateTimeField()
     response_recorded_at = models.DateTimeField()
