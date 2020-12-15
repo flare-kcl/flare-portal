@@ -141,7 +141,7 @@ class FearConditioningDataTest(TestCase):
                 ("phase", module.get_phase_display()),
                 ("trial", data.trial),
                 ("rating", data.rating),
-                ("CS", data.conditional_stimulus),
+                ("CS/GS", data.conditional_stimulus),
                 ("US", data.unconditional_stimulus),
                 ("trial started at", data.trial_started_at),
                 ("response recorded at", data.response_recorded_at),
@@ -154,7 +154,7 @@ class FearConditioningDataTest(TestCase):
         columns = FearConditioningData.get_list_display_columns()
 
         self.assertEqual(
-            columns, ["participant", "phase", "trial", "CS", "US", "rating"]
+            columns, ["participant", "phase", "trial", "CS/GS", "US", "rating"]
         )
 
     def test_list_display_values(self) -> None:
@@ -180,7 +180,7 @@ class FearConditioningDataTest(TestCase):
                 ("participant", data.participant),
                 ("phase", module.get_phase_display()),
                 ("trial", data.trial),
-                ("CS", data.conditional_stimulus),
+                ("CS/GS", data.conditional_stimulus),
                 ("US", data.unconditional_stimulus),
                 ("rating", data.rating),
             ],
