@@ -116,6 +116,7 @@ class FearConditioningDataTest(TestCase):
             trial_started_at=timezone.now(),
             response_recorded_at=timezone.now(),
             volume_level=0.78,
+            calibrated_volume_level=0.85,
             headphones=True,
         )
 
@@ -133,6 +134,7 @@ class FearConditioningDataTest(TestCase):
             trial_started_at=timezone.now(),
             response_recorded_at=timezone.now(),
             volume_level=0.78,
+            calibrated_volume_level=0.85,
             headphones=True,
         )
 
@@ -147,6 +149,7 @@ class FearConditioningDataTest(TestCase):
                 ("trial started at", data.trial_started_at),
                 ("response recorded at", data.response_recorded_at),
                 ("volume level", data.volume_level),
+                ("calibrated volume level", data.calibrated_volume_level),
                 ("headphones", data.headphones),
             ],
         )
@@ -172,6 +175,7 @@ class FearConditioningDataTest(TestCase):
             trial_started_at=timezone.now(),
             response_recorded_at=timezone.now(),
             volume_level=0.78,
+            calibrated_volume_level=0.85,
             headphones=True,
         )
 
