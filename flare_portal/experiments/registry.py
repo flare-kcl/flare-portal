@@ -193,23 +193,28 @@ module_registry.register(FearConditioningModule)
 
 
 class DataViewMixin:
-    data_type: BaseData
+    data_type: Type[BaseData]
+
+    def get_data_type(self) -> Type[BaseData]:
+        return self.data_type
 
     def dispatch(self, *args: Any, **kwargs: Any) -> HttpResponse:
         self.experiment = get_object_or_404(Experiment, pk=kwargs["experiment_pk"])
         return super().dispatch(*args, **kwargs)  # type: ignore
 
     def get_queryset(self) -> QuerySet[BaseData]:
+        data_type = self.get_data_type()
         return (
-            self.data_type.objects.filter(module__experiment=self.experiment)
+            data_type.objects.filter(module__experiment=self.experiment)
             .order_by("pk")
             .select_related("participant", "module")
         )
 
     def get_context_data(self, **kwargs: Any) -> dict:
+        data_type = self.get_data_type()
         context = super().get_context_data(**kwargs)  # type: ignore
         context["experiment"] = self.experiment
-        context["data_type"] = self.data_type
+        context["data_type"] = data_type
         return context
 
 
@@ -265,18 +270,24 @@ class DataViewsetRegistry:
         self.urls: List[URLPattern] = []
         self.views: Dict[str, Callable] = {}
 
-    def register(self, data_model: Type[BaseData]) -> None:
+    def register(
+        self, data_model: Type[BaseData], list_view_class: Type[DataListView] = None
+    ) -> None:
         module_camel_case = data_model.get_module_camel_case()
 
         self.data_models.append(data_model)
 
         # ListView
-        list_view_class: ListView = type(  # type: ignore
-            f"{module_camel_case}ListView", (DataListView,), {"data_type": data_model},
-        )
         list_view_name = data_model.get_list_path_name()
+        if list_view_class is not None:
+            self.views[list_view_name] = list_view_class.as_view()
+        else:
+            self.views[list_view_name]: DataListView = type(  # type: ignore
+                f"{module_camel_case}ListView",
+                (DataListView,),
+                {"data_type": data_model},
+            ).as_view()
 
-        self.views[list_view_name] = list_view_class.as_view()
         self.urls.append(
             path(
                 data_model.get_list_path(),
@@ -303,7 +314,20 @@ class DataViewsetRegistry:
         )
 
 
+class FearConditioningDataListView(DataListView):
+    data_type = FearConditioningData
+
+    def get_queryset(self) -> QuerySet[BaseData]:
+        return (
+            super()
+            .get_queryset()
+            .order_by("participant_id", "module__sortorder", "trial")
+        )
+
+
 data_viewset_registry = DataViewsetRegistry()
 
 data_viewset_registry.register(BasicInfoData)
-data_viewset_registry.register(FearConditioningData)
+data_viewset_registry.register(
+    FearConditioningData, list_view_class=FearConditioningDataListView
+)
