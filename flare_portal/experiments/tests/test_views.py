@@ -952,43 +952,57 @@ class DataListViewTest(TestCase):
         self.assertEqual(list(resp.context["data"]), participant_data)
 
     def test_data_list_view_override(self) -> None:
-        # Should be able to override the pregenerated DataListView with the one
-        # specified in the data model's `data_list_view_class` attribute
+        # Should be able to override the pregenerated DataListView
         project: Project = ProjectFactory()
         experiment: Experiment = ExperimentFactory(project=project)
-        module: FearConditioningModule = FearConditioningModuleFactory(
-            experiment=experiment
+        module_1: FearConditioningModule = FearConditioningModuleFactory(
+            experiment=experiment, sortorder=2,
+        )
+        module_2: FearConditioningModule = FearConditioningModuleFactory(
+            experiment=experiment, sortorder=1,
         )
         participant_1: Participant = ParticipantFactory(experiment=experiment)
         participant_2: Participant = ParticipantFactory(experiment=experiment)
         data = sorted(
             [
                 FearConditioningDataFactory(
-                    trial=4, module=module, participant=participant_1
+                    trial=4, module=module_1, participant=participant_1
                 ),
                 FearConditioningDataFactory(
-                    trial=2, module=module, participant=participant_1
+                    trial=2, module=module_1, participant=participant_1
                 ),
                 FearConditioningDataFactory(
-                    trial=3, module=module, participant=participant_1
+                    trial=3, module=module_1, participant=participant_1
                 ),
                 FearConditioningDataFactory(
-                    trial=1, module=module, participant=participant_1
+                    trial=1, module=module_1, participant=participant_1
                 ),
                 FearConditioningDataFactory(
-                    trial=4, module=module, participant=participant_2
+                    trial=4, module=module_2, participant=participant_2
                 ),
                 FearConditioningDataFactory(
-                    trial=2, module=module, participant=participant_2
+                    trial=2, module=module_2, participant=participant_2
                 ),
                 FearConditioningDataFactory(
-                    trial=3, module=module, participant=participant_2
+                    trial=3, module=module_2, participant=participant_2
                 ),
                 FearConditioningDataFactory(
-                    trial=1, module=module, participant=participant_2
+                    trial=1, module=module_2, participant=participant_2
+                ),
+                FearConditioningDataFactory(
+                    trial=4, module=module_1, participant=participant_2
+                ),
+                FearConditioningDataFactory(
+                    trial=2, module=module_1, participant=participant_2
+                ),
+                FearConditioningDataFactory(
+                    trial=3, module=module_1, participant=participant_2
+                ),
+                FearConditioningDataFactory(
+                    trial=1, module=module_1, participant=participant_2
                 ),
             ],
-            key=lambda d: (d.participant_id, d.trial),
+            key=lambda d: (d.participant_id, d.module.sortorder, d.trial),
         )
         url = reverse(
             "experiments:data:fear_conditioning_data_list",
