@@ -117,6 +117,7 @@ class ModuleDataAPIViewTest(TestCase):
             "trial_started_at": parse_datetime("2020-01-01T00:00Z"),
             "response_recorded_at": parse_datetime("2020-01-01T00:00Z"),
             "volume_level": "0.50",
+            "calibrated_volume_level": "0.85",
             "headphones": True,
         }
 
@@ -146,6 +147,9 @@ class ModuleDataAPIViewTest(TestCase):
         self.assertEqual(data.trial_started_at, json_data["trial_started_at"])
         self.assertEqual(data.response_recorded_at, json_data["response_recorded_at"])
         self.assertEqual(data.volume_level, Decimal(json_data["volume_level"]))
+        self.assertEqual(
+            data.calibrated_volume_level, Decimal(json_data["calibrated_volume_level"])
+        )
         self.assertEqual(data.headphones, json_data["headphones"])
 
     def test_validation(self) -> None:
@@ -166,6 +170,7 @@ class ModuleDataAPIViewTest(TestCase):
             "trial_started_at": parse_datetime("2020-01-01T00:00Z"),
             "response_recorded_at": parse_datetime("2020-01-01T00:00Z"),
             "volume_level": 0.50,
+            "calibrated_volume_level": 0.85,
             "headphones": True,
         }
 
@@ -203,6 +208,7 @@ class FearConditioningDataAPIViewTest(TestCase):
             "trial_started_at": parse_datetime("2020-01-01T00:00Z"),
             "response_recorded_at": parse_datetime("2020-01-01T00:00Z"),
             "volume_level": "0.50",
+            "calibrated_volume_level": "0.85",
             "headphones": True,
         }
 
