@@ -20,8 +20,11 @@ class ConfigurationAPIView(APIView):
                     experiment=constants.ExperimentType(
                         id=experiment.pk,
                         name=experiment.name,
+                        description=experiment.description,
                         trial_length=experiment.trial_length,
                         rating_delay=experiment.rating_delay,
+                        iti_min_delay=experiment.iti_min_delay,
+                        iti_max_delay=experiment.iti_max_delay,
                         rating_scale_anchor_label_left=(
                             experiment.rating_scale_anchor_label_left
                         ),

@@ -33,6 +33,8 @@ class ExperimentFactory(factory.django.DjangoModelFactory):
     project = factory.SubFactory(ProjectFactory)
     trial_length = 10.0
     rating_delay = 1.0
+    iti_min_delay = 1
+    iti_max_delay = 3
 
 
 class ParticipantFactory(factory.django.DjangoModelFactory):

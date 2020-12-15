@@ -18,6 +18,8 @@ class ExperimentForm(forms.ModelForm):
             "project",
             "trial_length",
             "rating_delay",
+            "iti_min_delay",
+            "iti_max_delay",
             "rating_scale_anchor_label_left",
             "rating_scale_anchor_label_center",
             "rating_scale_anchor_label_right",
