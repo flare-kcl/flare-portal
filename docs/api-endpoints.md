@@ -27,6 +27,8 @@ POST /api/v1/configuration/
     "name": "Demo experiment",
     "trial_length": 10.0,
     "rating_delay": 1.0,
+    "iti_min_delay": 1,
+    "iti_max_delay": 3,
     "rating_scale_anchor_label_left": "Certain no scream",
     "rating_scale_anchor_label_center": "Uncertain",
     "rating_scale_anchor_label_right": "Certain scream"
