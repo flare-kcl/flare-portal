@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('experiments', '0020_cs_verbose_name'),
+        ('experiments', '0021_calibrated_volume_level_field'),
     ]
 
     operations = [
