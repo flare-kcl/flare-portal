@@ -114,6 +114,7 @@ class FearConditioningData(BaseData):
     trial_started_at = models.DateTimeField()
     response_recorded_at = models.DateTimeField()
     volume_level = models.DecimalField(max_digits=3, decimal_places=2)
+    calibrated_volume_level = models.DecimalField(max_digits=3, decimal_places=2)
     headphones = models.BooleanField()
 
     class Meta:
@@ -128,6 +129,7 @@ class FearConditioningData(BaseData):
         "trial_started_at",
         "response_recorded_at",
         "volume_level",
+        "calibrated_volume_level",
         "headphones",
     ]
     list_display = [
