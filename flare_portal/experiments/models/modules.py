@@ -138,6 +138,19 @@ class BasicInfoModule(BaseModule):
     collect_headphone_model = models.BooleanField(default=False)
     collect_headphone_label = models.BooleanField(default=False)
 
+    def get_module_config(self) -> constants.ModuleConfigType:
+        return constants.ModuleConfigType(
+            id=self.pk,
+            type=self.get_module_tag(),
+            config={
+                "collect_date_of_birth": self.collect_date_of_birth,
+                "collect_gender": self.collect_gender,
+                "collect_headphone_make": self.collect_headphone_make,
+                "collect_headphone_model": self.collect_headphone_model,
+                "collect_headphone_label": self.collect_headphone_label,
+            },
+        )
+
     def get_module_description(self) -> str:
         collecting = {
             "date of birth": self.collect_date_of_birth,
