@@ -37,6 +37,8 @@ class Experiment(models.Model):
     project = models.ForeignKey("experiments.Project", on_delete=models.CASCADE)
     trial_length = models.FloatField()
     rating_delay = models.FloatField(default=1)
+    iti_min_delay = models.PositiveIntegerField(default=1, verbose_name="ITI min delay")
+    iti_max_delay = models.PositiveIntegerField(default=3, verbose_name="ITI max delay")
 
     rating_scale_anchor_label_left = models.CharField(
         max_length=255, default="Certain no scream"

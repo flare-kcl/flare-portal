@@ -360,6 +360,8 @@ class ExperimentCreateViewTest(TestCase):
             "project": str(self.project.pk),
             "trial_length": "5.0",
             "rating_delay": "1.5",
+            "iti_min_delay": "1",
+            "iti_max_delay": "3",
             "rating_scale_anchor_label_left": "Certain no beep",
             "rating_scale_anchor_label_center": "Uncertain",
             "rating_scale_anchor_label_right": "Certain beep",
@@ -384,6 +386,9 @@ class ExperimentCreateViewTest(TestCase):
         self.assertEqual(experiment.project, self.project)
         self.assertEqual(experiment.trial_length, float(form_data["trial_length"]))
         self.assertEqual(experiment.rating_delay, float(form_data["rating_delay"]))
+        self.assertEqual(experiment.iti_min_delay, int(form_data["iti_min_delay"]))
+        self.assertEqual(experiment.iti_max_delay, int(form_data["iti_max_delay"]))
+
         self.assertEqual(
             experiment.rating_scale_anchor_label_left,
             form_data["rating_scale_anchor_label_left"],
@@ -415,6 +420,8 @@ class ExperimentCreateViewTest(TestCase):
             "project": str(self.project.pk),
             "trial_length": "10.0",
             "rating_delay": "15.0",
+            "iti_min_delay": "1",
+            "iti_max_delay": "3",
         }
 
         resp = self.client.post(url, form_data, follow=True)
@@ -460,6 +467,8 @@ class ExperimentUpdateViewTest(TestCase):
             "owner": str(self.user.pk),
             "trial_length": "5.0",
             "rating_delay": "1.5",
+            "iti_min_delay": "1",
+            "iti_max_delay": "3",
             "rating_scale_anchor_label_left": "Certain no beep",
             "rating_scale_anchor_label_center": "Uncertain",
             "rating_scale_anchor_label_right": "Certain beep",
@@ -486,6 +495,8 @@ class ExperimentUpdateViewTest(TestCase):
         self.assertEqual(experiment.owner_id, int(form_data["owner"]))
         self.assertEqual(experiment.trial_length, float(form_data["trial_length"]))
         self.assertEqual(experiment.rating_delay, float(form_data["rating_delay"]))
+        self.assertEqual(experiment.iti_min_delay, int(form_data["iti_min_delay"]))
+        self.assertEqual(experiment.iti_max_delay, int(form_data["iti_max_delay"]))
         self.assertEqual(
             experiment.rating_scale_anchor_label_left,
             form_data["rating_scale_anchor_label_left"],
