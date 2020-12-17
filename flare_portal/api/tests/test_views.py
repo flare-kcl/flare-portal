@@ -242,8 +242,8 @@ class CriterionDataAPIViewTest(TestCase):
         participant = ParticipantFactory(experiment=experiment)
         module = CriterionModuleFactory(experiment=experiment)
 
-        question_1 = CriterionQuestionFactory()
-        question_2 = CriterionQuestionFactory()
+        question_1 = CriterionQuestionFactory(module=module)
+        question_2 = CriterionQuestionFactory(module=module)
 
         url = reverse("api:criterion_data")
 
@@ -278,7 +278,68 @@ class CriterionDataAPIViewTest(TestCase):
         self.assertEqual(answers[1].answer, False)
 
     def test_unique_answer(self) -> None:
-        self.fail()
+        experiment = ExperimentFactory()
+        participant = ParticipantFactory(experiment=experiment)
+        module = CriterionModuleFactory(experiment=experiment)
+
+        question_1 = CriterionQuestionFactory(module=module)
+
+        url = reverse("api:criterion_data")
+
+        # Participant can only submit one answer to a question
+        json_data = {
+            "participant": participant.participant_id,
+            "module": module.pk,
+            "question": question_1.pk,
+            "answer": True,
+        }
+
+        resp = self.client.post(url, json_data, content_type="application/json")
+
+        self.assertEqual(201, resp.status_code)
+
+        json_data = {
+            "participant": participant.participant_id,
+            "module": module.pk,
+            "question": question_1.pk,
+            "answer": True,
+        }
+
+        resp = self.client.post(url, json_data, content_type="application/json")
+
+        # Error
+        self.assertEqual(400, resp.status_code)
+        self.assertEqual(
+            resp.json(),
+            {
+                "non_field_errors": [
+                    "The fields participant, question must make a unique set."
+                ]
+            },
+        )
 
     def test_question_validation(self) -> None:
-        self.fail()
+        # Question should belong to the module
+        experiment = ExperimentFactory()
+        participant = ParticipantFactory(experiment=experiment)
+        module = CriterionModuleFactory(experiment=experiment)
+
+        question_1 = CriterionQuestionFactory()
+
+        url = reverse("api:criterion_data")
+
+        # Participant can only submit one answer to a question
+        json_data = {
+            "participant": participant.participant_id,
+            "module": module.pk,
+            "question": question_1.pk,
+            "answer": True,
+        }
+
+        resp = self.client.post(url, json_data, content_type="application/json")
+
+        self.assertEqual(400, resp.status_code)
+
+        self.assertEqual(
+            resp.json(), {"question": ["This question does not belong to that module."]}
+        )

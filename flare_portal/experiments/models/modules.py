@@ -26,7 +26,7 @@ class BaseModule(Nameable, models.Model):
     inlines: List[InlineFormSetFactory] = []
 
     class Meta:
-        ordering = ["sortorder"]
+        ordering = ["sortorder", "id"]
 
     @classmethod
     def get_module_camel_case(cls) -> str:

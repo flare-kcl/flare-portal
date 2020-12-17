@@ -2,7 +2,7 @@ import re
 from typing import Any, List, Literal, Tuple, Union
 
 from django.contrib.admin.utils import get_fields_from_path
-from django.core.exceptions import FieldDoesNotExist
+from django.core.exceptions import FieldDoesNotExist, ValidationError
 from django.db import models
 
 from model_utils import Choices
@@ -160,6 +160,7 @@ class FearConditioningData(BaseData):
     ]
 
     class Meta:
+        # Each participant can only submit data once per trial
         unique_together = ("trial", "module", "participant")
 
 
@@ -245,6 +246,16 @@ class CriterionData(BaseData):
         "question",
         "passed",
     ]
+
+    class Meta:
+        # Each participant can only answer a question once
+        unique_together = ("participant", "question")
+
+    def clean(self) -> None:
+        if self.question.module != self.module:  # type: ignore
+            raise ValidationError(
+                {"question": "This question does not belong to that module."}
+            )
 
     @property
     def passed(self) -> bool:
