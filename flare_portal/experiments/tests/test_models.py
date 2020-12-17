@@ -7,6 +7,8 @@ from freezegun import freeze_time
 from flare_portal.users.factories import UserFactory
 
 from ..factories import (
+    CriterionModuleFactory,
+    CriterionQuestionFactory,
     ExperimentFactory,
     FearConditioningModuleFactory,
     ParticipantFactory,
@@ -14,6 +16,7 @@ from ..factories import (
 )
 from ..models import (
     BaseModule,
+    CriterionData,
     Experiment,
     FearConditioningData,
     FearConditioningModule,
@@ -205,3 +208,53 @@ class ModuleTest(TestCase):
                     get_module_config,
                     "Missing `get_module_config` implementation",
                 )
+
+
+class CriterionDataTest(TestCase):
+    def test_model(self) -> None:
+        participant: Participant = ParticipantFactory()
+        module = CriterionModuleFactory()
+        required_question_yes = CriterionQuestionFactory(
+            module=module, required_answer=True
+        )
+        required_question_no = CriterionQuestionFactory(
+            module=module, required_answer=False
+        )
+        required_question_either = CriterionQuestionFactory(
+            module=module, required_answer=None
+        )
+        non_required_question = CriterionQuestionFactory(module=module, required=False)
+
+        data = CriterionData(
+            participant=participant,
+            module=module,
+        )
+
+        # Required question yes
+        data.question = required_question_yes
+        data.answer = True
+        self.assertTrue(data.passed)
+
+        data.answer = False
+        self.assertFalse(data.passed)
+
+        # Required question no
+        data.question = required_question_no
+        data.answer = True
+        self.assertFalse(data.passed)
+
+        data.answer = False
+        self.assertTrue(data.passed)
+
+        # Required question either
+        data.question = required_question_either
+        data.answer = True
+        self.assertTrue(data.passed)
+
+        data.answer = False
+        self.assertTrue(data.passed)
+
+        # Non required question
+        data.question = non_required_question
+        data.answer = None
+        self.assertTrue(data.passed)

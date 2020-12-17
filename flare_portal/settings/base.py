@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     "flare_portal.api",
     "flare_portal.experiments",
     "flare_portal.users",
+    "flare_portal.utils",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",

@@ -8,6 +8,7 @@ from rest_framework.generics import CreateAPIView
 from flare_portal.experiments.models import (
     BaseData,
     BasicInfoData,
+    CriterionData,
     FearConditioningData,
     Participant,
 )
@@ -26,6 +27,17 @@ class DataSerializerMixin(serializers.ModelSerializer):
                     "module's experiment."
                 }
             )
+
+        # Run model-level validation
+        if self.instance is None:
+            # api is called to create model instance
+            instance = self.Meta.model(**data)
+            instance.clean()
+        else:
+            instance = self.instance
+            for datum in data:
+                setattr(instance, datum, data[datum])
+            instance.clean()
         return data
 
 
@@ -71,4 +83,5 @@ class DataAPIRegistry:
 data_api_registry = DataAPIRegistry()
 
 data_api_registry.register(BasicInfoData)
+data_api_registry.register(CriterionData)
 data_api_registry.register(FearConditioningData)
