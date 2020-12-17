@@ -699,6 +699,7 @@ class ModuleCreateViewTest(TestCase):
 
         form_data = {
             "intro_text": "Intro 123",
+            "outro_text": "Outro 123",
             "experiment": str(self.experiment.pk),
             "questions-TOTAL_FORMS": "3",
             "questions-INITIAL_FORMS": "0",
@@ -744,6 +745,7 @@ class ModuleCreateViewTest(TestCase):
         )
 
         self.assertEqual(module.intro_text, form_data["intro_text"])
+        self.assertEqual(module.outro_text, form_data["outro_text"])
 
         questions = module.questions.all()
 

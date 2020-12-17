@@ -82,6 +82,7 @@ class CriterionModuleFactory(factory.django.DjangoModelFactory):
 
     experiment = factory.SubFactory(ExperimentFactory)
     intro_text = factory.Faker("paragraph")
+    outro_text = factory.Faker("paragraph")
 
 
 class CriterionQuestionFactory(factory.django.DjangoModelFactory):

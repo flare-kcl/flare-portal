@@ -211,6 +211,7 @@ class CriterionQuestionInline(InlineFormSetFactory):
 
 class CriterionModule(BaseModule):
     intro_text = models.TextField(blank=True)
+    outro_text = models.TextField(blank=True)
 
     inlines = [CriterionQuestionInline]
 
@@ -220,10 +221,12 @@ class CriterionModule(BaseModule):
             type=self.get_module_tag(),
             config={
                 "intro_text": self.intro_text,
+                "outro_text": self.outro_text,
                 "questions": [
                     {
                         "id": question.pk,
                         "question_text": question.question_text,
+                        "help_text": question.help_text,
                         "required_answer": question.required_answer,
                         "required": question.required,
                     }
