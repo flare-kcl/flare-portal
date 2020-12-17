@@ -60,15 +60,16 @@ class Experiment(models.Model):
         )
 
     def clean(self) -> None:
+        validation_errors = {}
+
         if self.rating_delay > self.trial_length:
-            raise ValidationError(
-                {"rating_delay": "Rating delay cannot be longer than the trial length."}
-            )
+            validation_errors["rating_delay"] = "Rating delay cannot be longer than the trial length."
 
         if self.iti_min_delay > self.iti_max_delay:
-            raise ValidationError(
-                {"iti_min_delay": "Minimum delay cannot be shorter than maximum delay."}
-            )
+            validation_errors["iti_min_delay"] = "Minimum delay cannot be shorter than maximum delay."
+
+        if validation_errors:
+            raise ValidationError(validation_errors)
 
     def __str__(self) -> str:
         return self.name
