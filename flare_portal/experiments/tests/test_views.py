@@ -763,7 +763,8 @@ class ModuleCreateViewTest(TestCase):
         self.assertEqual(questions[2].sortorder, 3)
 
         self.assertEqual(
-            str(list(resp.context["messages"])[0]), "Added criterion module",
+            str(list(resp.context["messages"])[0]),
+            "Added criterion module",
         )
 
 
