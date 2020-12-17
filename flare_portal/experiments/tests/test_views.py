@@ -421,7 +421,7 @@ class ExperimentCreateViewTest(TestCase):
             "project": str(self.project.pk),
             "trial_length": "10.0",
             "rating_delay": "15.0",
-            "iti_min_delay": "1",
+            "iti_min_delay": "6",
             "iti_max_delay": "3",
         }
 
@@ -437,6 +437,11 @@ class ExperimentCreateViewTest(TestCase):
         self.assertEqual(
             resp.context["form"].errors["rating_delay"][0],
             "Rating delay cannot be longer than the trial length.",
+        )
+
+        self.assertEqual(
+            resp.context["form"].errors["iti_min_delay"][0],
+            "Minimum delay cannot be shorter than maximum delay.",
         )
 
 
