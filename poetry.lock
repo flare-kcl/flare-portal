@@ -334,7 +334,7 @@ Django = ">=1.11"
 
 [[package]]
 name = "django-storages"
-version = "1.10.1"
+version = "1.11"
 description = "Support for many storage backends in Django"
 category = "main"
 optional = false
@@ -1293,7 +1293,7 @@ gunicorn = ["gunicorn"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "293e45212e9b050648bd0d0cf426b78e3ad18353cfb87e4fba560dbbbacda1b6"
+content-hash = "08c9626e0d5fb41e3fe6b1c23dccd6bcf3c98cb4c1d71399c6e0daa7a5a2938b"
 
 [metadata.files]
 appdirs = [
@@ -1474,8 +1474,8 @@ django-referrer-policy = [
     {file = "django-referrer-policy-1.0.tar.gz", hash = "sha256:09e134324fa08c10efc12244a4bae7aee5defa7d332b92c603b09258c854615a"},
 ]
 django-storages = [
-    {file = "django-storages-1.10.1.tar.gz", hash = "sha256:652275ab7844538c462b62810276c0244866f345878256a9e0e86f5b1283ae18"},
-    {file = "django_storages-1.10.1-py3-none-any.whl", hash = "sha256:12de8fb2605b9b57bfaf54b075280d7cbb3b3ee1ca4bc9b9add147af87fe3a2c"},
+    {file = "django-storages-1.11.tar.gz", hash = "sha256:7af56611c62a1c174aab4e862efb7fdd98296dccf76f42135f5b6851fc313c97"},
+    {file = "django_storages-1.11-py3-none-any.whl", hash = "sha256:056ec3e9e2b0c6f363913976072ffba2923e79e4859578047da139ba1637497e"},
 ]
 django-stubs = [
     {file = "django-stubs-1.7.0.tar.gz", hash = "sha256:ddd190aca5b9adb4d30760d5c64f67cb3658703f5f42c3bb0c2c71ff4d752c39"},
