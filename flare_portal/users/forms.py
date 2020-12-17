@@ -51,7 +51,8 @@ class UserForm(forms.ModelForm):
             self.add_error(
                 "password2",
                 forms.ValidationError(
-                    self.error_messages["password_mismatch"], code="password_mismatch",
+                    self.error_messages["password_mismatch"],
+                    code="password_mismatch",
                 ),
             )
 

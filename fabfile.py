@@ -73,7 +73,7 @@ def start(c):
     Start the development environment
     """
     if FRONTEND == "local":
-        local(f"docker-compose up -d web")
+        local("docker-compose up -d web")
     else:
         local("docker-compose up -d web frontend")
 
@@ -191,7 +191,8 @@ def import_data(c, database_filename):
         service="db",
     )
     print(
-        "Any superuser accounts you previously created locally will have been wiped and will need to be recreated."
+        "Any superuser accounts you previously created locally will have been "
+        "wiped and will need to be recreated."
     )
 
 
@@ -343,7 +344,8 @@ def pull_media_from_s3(
     local_media_folder=LOCAL_MEDIA_FOLDER,
 ):
     aws_cmd = "s3 sync --delete s3://{bucket_name} {local_media}".format(
-        bucket_name=aws_storage_bucket_name, local_media=local_media_folder,
+        bucket_name=aws_storage_bucket_name,
+        local_media=local_media_folder,
     )
     aws(c, aws_cmd, aws_access_key_id, aws_secret_access_key)
 
@@ -356,7 +358,8 @@ def push_media_to_s3(
     local_media_folder=LOCAL_MEDIA_FOLDER,
 ):
     aws_cmd = "s3 sync --delete {local_media} s3://{bucket_name}/".format(
-        bucket_name=aws_storage_bucket_name, local_media=local_media_folder,
+        bucket_name=aws_storage_bucket_name,
+        local_media=local_media_folder,
     )
     aws(c, aws_cmd, aws_access_key_id, aws_secret_access_key)
 
@@ -382,12 +385,15 @@ def pull_images_from_s3(
     aws_storage_bucket_name,
     local_images_folder=LOCAL_IMAGES_FOLDER,
 ):
-    aws_cmd = "s3 sync --delete s3://{bucket_name}/original_images {local_media}".format(
-        bucket_name=aws_storage_bucket_name, local_media=local_images_folder
+    aws_cmd = (
+        "s3 sync --delete s3://{bucket_name}/original_images {local_media}".format(
+            bucket_name=aws_storage_bucket_name, local_media=local_images_folder
+        )
     )
     aws(c, aws_cmd, aws_access_key_id, aws_secret_access_key)
-    # The above command just syncs the original images, so we need to drop the wagtailimages_renditions
-    # table so that the renditions will be re-created when requested on the local build.
+    # The above command just syncs the original images, so we need to drop the
+    # wagtailimages_renditions table so that the renditions will be re-created
+    # when requested on the local build.
     delete_local_renditions(c)
 
 
@@ -449,7 +455,8 @@ def check_if_heroku_app_access_granted(c, app_instance):
     error = local(f"heroku access --app {app_instance}", hide="both", warn=True).stderr
     if error:
         raise Exit(
-            "You do not have access to this app. Please either try to add yourself with:\n"
+            "You do not have access to this app. Please either try to add "
+            "yourself with:\n"
             f"heroku apps:join --app {app_instance}\n\n"
             "Or ask a team admin to add you with:\n"
             f"heroku access:add <your email address> --app {app_instance}"
@@ -484,7 +491,8 @@ def pull_media_from_s3_heroku(c, app_instance):
 #     datestamp = datetime.datetime.now().isoformat(timespec="seconds")
 
 #     dexec(
-#         "heroku pg:backups:download --output={dump_folder}/{datestamp}.dump --app {app}".format(
+#         ("heroku pg:backups:download --output={dump_folder}/{datestamp}.dump
+#         ""--app {app}").format(
 #             app=app_instance, dump_folder=LOCAL_DUMP_FOLDER, datestamp=datestamp
 #         ),
 #         service="utils",
@@ -526,8 +534,7 @@ def make_bold(msg):
 
 @task
 def dellar_snapshot(c, filename):
-    """ Snapshot the database, files will be stored in the db container
-    """
+    """Snapshot the database, files will be stored in the db container"""
     dexec(
         "pg_dump -d {database_name} -U {database_username} > {filename}.psql".format(
             database_name=LOCAL_DATABASE_NAME,

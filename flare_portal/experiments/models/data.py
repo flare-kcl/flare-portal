@@ -152,7 +152,9 @@ class BasicInfoData(BaseData):
         ("no_answer", "Prefer not to answer"),
     )
     HEADPHONE_TYPES = Choices(
-        ("in_ear", "In-ear"), ("on_ear", "On-ear"), ("over_ear", "Over-ear"),
+        ("in_ear", "In-ear"),
+        ("on_ear", "On-ear"),
+        ("over_ear", "Over-ear"),
     )
 
     fields = [
@@ -178,7 +180,9 @@ class BasicInfoData(BaseData):
     ]
 
     module = models.ForeignKey(  # type: ignore
-        "experiments.BasicInfoModule", on_delete=models.PROTECT, related_name="data",
+        "experiments.BasicInfoModule",
+        on_delete=models.PROTECT,
+        related_name="data",
     )
 
     # Optional

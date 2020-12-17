@@ -19,5 +19,6 @@ ExperimentType = TypedDict(
 )
 
 ConfigType = TypedDict(
-    "ConfigType", {"experiment": ExperimentType, "modules": List[ModuleConfigType]},
+    "ConfigType",
+    {"experiment": ExperimentType, "modules": List[ModuleConfigType]},
 )
