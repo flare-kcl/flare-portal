@@ -617,7 +617,8 @@ class ExperimentDetailViewTest(TestCase):
         self.assertEqual(200, resp.status_code)
 
         self.assertEqual(
-            modules_1, list(resp.context["modules"]),
+            modules_1,
+            list(resp.context["modules"]),
         )
 
 
@@ -677,7 +678,8 @@ class ModuleCreateViewTest(TestCase):
         )
 
         self.assertEqual(
-            str(list(resp.context["messages"])[0]), "Added fear conditioning module",
+            str(list(resp.context["messages"])[0]),
+            "Added fear conditioning module",
         )
 
 
@@ -742,7 +744,8 @@ class ModuleUpdateViewTest(TestCase):
         )
 
         self.assertEqual(
-            str(list(resp.context["messages"])[0]), "Updated fear conditioning module",
+            str(list(resp.context["messages"])[0]),
+            "Updated fear conditioning module",
         )
 
 
@@ -784,7 +787,8 @@ class ModuleDeleteViewTest(TestCase):
         self.assertEqual(0, BaseModule.objects.all().count())
 
         self.assertEqual(
-            str(list(resp.context["messages"])[0]), "Deleted fear conditioning module",
+            str(list(resp.context["messages"])[0]),
+            "Deleted fear conditioning module",
         )
 
 
@@ -967,10 +971,12 @@ class DataListViewTest(TestCase):
         project: Project = ProjectFactory()
         experiment: Experiment = ExperimentFactory(project=project)
         module_1: FearConditioningModule = FearConditioningModuleFactory(
-            experiment=experiment, sortorder=2,
+            experiment=experiment,
+            sortorder=2,
         )
         module_2: FearConditioningModule = FearConditioningModuleFactory(
-            experiment=experiment, sortorder=1,
+            experiment=experiment,
+            sortorder=1,
         )
         participant_1: Participant = ParticipantFactory(experiment=experiment)
         participant_2: Participant = ParticipantFactory(experiment=experiment)

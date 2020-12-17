@@ -129,7 +129,10 @@ class ModuleRegistry:
 
         create_view_class: CreateView = type(  # type: ignore
             f"{module_camel_case}CreateView",
-            (ModuleCreateViewMixin, CreateView,),
+            (
+                ModuleCreateViewMixin,
+                CreateView,
+            ),
             {"form_class": form_class},
         )
         create_view_name = module_class.get_create_path_name()
@@ -146,7 +149,10 @@ class ModuleRegistry:
         # Update view
         update_view_class: UpdateView = type(  # type: ignore
             f"{module_camel_case}UpdateView",
-            (ModuleUpdateViewMixin, UpdateView,),
+            (
+                ModuleUpdateViewMixin,
+                UpdateView,
+            ),
             {
                 "model": module_class,
                 "fields": [
