@@ -292,14 +292,11 @@ tests = ["pytest (<4.0)", "pytest-django", "pytest-flakes (==1.0.1)", "pytest-pe
 
 [[package]]
 name = "django-extensions"
-version = "2.2.9"
+version = "3.1.0"
 description = "Extensions for Django"
 category = "dev"
 optional = false
-python-versions = "*"
-
-[package.dependencies]
-six = ">=1.2"
+python-versions = ">=3.5"
 
 [[package]]
 name = "django-model-utils"
@@ -1296,7 +1293,7 @@ gunicorn = ["gunicorn"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "63f2dbeb0e30c05a171b83a08bb871499187b467248b4366fa53ca8ccda7100b"
+content-hash = "599dab03185c77774f4618631b9a379e28480095e9427fce5474c561fa857188"
 
 [metadata.files]
 appdirs = [
@@ -1462,8 +1459,8 @@ django-csp = [
     {file = "django_csp-3.7.tar.gz", hash = "sha256:01eda02ad3f10261c74131cdc0b5a6a62b7c7ad4fd017fbefb7a14776e0a9727"},
 ]
 django-extensions = [
-    {file = "django-extensions-2.2.9.tar.gz", hash = "sha256:2f81b618ba4d1b0e58603e25012e5c74f88a4b706e0022a3b21f24f0322a6ce6"},
-    {file = "django_extensions-2.2.9-py2.py3-none-any.whl", hash = "sha256:b19182d101a441fe001c5753553a901e2ef3ff60e8fbbe38881eb4a61fdd17c4"},
+    {file = "django-extensions-3.1.0.tar.gz", hash = "sha256:7cd002495ff0a0e5eb6cdd6be759600905b4e4079232ea27618fc46bdd853651"},
+    {file = "django_extensions-3.1.0-py3-none-any.whl", hash = "sha256:c7f88625a53f631745d4f2bef9ec4dcb999ed59476393bdbbe99db8596778846"},
 ]
 django-model-utils = [
     {file = "django-model-utils-4.1.1.tar.gz", hash = "sha256:eb5dd05ef7d7ce6bc79cae54ea7c4a221f6f81e2aad7722933aee66489e7264b"},
