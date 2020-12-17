@@ -1,9 +1,13 @@
 import re
+from typing import List
 
+from django import forms
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.template.defaultfilters import pluralize
 from django.utils.text import get_text_list
 
+from extra_views import InlineFormSetFactory
 from model_utils import Choices
 from model_utils.managers import InheritanceManager
 
@@ -19,8 +23,10 @@ class BaseModule(Nameable, models.Model):
 
     objects = InheritanceManager()
 
+    inlines: List[InlineFormSetFactory] = []
+
     class Meta:
-        ordering = ["sortorder"]
+        ordering = ["sortorder", "id"]
 
     @classmethod
     def get_module_camel_case(cls) -> str:
@@ -167,3 +173,68 @@ class BasicInfoModule(BaseModule):
 
     def __str__(self) -> str:
         return "Basic info - " + super().__str__()
+
+
+class CriterionQuestion(models.Model):
+    question_text = models.CharField(max_length=255)
+    help_text = models.TextField(blank=True)
+    required_answer = models.BooleanField(
+        default=None,
+        null=True,
+        blank=True,
+        choices=(
+            (None, "Yes or No"),
+            (True, "Yes"),
+            (False, "No"),
+        ),
+    )
+    required = models.BooleanField(default=True)
+
+    module = models.ForeignKey(
+        "experiments.CriterionModule",
+        on_delete=models.CASCADE,
+        related_name="questions",
+    )
+    sortorder = models.PositiveIntegerField(default=0)
+
+    inline_label = "Questions"
+
+    def __str__(self) -> str:
+        return self.question_text
+
+
+class CriterionQuestionInline(InlineFormSetFactory):
+    model = CriterionQuestion
+    fields = ["question_text", "help_text", "required_answer", "required", "sortorder"]
+    factory_kwargs = {"widgets": {"sortorder": forms.HiddenInput}, "extra": 0}
+
+
+class CriterionModule(BaseModule):
+    intro_text = models.TextField(blank=True)
+
+    inlines = [CriterionQuestionInline]
+
+    def get_module_config(self) -> constants.ModuleConfigType:
+        return constants.ModuleConfigType(
+            id=self.pk,
+            type=self.get_module_tag(),
+            config={
+                "intro_text": self.intro_text,
+                "questions": [
+                    {
+                        "id": question.pk,
+                        "question_text": question.question_text,
+                        "required_answer": question.required_answer,
+                        "required": question.required,
+                    }
+                    for question in self.questions.all()
+                ],
+            },
+        )
+
+    def get_module_description(self) -> str:
+        question_count = self.questions.count()
+        return f"{question_count} question{pluralize(question_count)}"
+
+    def __str__(self) -> str:
+        return "Criterion - " + super().__str__()

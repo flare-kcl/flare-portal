@@ -17,6 +17,7 @@ from ..factories import (
 )
 from ..models import (
     BaseModule,
+    CriterionModule,
     Experiment,
     FearConditioningData,
     FearConditioningModule,
@@ -680,6 +681,90 @@ class ModuleCreateViewTest(TestCase):
         self.assertEqual(
             str(list(resp.context["messages"])[0]),
             "Added fear conditioning module",
+        )
+
+    def test_create_criterion_module(self) -> None:
+        # Criterion module should have a formset for the questions
+        url = reverse(
+            "experiments:modules:criterion_create",
+            kwargs={"project_pk": self.project.pk, "experiment_pk": self.experiment.pk},
+        )
+
+        resp = self.client.get(url)
+
+        self.assertEqual(200, resp.status_code)
+
+        self.assertEqual(CriterionModule, resp.context["module_type"])
+        self.assertEqual(self.experiment.pk, resp.context["form"].initial["experiment"])
+
+        form_data = {
+            "intro_text": "Intro 123",
+            "experiment": str(self.experiment.pk),
+            "questions-TOTAL_FORMS": "3",
+            "questions-INITIAL_FORMS": "0",
+            "questions-MIN_NUM_FORMS": "0",
+            "questions-MAX_NUM_FORMS": "1000",
+            "questions-0-id": "",
+            "questions-0-question_text": "This is question 1",
+            "questions-0-help_text": "This is help text 1",
+            "questions-0-required_answer": True,
+            "questions-0-sortorder": "1",
+            "questions-0-DELETE": "",
+            "questions-1-id": "",
+            "questions-1-question_text": "This is question 2",
+            "questions-1-help_text": "This is help text 2",
+            "questions-1-required_answer": False,
+            "questions-1-sortorder": "2",
+            "questions-1-DELETE": "",
+            "questions-2-id": "",
+            "questions-2-question_text": "This is question 3",
+            "questions-2-help_text": "This is help text 3",
+            "questions-2-required_answer": False,
+            "questions-2-sortorder": "3",
+            "questions-2-DELETE": "",
+        }
+
+        resp = self.client.post(url, form_data, follow=True)
+
+        self.assertRedirects(
+            resp,
+            reverse(
+                "experiments:experiment_detail",
+                kwargs={
+                    "project_pk": self.project.pk,
+                    "experiment_pk": self.experiment.pk,
+                },
+            ),
+        )
+
+        # Verify data
+
+        module: CriterionModule = (
+            self.experiment.modules.select_subclasses().get()  # type: ignore
+        )
+
+        self.assertEqual(module.intro_text, form_data["intro_text"])
+
+        questions = module.questions.all()
+
+        self.assertEqual(questions[0].question_text, "This is question 1")
+        self.assertEqual(questions[0].help_text, "This is help text 1")
+        self.assertEqual(questions[0].required_answer, True)
+        self.assertEqual(questions[0].sortorder, 1)
+
+        self.assertEqual(questions[1].question_text, "This is question 2")
+        self.assertEqual(questions[1].help_text, "This is help text 2")
+        self.assertEqual(questions[1].required_answer, False)
+        self.assertEqual(questions[1].sortorder, 2)
+
+        self.assertEqual(questions[2].question_text, "This is question 3")
+        self.assertEqual(questions[2].help_text, "This is help text 3")
+        self.assertEqual(questions[2].required_answer, False)
+        self.assertEqual(questions[2].sortorder, 3)
+
+        self.assertEqual(
+            str(list(resp.context["messages"])[0]),
+            "Added criterion module",
         )
 
 

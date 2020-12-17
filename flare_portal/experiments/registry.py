@@ -9,11 +9,19 @@ from django.urls import URLPattern, path, reverse
 from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
+from extra_views import (
+    CreateWithInlinesView,
+    InlineFormSetFactory,
+    UpdateWithInlinesView,
+)
+
 from .models import (
     BaseData,
     BaseModule,
     BasicInfoData,
     BasicInfoModule,
+    CriterionData,
+    CriterionModule,
     Experiment,
     FearConditioningData,
     FearConditioningModule,
@@ -48,14 +56,16 @@ class ModuleViewMixin:
         return context
 
 
-class ModuleCreateViewMixin(ModuleViewMixin):
+class ModuleCreateViewMixin(ModuleViewMixin, CreateWithInlinesView):
     template_name = "experiments/module_form.html"
 
     def get_initial(self) -> dict:
         return {"experiment": self.experiment.pk}
 
-    def form_valid(self, form: forms.BaseModelForm) -> HttpResponse:
-        response = super().form_valid(form)  # type:ignore
+    def forms_valid(
+        self, form: forms.BaseModelForm, inlines: List[InlineFormSetFactory]
+    ) -> HttpResponse:
+        response = super().forms_valid(form, inlines)
         messages.success(
             self.request,  # type:ignore
             f"Added {self.object.get_module_name()} module",  # type:ignore
@@ -63,11 +73,13 @@ class ModuleCreateViewMixin(ModuleViewMixin):
         return response
 
 
-class ModuleUpdateViewMixin(ModuleViewMixin):
+class ModuleUpdateViewMixin(ModuleViewMixin, UpdateWithInlinesView):
     template_name = "experiments/module_form.html"
 
-    def form_valid(self, form: forms.BaseModelForm) -> HttpResponse:
-        response = super().form_valid(form)  # type:ignore
+    def forms_valid(
+        self, form: forms.BaseModelForm, inlines: List[InlineFormSetFactory]
+    ) -> HttpResponse:
+        response = super().forms_valid(form, inlines)
         messages.success(
             self.request,  # type:ignore
             f"Updated {self.object.get_module_name()} module",  # type:ignore
@@ -129,11 +141,12 @@ class ModuleRegistry:
 
         create_view_class: CreateView = type(  # type: ignore
             f"{module_camel_case}CreateView",
-            (
-                ModuleCreateViewMixin,
-                CreateView,
-            ),
-            {"form_class": form_class},
+            (ModuleCreateViewMixin,),
+            {
+                "model": module_class,
+                "form_class": form_class,
+                "inlines": module_class.inlines,
+            },
         )
         create_view_name = module_class.get_create_path_name()
 
@@ -149,10 +162,7 @@ class ModuleRegistry:
         # Update view
         update_view_class: UpdateView = type(  # type: ignore
             f"{module_camel_case}UpdateView",
-            (
-                ModuleUpdateViewMixin,
-                UpdateView,
-            ),
+            (ModuleUpdateViewMixin,),
             {
                 "model": module_class,
                 "fields": [
@@ -161,6 +171,7 @@ class ModuleRegistry:
                     if f.name not in ["sortorder", "experiment"]
                 ],
                 "pk_url_kwarg": "module_pk",
+                "inlines": module_class.inlines,
             },
         )
         update_view_name = module_class.get_update_path_name()
@@ -195,6 +206,7 @@ class ModuleRegistry:
 module_registry = ModuleRegistry()
 
 module_registry.register(BasicInfoModule)
+module_registry.register(CriterionModule)
 module_registry.register(FearConditioningModule)
 
 
@@ -331,9 +343,22 @@ class FearConditioningDataListView(DataListView):
         )
 
 
+class CriterionDataListView(DataListView):
+    data_type = CriterionData
+
+    def get_queryset(self) -> QuerySet[BaseData]:
+        return (
+            super()
+            .get_queryset()
+            .select_related("question")
+            .order_by("participant_id", "module__sortorder", "question")
+        )
+
+
 data_viewset_registry = DataViewsetRegistry()
 
 data_viewset_registry.register(BasicInfoData)
+data_viewset_registry.register(CriterionData, list_view_class=CriterionDataListView)
 data_viewset_registry.register(
     FearConditioningData, list_view_class=FearConditioningDataListView
 )

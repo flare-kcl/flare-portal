@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load experiments_tags %}
+{% load experiments_tags util_tags widget_tweaks %}
 
 {% block title %}
     {% if module %}
@@ -16,7 +16,9 @@
             <div class="col-lg-4">
                 {% include "experiments/includes/experiment_sidebar.html" %}
             </div>
-            <div class="col-lg-8">
+            <form action="" method="POST" class="col-lg-8">
+                {% csrf_token %}
+
                 <div class="card">
                     <div class="card-header">
                         <h3 class="card-title">
@@ -27,22 +29,20 @@
                             {% endif %}
                         </h3>
                     </div>
-                    <form action="" method="POST">
-                        {% csrf_token %}
+                    <div class="card-body">
+                        {% if form.non_field_errors %}
+                            <div class="card-alert alert alert-danger my-3">
+                                {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+                            </div>
+                        {% endif %}
 
-                        <div class="card-body">
-                            {% if form.non_field_errors %}
-                                <div class="card-alert alert alert-danger my-3">
-                                    {% for error in form.non_field_errors %}{{ error }}{% endfor %}
-                                </div>
-                            {% endif %}
+                        {% for field in form %}
+                            {% include "includes/form-group.html" %}
+                        {% endfor %}
 
-                            {% for field in form %}
-                                {% include "includes/form-group.html" %}
-                            {% endfor %}
+                    </div>
 
-                        </div>
-
+                    {% if not inlines %}
                         <div class="card-footer">
                             <div class="d-flex">
                                 <a href="{% url "experiments:experiment_detail" project_pk=experiment.project_id experiment_pk=experiment.pk %}" class="btn btn-link">Cancel</a>
@@ -55,9 +55,82 @@
                                 </div>
                             </div>
                         </div>
-                    </form>
+                    {% endif %}
                 </div>
-            </div>
+                {% for formset in inlines %}
+                    <div class="card" x-data="{ forms: [], startIndex: {{ formset.management_form.TOTAL_FORMS.value }}, prefix: '{{ formset.prefix }}' }">
+                        {{ formset.management_form.TOTAL_FORMS|attr:"x-bind::value:startIndex + forms.length" }}
+                        {{ formset.management_form.INITIAL_FORMS }}
+                        {{ formset.management_form.MIN_NUM_FORMS }}
+                        {{ formset.management_form.MAX_NUM_FORMS }}
+
+                        <div class="card-header">
+                            <h3 class="card-title">{{ formset.model.inline_label }}</h3>
+                        </div>
+                        {% for inline_form in formset %}
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-lg-8">
+                                        {% if inline_form.non_field_errors %}
+                                            {% for error in inline_form.non_field_errors %}
+                                                <div class="text-danger small mb-2">{{ error }}</div>
+                                            {% endfor %}
+                                        {% endif %}
+
+                                        {% for field in inline_form %}
+                                            {% if field.name != "DELETE" %}
+                                                {% include "includes/form-group.html" %}
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                    <div class="col-lg-4">
+                                        {% include "includes/form-group.html" with field=inline_form.DELETE %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+
+                        {% get_formset_form formset as formset_form %}
+                        <template x-for="(form, index) in forms" :key="index" class="card-body">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-lg-8">
+                                        {% for field in formset_form %}
+                                            {% if field.name != "DELETE" %}
+                                                {% alpine_field field "${index + startIndex}" %}
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <a class="icon" href="#" @click.prevent="forms.splice(index, 1)"><i class="fe fe-trash text-danger"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+
+                        <div class="card-footer d-flex">
+                            <button class="btn btn-sm btn-secondary" @click.prevent="forms.push({% alpine_field_defaults formset_form %})" x-text="`Add more ${prefix}`">Add more</button>
+                        </div>
+                    </div>
+                {% endfor %}
+
+                {% if inlines %}
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex">
+                                <a href="{% url "experiments:experiment_detail" project_pk=experiment.project_id experiment_pk=experiment.pk %}" class="btn btn-link">Cancel</a>
+
+                                <div class="btn-list ml-auto">
+                                    {% if module %}
+                                        <a href="{% get_module_delete_url module %}" class="btn btn-link text-danger">Delete</a>
+                                    {% endif %}
+                                    <button type="submit" class="btn btn-primary ml-auto">{% if module %}Save{% else %}Add {{ module_type.get_module_name }} module{% endif %}</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </form>
         </div>
     </div>
 {% endblock content %}
