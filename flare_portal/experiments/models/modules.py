@@ -1,6 +1,7 @@
 import re
 from typing import List
 
+from django import forms
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.template.defaultfilters import pluralize
@@ -177,7 +178,13 @@ class BasicInfoModule(BaseModule):
 class CriterionQuestion(models.Model):
     question_text = models.CharField(max_length=255)
     help_text = models.TextField(blank=True)
-    required_answer = models.BooleanField(default=False)
+    required_answer = models.BooleanField(
+        default=None,
+        null=True,
+        blank=True,
+        choices=((None, "Yes or No"), (True, "Yes"), (False, "No"),),
+    )
+    required = models.BooleanField(default=True)
 
     module = models.ForeignKey(
         "experiments.CriterionModule",
@@ -186,13 +193,16 @@ class CriterionQuestion(models.Model):
     )
     sortorder = models.PositiveIntegerField(default=0)
 
+    inline_label = "Questions"
+
     def __str__(self) -> str:
         return self.question_text
 
 
 class CriterionQuestionInline(InlineFormSetFactory):
     model = CriterionQuestion
-    fields = ["question_text", "help_text", "required_answer", "sortorder"]
+    fields = ["question_text", "help_text", "required_answer", "required", "sortorder"]
+    factory_kwargs = {"widgets": {"sortorder": forms.HiddenInput}, "extra": 0}
 
 
 class CriterionModule(BaseModule):

@@ -9,7 +9,11 @@ from django.urls import URLPattern, path, reverse
 from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
-from extra_views import CreateWithInlinesView
+from extra_views import (
+    CreateWithInlinesView,
+    InlineFormSetFactory,
+    UpdateWithInlinesView,
+)
 
 from .models import (
     BaseData,
@@ -58,8 +62,10 @@ class ModuleCreateViewMixin(ModuleViewMixin, CreateWithInlinesView):
     def get_initial(self) -> dict:
         return {"experiment": self.experiment.pk}
 
-    def forms_valid(self, form: forms.BaseModelForm, inlines: Any) -> HttpResponse:
-        response = super().forms_valid(form, inlines)  # type:ignore
+    def forms_valid(
+        self, form: forms.BaseModelForm, inlines: List[InlineFormSetFactory]
+    ) -> HttpResponse:
+        response = super().forms_valid(form, inlines)
         messages.success(
             self.request,  # type:ignore
             f"Added {self.object.get_module_name()} module",  # type:ignore
@@ -67,11 +73,13 @@ class ModuleCreateViewMixin(ModuleViewMixin, CreateWithInlinesView):
         return response
 
 
-class ModuleUpdateViewMixin(ModuleViewMixin):
+class ModuleUpdateViewMixin(ModuleViewMixin, UpdateWithInlinesView):
     template_name = "experiments/module_form.html"
 
-    def form_valid(self, form: forms.BaseModelForm) -> HttpResponse:
-        response = super().form_valid(form)  # type:ignore
+    def forms_valid(
+        self, form: forms.BaseModelForm, inlines: List[InlineFormSetFactory]
+    ) -> HttpResponse:
+        response = super().forms_valid(form, inlines)
         messages.success(
             self.request,  # type:ignore
             f"Updated {self.object.get_module_name()} module",  # type:ignore
@@ -154,10 +162,7 @@ class ModuleRegistry:
         # Update view
         update_view_class: UpdateView = type(  # type: ignore
             f"{module_camel_case}UpdateView",
-            (
-                ModuleUpdateViewMixin,
-                UpdateView,
-            ),
+            (ModuleUpdateViewMixin,),
             {
                 "model": module_class,
                 "fields": [
@@ -166,6 +171,7 @@ class ModuleRegistry:
                     if f.name not in ["sortorder", "experiment"]
                 ],
                 "pk_url_kwarg": "module_pk",
+                "inlines": module_class.inlines,
             },
         )
         update_view_name = module_class.get_update_path_name()

@@ -8,7 +8,7 @@ import { Sortable } from '@shopify/draggable';
 // eslint-disable-next-line no-unused-vars
 window.require(['jquery', 'selectize'], ($, selectize) => {
     $(document).ready(() => {
-        $('[data-selectize]').selectize({});
+        $('[data-selectize]').selectize({ allowEmptyOption: true });
     });
 });
 

@@ -9,7 +9,7 @@ import flare_portal.experiments.models.core
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("experiments", "0019_trial_unique_together_constraint"),
+        ("experiments", "0022_iti_duration_fields"),
     ]
 
     operations = [
