@@ -343,10 +343,22 @@ class FearConditioningDataListView(DataListView):
         )
 
 
+class CriterionDataListView(DataListView):
+    data_type = CriterionData
+
+    def get_queryset(self) -> QuerySet[BaseData]:
+        return (
+            super()
+            .get_queryset()
+            .select_related("question")
+            .order_by("participant_id", "module__sortorder", "question")
+        )
+
+
 data_viewset_registry = DataViewsetRegistry()
 
 data_viewset_registry.register(BasicInfoData)
-data_viewset_registry.register(CriterionData)
+data_viewset_registry.register(CriterionData, list_view_class=CriterionDataListView)
 data_viewset_registry.register(
     FearConditioningData, list_view_class=FearConditioningDataListView
 )

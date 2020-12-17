@@ -182,7 +182,11 @@ class CriterionQuestion(models.Model):
         default=None,
         null=True,
         blank=True,
-        choices=((None, "Yes or No"), (True, "Yes"), (False, "No"),),
+        choices=(
+            (None, "Yes or No"),
+            (True, "Yes"),
+            (False, "No"),
+        ),
     )
     required = models.BooleanField(default=True)
 
@@ -209,6 +213,24 @@ class CriterionModule(BaseModule):
     intro_text = models.TextField(blank=True)
 
     inlines = [CriterionQuestionInline]
+
+    def get_module_config(self) -> constants.ModuleConfigType:
+        return constants.ModuleConfigType(
+            id=self.pk,
+            type=self.get_module_tag(),
+            config={
+                "intro_text": self.intro_text,
+                "questions": [
+                    {
+                        "id": question.pk,
+                        "question_text": question.question_text,
+                        "required_answer": question.required_answer,
+                        "required": question.required,
+                    }
+                    for question in self.questions.all()
+                ],
+            },
+        )
 
     def get_module_description(self) -> str:
         question_count = self.questions.count()

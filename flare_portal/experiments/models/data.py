@@ -2,6 +2,7 @@ import re
 from typing import Any, List, Literal, Tuple, Union
 
 from django.contrib.admin.utils import get_fields_from_path
+from django.core.exceptions import FieldDoesNotExist
 from django.db import models
 
 from model_utils import Choices
@@ -67,13 +68,25 @@ class BaseData(Nameable, models.Model):
 
     def get_field_values(self, field_names: List[str]) -> List[Tuple[str, Any]]:
         """Returns a tuple of field names and values for the given fields"""
-        return [
-            (
-                get_fields_from_path(self._meta.model, fname)[-1].verbose_name,
-                get_field_value(self, fname),
-            )
-            for fname in field_names
-        ]
+
+        field_values = []
+
+        for fname in field_names:
+            try:
+                field_values.append(
+                    (
+                        get_fields_from_path(self._meta.model, fname)[-1].verbose_name,
+                        get_field_value(self, fname),
+                    )
+                )
+            except FieldDoesNotExist:
+                value = getattr(self, fname)
+
+                if callable(value):
+                    value = value()
+                field_values.append((fname, value))
+
+        return field_values
 
     def get_data_values(self) -> List[Tuple[str, Any]]:
         """Returns data for the data detail view"""
@@ -91,10 +104,18 @@ class BaseData(Nameable, models.Model):
     @classmethod
     def get_list_display_columns(cls) -> List[str]:
         """Returns the column names for this model for use in the table"""
-        return [
-            get_fields_from_path(cls, fname)[-1].verbose_name
-            for fname in cls.list_display
-        ]
+
+        display_columns = []
+
+        for fname in cls.list_display:
+            try:
+                field = get_fields_from_path(cls, fname)[-1]
+                display_columns.append(field.verbose_name)
+            except FieldDoesNotExist:
+                # Field is property/method
+                display_columns.append(fname.replace("_", " "))
+
+        return display_columns
 
     def get_list_display_values(self) -> List[Tuple[str, Any]]:
         """Returns a single row of data for the data list view"""
@@ -117,9 +138,6 @@ class FearConditioningData(BaseData):
     calibrated_volume_level = models.DecimalField(max_digits=3, decimal_places=2)
     headphones = models.BooleanField()
 
-    class Meta:
-        unique_together = ("trial", "module", "participant")
-
     fields = [
         "module__phase",
         "trial",
@@ -141,6 +159,9 @@ class FearConditioningData(BaseData):
         "rating",
     ]
 
+    class Meta:
+        unique_together = ("trial", "module", "participant")
+
 
 class BasicInfoData(BaseData):
     GENDERS = Choices(
@@ -156,28 +177,6 @@ class BasicInfoData(BaseData):
         ("on_ear", "On-ear"),
         ("over_ear", "Over-ear"),
     )
-
-    fields = [
-        "date_of_birth",
-        "gender",
-        "headphone_type",
-        "headphone_make",
-        "headphone_model",
-        "headphone_label",
-        "device_make",
-        "device_model",
-        "os_name",
-        "os_version",
-    ]
-    list_display = [
-        "participant",
-        "date_of_birth",
-        "gender",
-        "headphone_type",
-        "device_make",
-        "os_name",
-        "os_version",
-    ]
 
     module = models.ForeignKey(  # type: ignore
         "experiments.BasicInfoModule",
@@ -201,6 +200,28 @@ class BasicInfoData(BaseData):
     os_name = models.CharField(max_length=255)
     os_version = models.CharField(max_length=255)
 
+    fields = [
+        "date_of_birth",
+        "gender",
+        "headphone_type",
+        "headphone_make",
+        "headphone_model",
+        "headphone_label",
+        "device_make",
+        "device_model",
+        "os_name",
+        "os_version",
+    ]
+    list_display = [
+        "participant",
+        "date_of_birth",
+        "gender",
+        "headphone_type",
+        "device_make",
+        "os_name",
+        "os_version",
+    ]
+
     def get_date_of_birth_display(self) -> str:
         if self.date_of_birth:
             return self.date_of_birth.strftime("%Y-%m")
@@ -211,8 +232,32 @@ class CriterionData(BaseData):
     question = models.ForeignKey(
         "experiments.CriterionQuestion", on_delete=models.CASCADE
     )
-    answer = models.BooleanField()
+    answer = models.BooleanField(null=True)
 
     module = models.ForeignKey(  # type: ignore
-        "experiments.CriterionModule", on_delete=models.PROTECT, related_name="data",
+        "experiments.CriterionModule",
+        on_delete=models.PROTECT,
+        related_name="data",
     )
+
+    list_display = [
+        "participant",
+        "question",
+        "passed",
+    ]
+
+    @property
+    def passed(self) -> bool:
+        """Whether or not the participant answered correctly for the question"""
+        return (
+            # No answer
+            (self.answer is None and not self.question.required)
+            # Correct answer
+            or (
+                self.question.required_answer is not None
+                and self.question.required_answer == self.answer
+            )
+            # Either answer is correct as long as there is one
+            or (self.question.required_answer is None and self.answer is not None)
+            or False
+        )
