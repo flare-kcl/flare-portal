@@ -27,7 +27,7 @@ gunicorn = ["gunicorn"]
 
 [tool.poetry.dev-dependencies]
 Werkzeug = "~1.0"
-django-extensions = "~2.2"
+django-extensions = "~3.1"
 fabric = "~2.5"
 stellar = "~0.4"
 SQLAlchemy = "1.2.5"
