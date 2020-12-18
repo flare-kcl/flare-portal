@@ -16,10 +16,14 @@
             {% if field|widget_type == 'horizontalcheckboxselectmultiple' %}
                 {{ field|add_error_class:"is-invalid" }}
             {% elif field|widget_type == 'checkboxinput' %}
-                <label class="custom-switch">
+                <label class="custom-switch {% if field.help_text %}custom-switch--with-description{% endif %}">
                     {{ field|add_class:"custom-switch-input" }}
                     <span class="custom-switch-indicator"></span>
                     <span class="custom-switch-description">{{ field.label }}</span>
+
+                    {% if field.help_text %}
+                        <p class="custom-switch-description">{{ field.help_text }}</p>
+                    {% endif %}
                 </label>
             {% elif field|widget_type == 'select' %}
                 {{ field|add_class:"form-control custom-select"|add_error_class:"is-invalid"|attr:"data-selectize" }}

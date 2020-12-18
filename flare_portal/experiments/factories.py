@@ -12,6 +12,7 @@ from .models import (
     FearConditioningModule,
     Participant,
     Project,
+    WebModule,
 )
 
 
@@ -93,3 +94,13 @@ class CriterionQuestionFactory(factory.django.DjangoModelFactory):
     required_answer = factory.Faker("random_element", elements=[True, False])
 
     module = factory.SubFactory(CriterionModuleFactory)
+
+
+class WebModuleFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = WebModule
+
+    url = "http://google.com"
+    intro_text = factory.Faker("heading")
+    help_text = factory.Faker("paragraph")
+    append_participant_id = True
