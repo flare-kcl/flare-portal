@@ -22,11 +22,11 @@ from .models import (
     BasicInfoModule,
     CriterionData,
     CriterionModule,
-    WebModule,
     Experiment,
     FearConditioningData,
     FearConditioningModule,
     Participant,
+    WebModule,
 )
 
 
