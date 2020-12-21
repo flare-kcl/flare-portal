@@ -1,9 +1,18 @@
 import json
+import re
+from typing import Any, Dict
 
 from django import forms, template
 from django.utils.safestring import mark_safe
 
 register = template.Library()
+
+
+@register.simple_tag(takes_context=True)
+def active(context: Dict[str, Any], path: str) -> str:
+    if context.get("request") and re.search(path, context["request"].path):
+        return "active"
+    return ""
 
 
 @register.simple_tag

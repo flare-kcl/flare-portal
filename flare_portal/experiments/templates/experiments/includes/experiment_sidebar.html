@@ -1,4 +1,4 @@
-{% load experiments_tags %}
+{% load experiments_tags util_tags %}
 
 <div class="card">
     <div class="card-header">
@@ -47,11 +47,12 @@
             <span class="icon mr-3"><i class="fe fe-layers"></i></span>Modules
         </a>
         <div class="dropdown">
-            <a href="#" class="list-group-item list-group-item-action d-flex align-items-center" data-toggle="dropdown">
+            {% get_module_data_types as data_types %}
+
+            <a href="#" class="list-group-item list-group-item-action d-flex align-items-center{% for dt in data_types %}{% get_data_list_url dt as path %} {% active path %}{% endfor %}" data-toggle="dropdown">
                 <span class="icon mr-3"><i class="fe fe-database"></i></span>Data
             </a>
             <div class="dropdown-menu">
-                {% get_module_data_types as data_types %}
                 {% for data_type in data_types %}
                     <a class="dropdown-item" href="{% get_data_list_url data_type %}">{{ data_type.get_module_name|capfirst }}</a>
                 {% endfor %}
