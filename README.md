@@ -106,5 +106,5 @@ Python packages can be installed using poetry in the web container:
 
 ```
 fab sh-root
-poerty install wagtail-guide
+poetry install wagtail-guide
 ```
