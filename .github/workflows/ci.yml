@@ -82,7 +82,6 @@ jobs:
           restore-keys: |
             poetry-
       - run: poetry install
-
       # Linting for Python
       - run: poetry run flake8 flare_portal
       - run: poetry run black --check ./
