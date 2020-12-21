@@ -20,5 +20,18 @@ ExperimentType = TypedDict(
 
 ConfigType = TypedDict(
     "ConfigType",
-    {"experiment": ExperimentType, "modules": List[ModuleConfigType]},
+    {
+        "participant_started_at": str,
+        "participant_finished_at": str,
+        "experiment": ExperimentType,
+        "modules": List[ModuleConfigType],
+    },
+)
+
+SubmissionType = TypedDict(
+    "SubmissionType",
+    {
+        "participant_started_at": str,
+        "participant_finished_at": str,
+    },
 )

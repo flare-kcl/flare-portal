@@ -3,6 +3,7 @@ from decimal import Decimal
 from django.test import TestCase
 from django.urls import reverse
 from django.utils.dateparse import parse_datetime
+from rest_framework.serializers import DateTimeField
 
 from flare_portal.experiments.factories import (
     CriterionModuleFactory,
@@ -100,6 +101,57 @@ class ConfigurationAPIViewTest(TestCase):
         self.assertEqual(400, resp.status_code)
 
         self.assertEqual(resp.json(), {"participant": ["Invalid participant"]})
+
+
+class SubmissionAPIViewTest(TestCase):
+    def test_post(self) -> None:
+        experiment: Experiment = ExperimentFactory()
+        participant = ParticipantFactory(
+            participant_id="Flare.ABCDEF", experiment=experiment
+        )
+
+        # Try to finish the experiment
+        submit_resp = self.client.post(
+            reverse("api:submission"),
+            {"participant": "Flare.ABCDEF"},
+            content_type="application/json",
+        )
+
+        # Test that the request fails because it hasn't started
+        self.assertEqual(400, submit_resp.status_code)
+
+        # Start experiment
+        config_resp = self.client.post(
+            reverse("api:configuration"),
+            {"participant": "Flare.ABCDEF"},
+            content_type="application/json",
+        )
+
+        # Test that the participant object has been updated
+        config_data = config_resp.json()
+        updated_participant = Participant.objects.get(pk=participant.id)
+        self.assertEqual(config_data["participant_started_at"], None)
+        self.assertEqual(config_data["participant_finished_at"], None)
+
+        # Finish experiment
+        submit_resp = self.client.post(
+            reverse("api:submission"),
+            {"participant": "Flare.ABCDEF"},
+            content_type="application/json",
+        )
+
+        # Test response
+        submit_data = submit_resp.json()
+        updated_participant = Participant.objects.get(pk=participant.id)
+        self.assertEqual(200, submit_resp.status_code)
+        self.assertEqual(
+            submit_data["participant_started_at"],
+            DateTimeField().to_representation(updated_participant.started_at),
+        )
+        self.assertEqual(
+            submit_data["participant_finished_at"],
+            DateTimeField().to_representation(updated_participant.finished_at),
+        )
 
 
 class ModuleDataAPIViewTest(TestCase):

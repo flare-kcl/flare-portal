@@ -38,7 +38,8 @@
                                     <tr>
                                         <th></th>
                                         <th>Login ID</th>
-                                        <th>Created</th>
+                                        <th>Started</th>
+                                        <th>Finished</th>
                                         <th>Delete</th>
                                         <th></th>
                                     </tr>
@@ -64,7 +65,8 @@
                                                     <div class="invalid-feedback">{{ error }}</div>
                                                 {% endfor %}
                                             </td>
-                                            <td>{{ form.instance.created_at|default:"" }}</td>
+                                            <td>{{ form.instance.started_at|default:"" }}</td>
+                                            <td>{{ form.instance.finished_at|default:"" }}</td>
                                             <td>
                                                 {% if form.instance.pk %}
                                                     <label class="custom-control custom-checkbox" for="{{ form.DELETE.id_for_label }}">
