@@ -4,3 +4,4 @@ coverage
 venv
 .config
 tabler
+.mypy_cache
