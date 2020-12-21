@@ -13,7 +13,6 @@ from ..factories import (
     FearConditioningModuleFactory,
     ParticipantFactory,
     ProjectFactory,
-    WebModuleFactory,
 )
 from ..models import (
     BaseModule,

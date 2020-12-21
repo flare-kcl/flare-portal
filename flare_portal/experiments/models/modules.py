@@ -247,11 +247,14 @@ class WebModule(BaseModule):
     auto_close_url = models.URLField(
         blank=True,
         verbose_name="Automatic close URL",
-        help_text="Optional: Enter a URL here that if redirected to will automatically close this module.",
+        help_text="Optional: Enter a URL here that if redirected to will "
+        "automatically close this module.",
     )
     append_participant_id = models.BooleanField(
         blank=True,
-        help_text="Optional: Enabling this feature will append the particpant's id to the url. This is useful if you are using a survey service such as Qualtrics or Google Forms.",
+        help_text="Optional: Enabling this feature will append the"
+        "particpant's id to the url. This is useful if you are using a "
+        "survey service such as Qualtrics or Google Forms.",
     )
 
     def get_module_config(self) -> constants.ModuleConfigType:
