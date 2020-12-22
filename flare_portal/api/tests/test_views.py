@@ -113,6 +113,31 @@ class ConfigurationAPIViewTest(TestCase):
         self.assertEqual(resp.json(), {"participant": ["Invalid participant"]})
 
 
+class TermsAndConditionsAPIViewTest(TestCase):
+    def test_agree_to_terms(self) -> None:
+        participant = ParticipantFactory(participant_id="Flare.ABCDEF")
+
+        resp = self.client.post(
+            reverse("api:terms_and_conditions"),
+            {"participant": "Flare.ABCDEF"},
+            content_type="application/json",
+        )
+
+        self.assertEqual(200, resp.status_code)
+
+        self.assertEqual(
+            resp.json(),
+            {
+                "participant": "Flare.ABCDEF",
+                "agreed_to_terms_and_conditions": True,
+            },
+        )
+
+        participant.refresh_from_db()
+
+        self.assertTrue(participant.agreed_to_terms_and_conditions)
+
+
 class ModuleDataAPIViewTest(TestCase):
     def test_post(self) -> None:
         experiment: Experiment = ExperimentFactory()

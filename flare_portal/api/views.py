@@ -7,7 +7,7 @@ from flare_portal.experiments.models import Experiment
 from flare_portal.site_config.models import SiteConfiguration
 
 from . import constants
-from .forms import ConfigurationForm
+from .forms import ConfigurationForm, TermsAndConditionsForm
 
 
 class ConfigurationAPIView(APIView):
@@ -53,3 +53,24 @@ class ConfigurationAPIView(APIView):
 
 
 configuration_api_view = ConfigurationAPIView.as_view()
+
+
+class TermsAndConditionsAPIView(APIView):
+    def post(self, request: Request, format: str = None) -> Response:
+        form = TermsAndConditionsForm(request.data)
+
+        if form.is_valid():
+            participant = form.save()
+            return Response(
+                {
+                    "participant": participant.participant_id,
+                    "agreed_to_terms_and_conditions": (
+                        participant.agreed_to_terms_and_conditions
+                    ),
+                }
+            )
+
+        raise serializers.ValidationError(form.errors)
+
+
+terms_and_conditions_api_view = TermsAndConditionsAPIView.as_view()
