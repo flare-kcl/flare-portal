@@ -84,6 +84,7 @@ class Participant(models.Model):
     experiment = models.ForeignKey(
         "experiments.Experiment", on_delete=models.CASCADE, related_name="participants"
     )
+    agreed_to_terms_and_conditions = models.BooleanField(default=False)
 
     created_at = models.DateTimeField(auto_now_add=True)
     udpated_at = models.DateTimeField(auto_now=True)

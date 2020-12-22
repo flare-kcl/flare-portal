@@ -345,6 +345,14 @@ python-versions = "*"
 Django = ">=1.11"
 
 [[package]]
+name = "django-solo"
+version = "1.1.5"
+description = "Django Solo helps working with singletons"
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "django-storages"
 version = "1.11"
 description = "Support for many storage backends in Django"
@@ -1305,7 +1313,7 @@ gunicorn = ["gunicorn"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "5de5c3fc5845e02d0f237688a83328c7c636565e7bf21c902281306e00342ba3"
+content-hash = "40c421095b40535167957545920a5b0533b0a094a1a726a75b92c6cec4bc38f6"
 
 [metadata.files]
 appdirs = [
@@ -1479,6 +1487,9 @@ django-redis = [
 ]
 django-referrer-policy = [
     {file = "django-referrer-policy-1.0.tar.gz", hash = "sha256:09e134324fa08c10efc12244a4bae7aee5defa7d332b92c603b09258c854615a"},
+]
+django-solo = [
+    {file = "django-solo-1.1.5.tar.gz", hash = "sha256:e412f0f844aa101fa77ba5d07768a8a77ea0e0a6e098b87a6eef3bedb2e5ecd4"},
 ]
 django-storages = [
     {file = "django-storages-1.11.tar.gz", hash = "sha256:7af56611c62a1c174aab4e862efb7fdd98296dccf76f42135f5b6851fc313c97"},

@@ -16,10 +16,15 @@ from flare_portal.experiments.models import (
     FearConditioningModule,
     Participant,
 )
+from flare_portal.site_config.models import SiteConfiguration
 
 
 class ConfigurationAPIViewTest(TestCase):
     def test_post(self) -> None:
+        config = SiteConfiguration.get_solo()
+        config.terms_and_conditions = "Some T&Cs"
+        config.save()
+
         experiment: Experiment = ExperimentFactory()
         ParticipantFactory(participant_id="Flare.ABCDEF", experiment=experiment)
 
@@ -63,6 +68,12 @@ class ConfigurationAPIViewTest(TestCase):
             },
         )
         self.assertEqual(
+            data["config"],
+            {
+                "terms_and_conditions": "Some T&Cs",
+            },
+        )
+        self.assertEqual(
             data["modules"],
             [
                 {
@@ -100,6 +111,31 @@ class ConfigurationAPIViewTest(TestCase):
         self.assertEqual(400, resp.status_code)
 
         self.assertEqual(resp.json(), {"participant": ["Invalid participant"]})
+
+
+class TermsAndConditionsAPIViewTest(TestCase):
+    def test_agree_to_terms(self) -> None:
+        participant = ParticipantFactory(participant_id="Flare.ABCDEF")
+
+        resp = self.client.post(
+            reverse("api:terms_and_conditions"),
+            {"participant": "Flare.ABCDEF"},
+            content_type="application/json",
+        )
+
+        self.assertEqual(200, resp.status_code)
+
+        self.assertEqual(
+            resp.json(),
+            {
+                "participant": "Flare.ABCDEF",
+                "agreed_to_terms_and_conditions": True,
+            },
+        )
+
+        participant.refresh_from_db()
+
+        self.assertTrue(participant.agreed_to_terms_and_conditions)
 
 
 class ModuleDataAPIViewTest(TestCase):

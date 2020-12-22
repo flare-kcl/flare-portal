@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Update global FLARe settings{% endblock title %}
+
+{% block content %}
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">Update global FLARe settings</h1>
+        </div>
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="card">
+                    <form action="" method="POST">
+                        {% csrf_token %}
+
+                        <div class="card-body">
+                            {% if form.non_field_errors %}
+                                <div class="card-alert alert alert-danger my-3">
+                                    {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+
+                            {% for field in form %}
+                                {% include "includes/form-group.html" %}
+                            {% endfor %}
+
+                        </div>
+
+                        <div class="card-footer">
+                            <div class="d-flex">
+                                <div class="btn-list ml-auto">
+                                    <button type="submit" class="btn btn-primary">Save</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

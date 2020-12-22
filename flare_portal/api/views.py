@@ -4,9 +4,10 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from flare_portal.experiments.models import Experiment
+from flare_portal.site_config.models import SiteConfiguration
 
 from . import constants
-from .forms import ConfigurationForm
+from .forms import ConfigurationForm, TermsAndConditionsForm
 
 
 class ConfigurationAPIView(APIView):
@@ -15,6 +16,7 @@ class ConfigurationAPIView(APIView):
 
         if form.is_valid():
             experiment: Experiment = form.cleaned_data["participant"].experiment
+            config = SiteConfiguration.get_solo()
             return Response(
                 constants.ConfigType(
                     experiment=constants.ExperimentType(
@@ -35,6 +37,9 @@ class ConfigurationAPIView(APIView):
                             experiment.rating_scale_anchor_label_right
                         ),
                     ),
+                    config=constants.SiteConfigurationType(
+                        terms_and_conditions=config.terms_and_conditions,
+                    ),
                     modules=[
                         module.get_module_config()
                         for module in (
@@ -48,3 +53,24 @@ class ConfigurationAPIView(APIView):
 
 
 configuration_api_view = ConfigurationAPIView.as_view()
+
+
+class TermsAndConditionsAPIView(APIView):
+    def post(self, request: Request, format: str = None) -> Response:
+        form = TermsAndConditionsForm(request.data)
+
+        if form.is_valid():
+            participant = form.save()
+            return Response(
+                {
+                    "participant": participant.participant_id,
+                    "agreed_to_terms_and_conditions": (
+                        participant.agreed_to_terms_and_conditions
+                    ),
+                }
+            )
+
+        raise serializers.ValidationError(form.errors)
+
+
+terms_and_conditions_api_view = TermsAndConditionsAPIView.as_view()
