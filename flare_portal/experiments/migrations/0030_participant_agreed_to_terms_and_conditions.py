@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("experiments", "0027_module_ordering"),
+        ("experiments", "0029_webmodule"),
     ]
 
     operations = [
