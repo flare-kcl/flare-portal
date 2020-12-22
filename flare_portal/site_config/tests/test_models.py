@@ -24,7 +24,23 @@ class SiteSettingsTest(TestCase):
 
 class UpdateSiteSettings(TestCase):
     def test_permissions(self) -> None:
-        self.fail()
+        # Only admins can edit site settings
+        user = UserFactory()
+        user.grant_role("RESEARCHER")
+        user.save()
+
+        self.client.force_login(user)
+
+        url = reverse("site_config:update")
+
+        resp = self.client.get(url)
+        self.assertEqual(302, resp.status_code)
+
+        user.grant_role("ADMIN")
+        user.save()
+
+        resp = self.client.get(url)
+        self.assertEqual(200, resp.status_code)
 
     def test_update(self) -> None:
         user = UserFactory()

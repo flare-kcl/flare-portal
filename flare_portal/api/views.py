@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from flare_portal.experiments.models import Experiment
+from flare_portal.site_config.models import SiteConfiguration
 
 from . import constants
 from .forms import ConfigurationForm
@@ -15,6 +16,7 @@ class ConfigurationAPIView(APIView):
 
         if form.is_valid():
             experiment: Experiment = form.cleaned_data["participant"].experiment
+            config = SiteConfiguration.get_solo()
             return Response(
                 constants.ConfigType(
                     experiment=constants.ExperimentType(
@@ -34,6 +36,9 @@ class ConfigurationAPIView(APIView):
                         rating_scale_anchor_label_right=(
                             experiment.rating_scale_anchor_label_right
                         ),
+                    ),
+                    config=constants.SiteConfigurationType(
+                        terms_and_conditions=config.terms_and_conditions,
                     ),
                     modules=[
                         module.get_module_config()

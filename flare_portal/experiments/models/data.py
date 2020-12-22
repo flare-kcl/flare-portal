@@ -165,6 +165,8 @@ class FearConditioningData(BaseData):
 
 
 class BasicInfoData(BaseData):
+    # Note: When changing the gender options, also change the corresponding
+    # list in the flare-app repo.
     GENDERS = Choices(
         ("male", "Male"),
         ("female", "Female"),

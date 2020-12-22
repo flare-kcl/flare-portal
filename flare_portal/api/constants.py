@@ -18,7 +18,18 @@ ExperimentType = TypedDict(
     },
 )
 
+SiteConfigurationType = TypedDict(
+    "SiteConfigurationType",
+    {
+        "terms_and_conditions": str,
+    },
+)
+
 ConfigType = TypedDict(
     "ConfigType",
-    {"experiment": ExperimentType, "modules": List[ModuleConfigType]},
+    {
+        "experiment": ExperimentType,
+        "config": SiteConfigurationType,
+        "modules": List[ModuleConfigType],
+    },
 )
