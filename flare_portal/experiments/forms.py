@@ -23,6 +23,12 @@ class ExperimentForm(forms.ModelForm):
             "rating_scale_anchor_label_left",
             "rating_scale_anchor_label_center",
             "rating_scale_anchor_label_right",
+            "us",
+            "csa",
+            "csb",
+            "context_a",
+            "context_b",
+            "context_c",
         ]
         widgets = {"project": forms.HiddenInput()}
 

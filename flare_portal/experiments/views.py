@@ -120,19 +120,7 @@ experiment_create_view = ExperimentCreateView.as_view()
 
 
 class ExperimentUpdateView(UpdateView):
-    fields = [
-        "name",
-        "description",
-        "code",
-        "owner",
-        "trial_length",
-        "rating_delay",
-        "iti_min_delay",
-        "iti_max_delay",
-        "rating_scale_anchor_label_left",
-        "rating_scale_anchor_label_center",
-        "rating_scale_anchor_label_right",
-    ]
+    form_class = ExperimentForm
     object: Experiment
     pk_url_kwarg = "experiment_pk"
     queryset = Experiment.objects.select_related("project")

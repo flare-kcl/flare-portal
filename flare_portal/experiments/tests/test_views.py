@@ -1,5 +1,6 @@
-from typing import Dict, List
+from typing import Any, BinaryIO, Dict, List
 
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.urls import reverse
 
@@ -342,6 +343,9 @@ class ExperimentCreateViewTest(TestCase):
 
         self.project = ProjectFactory()
 
+    def create_image_file_handler(self) -> BinaryIO:
+        return open("flare_portal/experiments/tests/assets/circle.png", "rb")
+
     def test_create_experiment(self) -> None:
         url = reverse(
             "experiments:experiment_create", kwargs={"project_pk": self.project.pk}
@@ -353,7 +357,33 @@ class ExperimentCreateViewTest(TestCase):
         self.assertEqual(resp.context["form"].initial["project"], self.project.pk)
         self.assertEqual(resp.context["form"].initial["owner"], self.user.pk)
 
-        form_data: Dict[str, str] = {
+        # File uploads
+        us_file = SimpleUploadedFile(
+            "file.wav", b"wav content", content_type="audio/wav"
+        )
+        csa_file = SimpleUploadedFile(
+            "csa.png", self.create_image_file_handler().read(), content_type="image/png"
+        )
+        csb_file = SimpleUploadedFile(
+            "csa.png", self.create_image_file_handler().read(), content_type="image/png"
+        )
+        context_a_file = SimpleUploadedFile(
+            "context_a.png",
+            self.create_image_file_handler().read(),
+            content_type="image/png",
+        )
+        context_b_file = SimpleUploadedFile(
+            "context_b.png",
+            self.create_image_file_handler().read(),
+            content_type="image/png",
+        )
+        context_c_file = SimpleUploadedFile(
+            "context_c.png",
+            self.create_image_file_handler().read(),
+            content_type="image/png",
+        )
+
+        form_data: Dict[str, Any] = {
             "name": "My experiment",
             "description": "This is my experiment",
             "code": "ABC123",
@@ -366,6 +396,12 @@ class ExperimentCreateViewTest(TestCase):
             "rating_scale_anchor_label_left": "Certain no beep",
             "rating_scale_anchor_label_center": "Uncertain",
             "rating_scale_anchor_label_right": "Certain beep",
+            "us": us_file,
+            "csa": csa_file,
+            "csb": csb_file,
+            "context_a": context_a_file,
+            "context_b": context_b_file,
+            "context_c": context_c_file,
         }
 
         resp = self.client.post(url, form_data, follow=True)
@@ -407,6 +443,14 @@ class ExperimentCreateViewTest(TestCase):
             str(list(resp.context["messages"])[0]),
             f'Added new experiment "{experiment}"',
         )
+
+        # Files exist
+        self.assertTrue(experiment.us)
+        self.assertTrue(experiment.csa)
+        self.assertTrue(experiment.csb)
+        self.assertTrue(experiment.context_a)
+        self.assertTrue(experiment.context_b)
+        self.assertTrue(experiment.context_c)
 
     def test_field_validation(self) -> None:
         url = reverse(
