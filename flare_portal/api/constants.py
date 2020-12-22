@@ -15,6 +15,12 @@ ExperimentType = TypedDict(
         "rating_scale_anchor_label_left": str,
         "rating_scale_anchor_label_center": str,
         "rating_scale_anchor_label_right": str,
+        "us": str,
+        "csa": str,
+        "csb": str,
+        "context_a": str,
+        "context_b": str,
+        "context_c": str,
     },
 )
 

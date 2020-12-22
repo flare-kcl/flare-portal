@@ -36,6 +36,18 @@ class ConfigurationAPIView(APIView):
                         rating_scale_anchor_label_right=(
                             experiment.rating_scale_anchor_label_right
                         ),
+                        us=experiment.us.url,
+                        csa=experiment.csa.url,
+                        csb=experiment.csb.url,
+                        context_a=(
+                            experiment.context_a.url if experiment.context_a else None
+                        ),
+                        context_b=(
+                            experiment.context_b.url if experiment.context_b else None
+                        ),
+                        context_c=(
+                            experiment.context_c.url if experiment.context_c else None
+                        ),
                     ),
                     config=constants.SiteConfigurationType(
                         terms_and_conditions=config.terms_and_conditions,

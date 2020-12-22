@@ -1,5 +1,6 @@
 from decimal import Decimal
 
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.urls import reverse
 from django.utils.dateparse import parse_datetime
@@ -18,14 +19,43 @@ from flare_portal.experiments.models import (
 )
 from flare_portal.site_config.models import SiteConfiguration
 
+test_file = "flare_portal/experiments/tests/assets/circle.png"
+
 
 class ConfigurationAPIViewTest(TestCase):
     def test_post(self) -> None:
+
         config = SiteConfiguration.get_solo()
         config.terms_and_conditions = "Some T&Cs"
         config.save()
 
-        experiment: Experiment = ExperimentFactory()
+        us_file = SimpleUploadedFile(
+            "file.wav", b"wav content", content_type="audio/wav"
+        )
+        csa_file = SimpleUploadedFile(
+            "csa.png", open(test_file, "rb").read(), content_type="image/png"
+        )
+        csb_file = SimpleUploadedFile(
+            "csa.png", open(test_file, "rb").read(), content_type="image/png"
+        )
+        context_a_file = SimpleUploadedFile(
+            "context_a.png",
+            open(test_file, "rb").read(),
+            content_type="image/png",
+        )
+        context_b_file = SimpleUploadedFile(
+            "context_b.png",
+            open(test_file, "rb").read(),
+            content_type="image/png",
+        )
+        experiment: Experiment = ExperimentFactory(
+            us=us_file,
+            csa=csa_file,
+            csb=csb_file,
+            context_a=context_a_file,
+            context_b=context_b_file,
+        )
+
         ParticipantFactory(participant_id="Flare.ABCDEF", experiment=experiment)
 
         module1: FearConditioningModule = FearConditioningModuleFactory(
@@ -65,6 +95,12 @@ class ConfigurationAPIViewTest(TestCase):
                 "rating_scale_anchor_label_right": (
                     experiment.rating_scale_anchor_label_right
                 ),
+                "us": experiment.us.url,
+                "csa": experiment.csa.url,
+                "csb": experiment.csb.url,
+                "context_a": experiment.context_a.url,
+                "context_b": experiment.context_b.url,
+                "context_c": None,
             },
         )
         self.assertEqual(
