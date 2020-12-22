@@ -16078,6 +16078,16 @@ a.tag-addon:hover {
     margin: 0;
 }
 
+.custom-switch--with-description {
+    padding-top: 0.75rem;
+    align-items: flex-start;
+    justify-content: space-between;
+
+    .custom-switch-description {
+        width: 50%;
+    }
+}
+
 .custom-switch-input {
     position: absolute;
     z-index: -1;

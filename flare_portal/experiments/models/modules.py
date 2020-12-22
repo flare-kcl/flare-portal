@@ -238,3 +238,40 @@ class CriterionModule(BaseModule):
 
     def __str__(self) -> str:
         return "Criterion - " + super().__str__()
+
+
+class WebModule(BaseModule):
+    heading = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
+    url = models.URLField(verbose_name="URL")
+    auto_close_url = models.URLField(
+        blank=True,
+        verbose_name="Automatic close URL",
+        help_text="Optional: Enter a URL here that if redirected to will "
+        "automatically close this module.",
+    )
+    append_participant_id = models.BooleanField(
+        blank=True,
+        help_text="Optional: Enabling this feature will append the"
+        "particpant's id to the url. This is useful if you are using a "
+        "survey service such as Qualtrics or Google Forms.",
+    )
+
+    def get_module_config(self) -> constants.ModuleConfigType:
+        return constants.ModuleConfigType(
+            id=self.pk,
+            type=self.get_module_tag(),
+            config={
+                "heading": self.heading,
+                "description": self.description,
+                "url": self.url,
+                "append_participant_id": self.append_participant_id,
+                "auto_close_url": self.auto_close_url,
+            },
+        )
+
+    def get_module_description(self) -> str:
+        return f"{self.heading} ({self.url})"
+
+    def __str__(self) -> str:
+        return "Web - " + super().__str__()

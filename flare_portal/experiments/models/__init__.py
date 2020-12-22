@@ -6,6 +6,7 @@ from .modules import (
     CriterionModule,
     CriterionQuestion,
     FearConditioningModule,
+    WebModule,
 )
 
 __all__ = [
@@ -21,4 +22,5 @@ __all__ = [
     "FearConditioningModule",
     "Participant",
     "Project",
+    "WebModule",
 ]
