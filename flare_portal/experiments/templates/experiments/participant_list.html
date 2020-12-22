@@ -39,6 +39,7 @@
                                         <th></th>
                                         <th>Login ID</th>
                                         <th>Created</th>
+                                        <th>Agreed to T&amp;Cs</th>
                                         <th>Delete</th>
                                         <th></th>
                                     </tr>
@@ -65,6 +66,11 @@
                                                 {% endfor %}
                                             </td>
                                             <td>{{ form.instance.created_at|default:"" }}</td>
+
+                                            <td>
+                                                <span class="status-icon {% if form.instance.agreed_to_terms_and_conditions %}bg-success{% else %}bg-danger{% endif %}"></span> {{ form.instance.agreed_to_terms_and_conditions|yesno|title }}
+                                            </td>
+
                                             <td>
                                                 {% if form.instance.pk %}
                                                     <label class="custom-control custom-checkbox" for="{{ form.DELETE.id_for_label }}">
