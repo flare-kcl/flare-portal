@@ -15,7 +15,12 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .forms import ExperimentForm, ParticipantBatchForm, ParticipantFormSet
+from .forms import (
+    ExperimentCreateForm,
+    ExperimentForm,
+    ParticipantBatchForm,
+    ParticipantFormSet,
+)
 from .models import Experiment, Project
 
 
@@ -99,7 +104,7 @@ experiment_list_view = ExperimentListView.as_view()
 
 class ExperimentCreateView(CreateView):
     model = Experiment
-    form_class = ExperimentForm
+    form_class = ExperimentCreateForm
     object: Experiment
 
     def get_initial(self) -> dict:

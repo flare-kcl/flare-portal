@@ -15,7 +15,6 @@ class ExperimentForm(forms.ModelForm):
             "description",
             "code",
             "owner",
-            "project",
             "trial_length",
             "rating_delay",
             "iti_min_delay",
@@ -30,6 +29,12 @@ class ExperimentForm(forms.ModelForm):
             "context_b",
             "context_c",
         ]
+
+
+class ExperimentCreateForm(forms.ModelForm):
+    class Meta:
+        model = Experiment
+        fields = ExperimentForm.Meta.fields + ["project"]
         widgets = {"project": forms.HiddenInput()}
 
 

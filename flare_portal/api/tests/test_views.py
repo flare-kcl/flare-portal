@@ -86,6 +86,7 @@ class ConfigurationAPIViewTest(TestCase):
                         "generalisation_stimuli_enabled": (
                             module1.generalisation_stimuli_enabled
                         ),
+                        "context": module1.context,
                     },
                 },
                 {
@@ -98,6 +99,7 @@ class ConfigurationAPIViewTest(TestCase):
                         "generalisation_stimuli_enabled": (
                             module2.generalisation_stimuli_enabled
                         ),
+                        "context": module2.context,
                     },
                 },
             ],
