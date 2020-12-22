@@ -17,10 +17,10 @@ __all__ = [
     "CriterionData",
     "CriterionModule",
     "CriterionQuestion",
-    "WebModule",
     "Experiment",
     "FearConditioningData",
     "FearConditioningModule",
     "Participant",
     "Project",
+    "WebModule",
 ]

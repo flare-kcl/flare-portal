@@ -243,7 +243,7 @@ class CriterionModule(BaseModule):
 class WebModule(BaseModule):
     heading = models.CharField(max_length=255)
     description = models.TextField(blank=True)
-    url = models.URLField()
+    url = models.URLField(verbose_name="URL")
     auto_close_url = models.URLField(
         blank=True,
         verbose_name="Automatic close URL",
