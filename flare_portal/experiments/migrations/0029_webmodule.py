@@ -7,7 +7,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("experiments", "0027_module_ordering"),
+        ("experiments", "0028_basic_info_unique"),
     ]
 
     operations = [
