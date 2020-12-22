@@ -223,6 +223,10 @@ class BasicInfoData(BaseData):
         "os_version",
     ]
 
+    class Meta:
+        # Each participant can only submit basic info once
+        unique_together = ("participant", "module")
+
     def get_date_of_birth_display(self) -> str:
         if self.date_of_birth:
             return self.date_of_birth.strftime("%Y-%m")
