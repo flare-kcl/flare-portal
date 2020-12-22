@@ -26,6 +26,7 @@ from .models import (
     FearConditioningData,
     FearConditioningModule,
     Participant,
+    WebModule,
 )
 
 
@@ -208,6 +209,7 @@ module_registry = ModuleRegistry()
 module_registry.register(BasicInfoModule)
 module_registry.register(CriterionModule)
 module_registry.register(FearConditioningModule)
+module_registry.register(WebModule)
 
 
 class DataViewMixin:
