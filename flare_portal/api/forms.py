@@ -52,6 +52,14 @@ class SubmissionForm(forms.Form):
     def clean(self):
         # Checks if the participant has logged in before.
         participant = self.cleaned_data.get("participant")
+
+        # Check the participant has started.
+        if participant and participant.started_at == None:
+            raise serializers.ValidationError(
+                {"participant": "This participant has not started an experiment."}
+            )
+
+        # Check that the participant hasn't already been marked as finished.
         if participant and participant.finished_at != None:
             raise serializers.ValidationError(
                 {

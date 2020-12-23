@@ -23,6 +23,33 @@ from flare_portal.site_config.models import SiteConfiguration
 test_file = "flare_portal/experiments/tests/assets/circle.png"
 
 
+def get_example_experiment() -> Experiment:
+    us_file = SimpleUploadedFile("file.wav", b"wav content", content_type="audio/wav")
+    csa_file = SimpleUploadedFile(
+        "csa.png", open(test_file, "rb").read(), content_type="image/png"
+    )
+    csb_file = SimpleUploadedFile(
+        "csa.png", open(test_file, "rb").read(), content_type="image/png"
+    )
+    context_a_file = SimpleUploadedFile(
+        "context_a.png",
+        open(test_file, "rb").read(),
+        content_type="image/png",
+    )
+    context_b_file = SimpleUploadedFile(
+        "context_b.png",
+        open(test_file, "rb").read(),
+        content_type="image/png",
+    )
+    return ExperimentFactory(
+        us=us_file,
+        csa=csa_file,
+        csb=csb_file,
+        context_a=context_a_file,
+        context_b=context_b_file,
+    )
+
+
 class ConfigurationAPIViewTest(TestCase):
     def test_post(self) -> None:
 
@@ -30,33 +57,7 @@ class ConfigurationAPIViewTest(TestCase):
         config.terms_and_conditions = "Some T&Cs"
         config.save()
 
-        us_file = SimpleUploadedFile(
-            "file.wav", b"wav content", content_type="audio/wav"
-        )
-        csa_file = SimpleUploadedFile(
-            "csa.png", open(test_file, "rb").read(), content_type="image/png"
-        )
-        csb_file = SimpleUploadedFile(
-            "csa.png", open(test_file, "rb").read(), content_type="image/png"
-        )
-        context_a_file = SimpleUploadedFile(
-            "context_a.png",
-            open(test_file, "rb").read(),
-            content_type="image/png",
-        )
-        context_b_file = SimpleUploadedFile(
-            "context_b.png",
-            open(test_file, "rb").read(),
-            content_type="image/png",
-        )
-        experiment: Experiment = ExperimentFactory(
-            us=us_file,
-            csa=csa_file,
-            csb=csb_file,
-            context_a=context_a_file,
-            context_b=context_b_file,
-        )
-
+        experiment: Experiment = get_example_experiment()
         ParticipantFactory(participant_id="Flare.ABCDEF", experiment=experiment)
 
         module1: FearConditioningModule = FearConditioningModuleFactory(
@@ -149,12 +150,20 @@ class ConfigurationAPIViewTest(TestCase):
 
         self.assertEqual(400, resp.status_code)
 
-        self.assertEqual(resp.json(), {"participant": ["Invalid participant"]})
+        self.assertEqual(
+            resp.json(),
+            {
+                "participant": [
+                    "This participant identifier is not correct, please contact "
+                    "your research assistant."
+                ]
+            },
+        )
 
 
 class SubmissionAPIViewTest(TestCase):
     def test_post(self) -> None:
-        experiment: Experiment = ExperimentFactory()
+        experiment: Experiment = get_example_experiment()
         participant = ParticipantFactory(
             participant_id="Flare.ABCDEF", experiment=experiment
         )

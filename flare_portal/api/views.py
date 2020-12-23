@@ -74,18 +74,8 @@ class SubmissionAPIView(APIView):
         form = SubmissionForm(request.data)
 
         if form.is_valid():
+            form.save()
             participant = form.cleaned_data["participant"]
-
-            # Raise error if participant hasn't started
-            if participant.started_at == None:
-                raise serializers.ValidationError(
-                    {"participant": "This participant has not started an experiment."}
-                )
-
-            # Mark participant as finished the experiment
-            if participant.finished_at == None:
-                participant.finished_at = timezone.now()
-                participant.save()
 
             return Response(
                 constants.SubmissionType(
