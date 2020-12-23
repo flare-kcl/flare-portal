@@ -7,7 +7,7 @@ from rest_framework.views import APIView
 from flare_portal.experiments.models import Experiment
 
 from . import constants
-from .forms import ConfigurationForm
+from .forms import ConfigurationForm, SubmissionForm
 
 
 class ConfigurationAPIView(APIView):
@@ -15,19 +15,13 @@ class ConfigurationAPIView(APIView):
         form = ConfigurationForm(request.data)
 
         if form.is_valid():
-            participant = form.cleaned_data["participant"]
-            experiment: Experiment = participant.experiment
+            # Invalidate the current particpant ID
+            form.save()
 
-            # Mark that the participant has started the experiment
-            participant_started_at = participant.started_at
-            if participant.started_at == None:
-                participant.started_at = timezone.now()
-                participant.save()
+            experiment: Experiment = form.cleaned_data["participant"].experiment
 
             return Response(
                 constants.ConfigType(
-                    participant_started_at=participant_started_at,
-                    participant_finished_at=participant.finished_at,
                     experiment=constants.ExperimentType(
                         id=experiment.pk,
                         name=experiment.name,
@@ -60,7 +54,7 @@ class ConfigurationAPIView(APIView):
 
 class SubmissionAPIView(APIView):
     def post(self, request: Request, format: str = None) -> Response:
-        form = ConfigurationForm(request.data)
+        form = SubmissionForm(request.data)
 
         if form.is_valid():
             participant = form.cleaned_data["participant"]

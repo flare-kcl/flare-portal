@@ -110,37 +110,35 @@ class SubmissionAPIViewTest(TestCase):
             participant_id="Flare.ABCDEF", experiment=experiment
         )
 
+        def post_config():
+            return self.client.post(
+                reverse("api:configuration"),
+                {"participant": "Flare.ABCDEF"},
+                content_type="application/json",
+            )
+
+        def post_submission():
+            # Try to finish the experiment
+            return self.client.post(
+                reverse("api:submission"),
+                {"participant": "Flare.ABCDEF"},
+                content_type="application/json",
+            )
+
         # Try to finish the experiment
-        submit_resp = self.client.post(
-            reverse("api:submission"),
-            {"participant": "Flare.ABCDEF"},
-            content_type="application/json",
-        )
+        submit_resp = post_submission()
 
         # Test that the request fails because it hasn't started
         self.assertEqual(400, submit_resp.status_code)
 
-        # Start experiment
-        config_resp = self.client.post(
-            reverse("api:configuration"),
-            {"participant": "Flare.ABCDEF"},
-            content_type="application/json",
-        )
+        # Test that the configuration object can only be retrived once
+        config_resp = post_config()
+        self.assertEqual(200, config_resp.status_code)
+        config_resp = post_config()
+        self.assertEqual(400, config_resp.status_code)
 
-        # Test that the participant object has been updated
-        config_data = config_resp.json()
-        updated_participant = Participant.objects.get(pk=participant.id)
-        self.assertEqual(config_data["participant_started_at"], None)
-        self.assertEqual(config_data["participant_finished_at"], None)
-
-        # Finish experiment
-        submit_resp = self.client.post(
-            reverse("api:submission"),
-            {"participant": "Flare.ABCDEF"},
-            content_type="application/json",
-        )
-
-        # Test response
+        # Finish experiment & Test response
+        submit_resp = post_submission()
         submit_data = submit_resp.json()
         updated_participant = Participant.objects.get(pk=participant.id)
         self.assertEqual(200, submit_resp.status_code)
