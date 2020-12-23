@@ -165,6 +165,8 @@ class FearConditioningData(BaseData):
 
 
 class BasicInfoData(BaseData):
+    # Note: When changing the gender options, also change the corresponding
+    # list in the flare-app repo.
     GENDERS = Choices(
         ("male", "Male"),
         ("female", "Female"),
@@ -222,6 +224,10 @@ class BasicInfoData(BaseData):
         "os_name",
         "os_version",
     ]
+
+    class Meta:
+        # Each participant can only submit basic info once
+        unique_together = ("participant", "module")
 
     def get_date_of_birth_display(self) -> str:
         if self.date_of_birth:

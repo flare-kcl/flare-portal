@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('experiments', '0027_module_ordering'),
+        ("experiments", "0032_fearconditioning_context"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='participant',
-            name='finished_at',
+            model_name="participant",
+            name="finished_at",
             field=models.DateTimeField(null=True),
         ),
         migrations.AddField(
-            model_name='participant',
-            name='started_at',
+            model_name="participant",
+            name="started_at",
             field=models.DateTimeField(null=True),
         ),
     ]

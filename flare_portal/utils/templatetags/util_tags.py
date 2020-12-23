@@ -1,9 +1,20 @@
 import json
+import os
+import re
+from typing import Any, Dict
 
 from django import forms, template
+from django.db.models.fields.files import FieldFile
 from django.utils.safestring import mark_safe
 
 register = template.Library()
+
+
+@register.simple_tag(takes_context=True)
+def active(context: Dict[str, Any], path: str) -> str:
+    if context.get("request") and re.search(path, context["request"].path):
+        return "active"
+    return ""
 
 
 @register.simple_tag
@@ -32,3 +43,8 @@ def alpine_field(field: forms.BoundField, index: str) -> dict:
     field.field.widget.attrs["x-model"] = f"form.{field.name}"
 
     return {"field": field}
+
+
+@register.filter
+def filename(value: FieldFile) -> str:
+    return os.path.basename(value.file.name)

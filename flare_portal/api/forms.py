@@ -37,12 +37,14 @@ class SubmissionForm(forms.Form):
         error_messages={"invalid_choice": "Invalid participant"},
     )
 
-    def save(self):
+    def save(self) -> Participant:
         # Flag the participant as started the experiment
         participant = self.cleaned_data.get("participant")
         if participant.finished_at == None:
             participant.finished_at = timezone.now()
             participant.save()
+
+        return participant
 
     def clean(self):
         # Checks if the participant has logged in before.
@@ -54,3 +56,17 @@ class SubmissionForm(forms.Form):
                     "the experiment"
                 }
             )
+
+
+class TermsAndConditionsForm(forms.Form):
+    participant = forms.ModelChoiceField(
+        queryset=Participant.objects.all(),
+        to_field_name="participant_id",
+        error_messages={"invalid_choice": "Invalid participant"},
+    )
+
+    def save(self) -> Participant:
+        participant = self.cleaned_data["participant"]
+        participant.agreed_to_terms_and_conditions = True
+        participant.save()
+        return participant
