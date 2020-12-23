@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('experiments', '0020_cs_verbose_name'),
+        ("experiments", "0020_cs_verbose_name"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='fearconditioningdata',
-            name='calibrated_volume_level',
+            model_name="fearconditioningdata",
+            name="calibrated_volume_level",
             field=models.DecimalField(decimal_places=2, default=1, max_digits=3),
             preserve_default=False,
         ),

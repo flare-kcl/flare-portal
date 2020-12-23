@@ -56,7 +56,7 @@ class FearConditioningModuleFactory(factory.django.DjangoModelFactory):
     phase = factory.Faker(
         "random_element", elements=dict(FearConditioningModule.PHASES).keys()
     )
-    trials_per_stimulus = factory.Faker("random_int", min=1, max=24)
+    trials_per_stimulus = factory.Faker("random_int", min=12, max=24)
     reinforcement_rate = factory.Faker("random_int", min=1, max=12)
 
 

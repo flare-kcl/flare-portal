@@ -39,3 +39,11 @@ ConfigType = TypedDict(
         "modules": List[ModuleConfigType],
     },
 )
+
+SubmissionType = TypedDict(
+    "SubmissionType",
+    {
+        "participant_started_at": str,
+        "participant_finished_at": str,
+    },
+)

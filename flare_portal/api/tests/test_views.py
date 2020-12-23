@@ -5,6 +5,8 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils.dateparse import parse_datetime
 
+from rest_framework.serializers import DateTimeField
+
 from flare_portal.experiments.factories import (
     CriterionModuleFactory,
     CriterionQuestionFactory,
@@ -22,6 +24,33 @@ from flare_portal.site_config.models import SiteConfiguration
 test_file = "flare_portal/experiments/tests/assets/circle.png"
 
 
+def get_example_experiment() -> Experiment:
+    us_file = SimpleUploadedFile("file.wav", b"wav content", content_type="audio/wav")
+    csa_file = SimpleUploadedFile(
+        "csa.png", open(test_file, "rb").read(), content_type="image/png"
+    )
+    csb_file = SimpleUploadedFile(
+        "csa.png", open(test_file, "rb").read(), content_type="image/png"
+    )
+    context_a_file = SimpleUploadedFile(
+        "context_a.png",
+        open(test_file, "rb").read(),
+        content_type="image/png",
+    )
+    context_b_file = SimpleUploadedFile(
+        "context_b.png",
+        open(test_file, "rb").read(),
+        content_type="image/png",
+    )
+    return ExperimentFactory(
+        us=us_file,
+        csa=csa_file,
+        csb=csb_file,
+        context_a=context_a_file,
+        context_b=context_b_file,
+    )
+
+
 class ConfigurationAPIViewTest(TestCase):
     def test_post(self) -> None:
 
@@ -29,33 +58,7 @@ class ConfigurationAPIViewTest(TestCase):
         config.terms_and_conditions = "Some T&Cs"
         config.save()
 
-        us_file = SimpleUploadedFile(
-            "file.wav", b"wav content", content_type="audio/wav"
-        )
-        csa_file = SimpleUploadedFile(
-            "csa.png", open(test_file, "rb").read(), content_type="image/png"
-        )
-        csb_file = SimpleUploadedFile(
-            "csa.png", open(test_file, "rb").read(), content_type="image/png"
-        )
-        context_a_file = SimpleUploadedFile(
-            "context_a.png",
-            open(test_file, "rb").read(),
-            content_type="image/png",
-        )
-        context_b_file = SimpleUploadedFile(
-            "context_b.png",
-            open(test_file, "rb").read(),
-            content_type="image/png",
-        )
-        experiment: Experiment = ExperimentFactory(
-            us=us_file,
-            csa=csa_file,
-            csb=csb_file,
-            context_a=context_a_file,
-            context_b=context_b_file,
-        )
-
+        experiment: Experiment = get_example_experiment()
         ParticipantFactory(participant_id="Flare.ABCDEF", experiment=experiment)
 
         module1: FearConditioningModule = FearConditioningModuleFactory(
@@ -148,7 +151,65 @@ class ConfigurationAPIViewTest(TestCase):
 
         self.assertEqual(400, resp.status_code)
 
-        self.assertEqual(resp.json(), {"participant": ["Invalid participant"]})
+        self.assertEqual(
+            resp.json(),
+            {
+                "participant": [
+                    "This participant identifier is not correct, please contact "
+                    "your research assistant."
+                ]
+            },
+        )
+
+
+class SubmissionAPIViewTest(TestCase):
+    def test_post(self) -> None:
+        experiment: Experiment = get_example_experiment()
+        participant = ParticipantFactory(
+            participant_id="Flare.ABCDEF", experiment=experiment
+        )
+
+        # Try to finish the experiment
+        submit_resp = self.client.post(
+            reverse("api:submission"),
+            {"participant": "Flare.ABCDEF"},
+            content_type="application/json",
+        )
+
+        # Test that the request fails because it hasn't started
+        self.assertEqual(400, submit_resp.status_code)
+
+        # Test that the configuration object can only be retrived once
+        config_resp = self.client.post(
+            reverse("api:configuration"),
+            {"participant": "Flare.ABCDEF"},
+            content_type="application/json",
+        )
+        self.assertEqual(200, config_resp.status_code)
+        config_resp = self.client.post(
+            reverse("api:configuration"),
+            {"participant": "Flare.ABCDEF"},
+            content_type="application/json",
+        )
+        self.assertEqual(400, config_resp.status_code)
+
+        # Finish experiment & Test response
+        submit_resp = self.client.post(
+            reverse("api:submission"),
+            {"participant": "Flare.ABCDEF"},
+            content_type="application/json",
+        )
+        submit_data = submit_resp.json()
+        updated_participant = Participant.objects.get(pk=participant.id)
+        self.assertEqual(200, submit_resp.status_code)
+        self.assertEqual(
+            submit_data["participant_started_at"],
+            DateTimeField().to_representation(updated_participant.started_at),
+        )
+        self.assertEqual(
+            submit_data["participant_finished_at"],
+            DateTimeField().to_representation(updated_participant.finished_at),
+        )
 
 
 class TermsAndConditionsAPIViewTest(TestCase):

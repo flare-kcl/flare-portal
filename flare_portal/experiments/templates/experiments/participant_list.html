@@ -38,7 +38,8 @@
                                     <tr>
                                         <th></th>
                                         <th>Login ID</th>
-                                        <th>Created</th>
+                                        <th>Started</th>
+                                        <th>Finished</th>
                                         <th>Agreed to T&amp;Cs</th>
                                         <th>Delete</th>
                                         <th></th>
@@ -65,7 +66,8 @@
                                                     <div class="invalid-feedback">{{ error }}</div>
                                                 {% endfor %}
                                             </td>
-                                            <td>{{ form.instance.created_at|default:"" }}</td>
+                                            <td>{{ form.instance.started_at|default:"" }}</td>
+                                            <td>{{ form.instance.finished_at|default:"" }}</td>
 
                                             <td>
                                                 <span class="status-icon {% if form.instance.agreed_to_terms_and_conditions %}bg-success{% else %}bg-danger{% endif %}"></span> {{ form.instance.agreed_to_terms_and_conditions|yesno|title }}
