@@ -94,6 +94,8 @@ class SubmissionAPIView(APIView):
                 )
             )
 
+        raise serializers.ValidationError(form.errors)
+
 
 class TermsAndConditionsAPIView(APIView):
     def post(self, request: Request, format: str = None) -> Response:
