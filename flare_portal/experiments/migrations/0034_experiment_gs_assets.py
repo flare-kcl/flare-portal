@@ -9,7 +9,7 @@ import flare_portal.experiments.models.core
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("experiments", "0032_fearconditioning_context"),
+        ("experiments", "0033_participant_started_date"),
     ]
 
     operations = [
