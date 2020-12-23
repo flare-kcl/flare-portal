@@ -8,7 +8,10 @@ class ConfigurationForm(forms.Form):
     participant = forms.ModelChoiceField(
         queryset=Participant.objects.all(),
         to_field_name="participant_id",
-        error_messages={"invalid_choice": "Invalid participant"},
+        error_messages={
+            "invalid_choice": "This participant identifier is "
+            "not correct, please contact your research assistant."
+        },
     )
 
     def save(self):
@@ -25,7 +28,7 @@ class ConfigurationForm(forms.Form):
             raise serializers.ValidationError(
                 {
                     "participant": "This participant has already started "
-                    "the experiment"
+                    "the experiment."
                 }
             )
 
