@@ -94,7 +94,9 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={"abstract": False,},
+            options={
+                "abstract": False,
+            },
             bases=(flare_portal.experiments.models.core.Nameable, models.Model),
         ),
     ]

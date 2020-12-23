@@ -11,7 +11,8 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.RemoveField(
-            model_name="fearconditioningmodule", name="rating_delay",
+            model_name="fearconditioningmodule",
+            name="rating_delay",
         ),
         migrations.AddField(
             model_name="experiment",

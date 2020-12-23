@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('experiments', '0021_calibrated_volume_level_field'),
+        ("experiments", "0021_calibrated_volume_level_field"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='experiment',
-            name='iti_max_delay',
-            field=models.PositiveIntegerField(default=3, verbose_name='ITI max delay'),
+            model_name="experiment",
+            name="iti_max_delay",
+            field=models.PositiveIntegerField(default=3, verbose_name="ITI max delay"),
         ),
         migrations.AddField(
-            model_name='experiment',
-            name='iti_min_delay',
-            field=models.PositiveIntegerField(default=1, verbose_name='ITI min delay'),
+            model_name="experiment",
+            name="iti_min_delay",
+            field=models.PositiveIntegerField(default=1, verbose_name="ITI min delay"),
         ),
     ]
