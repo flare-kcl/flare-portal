@@ -17,14 +17,14 @@ class ConfigurationForm(forms.Form):
     def save(self):
         # Flag the participant as started the experiment
         participant = self.cleaned_data.get("participant")
-        if participant.started_at == None:
+        if participant.started_at is None:
             participant.started_at = timezone.now()
             participant.save()
 
     def clean(self):
         # Checks if the participant has logged in before.
         participant = self.cleaned_data.get("participant")
-        if participant and participant.started_at != None:
+        if participant is not None and participant.started_at is not None:
             raise serializers.ValidationError(
                 {
                     "participant": "This participant has already started "
@@ -43,7 +43,7 @@ class SubmissionForm(forms.Form):
     def save(self) -> Participant:
         # Flag the participant as started the experiment
         participant = self.cleaned_data.get("participant")
-        if participant.finished_at == None:
+        if participant.finished_at is None:
             participant.finished_at = timezone.now()
             participant.save()
 
@@ -54,13 +54,13 @@ class SubmissionForm(forms.Form):
         participant = self.cleaned_data.get("participant")
 
         # Check the participant has started.
-        if participant and participant.started_at == None:
+        if participant is not None and participant.started_at is None:
             raise serializers.ValidationError(
                 {"participant": "This participant has not started an experiment."}
             )
 
         # Check that the participant hasn't already been marked as finished.
-        if participant and participant.finished_at != None:
+        if participant is not None and participant.finished_at is not None:
             raise serializers.ValidationError(
                 {
                     "participant": "This participant has already finished "
