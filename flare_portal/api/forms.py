@@ -1,3 +1,5 @@
+from typing import Any, Dict
+
 from django import forms
 from django.utils import timezone
 
@@ -16,16 +18,19 @@ class ConfigurationForm(forms.Form):
         },
     )
 
-    def save(self):
+    def save(self) -> Participant:
         # Flag the participant as started the experiment
         participant = self.cleaned_data.get("participant")
         if participant.started_at is None:
             participant.started_at = timezone.now()
             participant.save()
 
-    def clean(self):
+        return participant
+
+    def clean(self) -> Dict[str, Any]:
         # Checks if the participant has logged in before.
-        participant = self.cleaned_data.get("participant")
+        cleaned_data = super().clean()
+        participant = cleaned_data.get("participant")
         if participant is not None and participant.started_at is not None:
             raise serializers.ValidationError(
                 {
@@ -33,6 +38,7 @@ class ConfigurationForm(forms.Form):
                     "the experiment."
                 }
             )
+        return cleaned_data
 
 
 class SubmissionForm(forms.Form):
@@ -51,9 +57,10 @@ class SubmissionForm(forms.Form):
 
         return participant
 
-    def clean(self):
+    def clean(self) -> Dict[str, Any]:
         # Checks if the participant has logged in before.
-        participant = self.cleaned_data.get("participant")
+        cleaned_data = super().clean()
+        participant = cleaned_data.get("participant")
 
         # Check the participant has started.
         if participant is not None and participant.started_at is None:
@@ -69,6 +76,8 @@ class SubmissionForm(forms.Form):
                     "the experiment"
                 }
             )
+
+        return cleaned_data
 
 
 class TermsAndConditionsForm(forms.Form):
