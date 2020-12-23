@@ -21,6 +21,10 @@ ExperimentType = TypedDict(
         "context_a": str,
         "context_b": str,
         "context_c": str,
+        "gsa": str,
+        "gsb": str,
+        "gsc": str,
+        "gsd": str,
     },
 )
 

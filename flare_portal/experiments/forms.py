@@ -28,6 +28,10 @@ class ExperimentForm(forms.ModelForm):
             "context_a",
             "context_b",
             "context_c",
+            "gsa",
+            "gsb",
+            "gsc",
+            "gsd",
         ]
 
 

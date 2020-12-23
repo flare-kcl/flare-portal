@@ -87,11 +87,23 @@
 
                     <div class="card-body">
                         {% include "includes/form-group.html" with field=form.us accept="audio/wav,audio/mp3" %}
+                    </div>
 
-                        <div class="card-alert alert alert-info my-3">Note: CS, GS, and context images should be in PNG format and their dimensions should be 800x800px.</div>
+                    <div class="card-alert alert alert-info my-3">CS, GS, and context images should be in PNG format and their dimensions should be 800x800px.</div>
 
+                    <div class="card-body">
                         {% include "includes/form-group.html" with field=form.csa accept="image/png" %}
                         {% include "includes/form-group.html" with field=form.csb accept="image/png" %}
+                    </div>
+
+                    <div class="card-body">
+                        {% include "includes/form-group.html" with field=form.gsa accept="image/png" %}
+                        {% include "includes/form-group.html" with field=form.gsb accept="image/png" %}
+                        {% include "includes/form-group.html" with field=form.gsc accept="image/png" %}
+                        {% include "includes/form-group.html" with field=form.gsd accept="image/png" %}
+                    </div>
+
+                    <div class="card-body">
                         {% include "includes/form-group.html" with field=form.context_a accept="image/png" %}
                         {% include "includes/form-group.html" with field=form.context_b accept="image/png" %}
                         {% include "includes/form-group.html" with field=form.context_c accept="image/png" %}

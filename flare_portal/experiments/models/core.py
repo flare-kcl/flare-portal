@@ -89,6 +89,30 @@ class Experiment(models.Model):
         verbose_name="context C",
         validators=[FileExtensionValidator(["png"])],
     )
+    gsa = models.ImageField(
+        upload_to=experiment_assets_path,
+        blank=True,
+        verbose_name="GS A",
+        validators=[FileExtensionValidator(["png"])],
+    )
+    gsb = models.ImageField(
+        upload_to=experiment_assets_path,
+        blank=True,
+        verbose_name="GS B",
+        validators=[FileExtensionValidator(["png"])],
+    )
+    gsc = models.ImageField(
+        upload_to=experiment_assets_path,
+        blank=True,
+        verbose_name="GS C",
+        validators=[FileExtensionValidator(["png"])],
+    )
+    gsd = models.ImageField(
+        upload_to=experiment_assets_path,
+        blank=True,
+        verbose_name="GS D",
+        validators=[FileExtensionValidator(["png"])],
+    )
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

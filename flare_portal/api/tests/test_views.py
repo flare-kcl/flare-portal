@@ -104,6 +104,10 @@ class ConfigurationAPIViewTest(TestCase):
                 "context_a": experiment.context_a.url,
                 "context_b": experiment.context_b.url,
                 "context_c": None,
+                "gsa": None,
+                "gsb": None,
+                "gsc": None,
+                "gsd": None,
             },
         )
         self.assertEqual(
