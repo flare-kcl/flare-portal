@@ -15,7 +15,12 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .forms import ExperimentForm, ParticipantBatchForm, ParticipantFormSet
+from .forms import (
+    ExperimentCreateForm,
+    ExperimentForm,
+    ParticipantBatchForm,
+    ParticipantFormSet,
+)
 from .models import Experiment, Project
 
 
@@ -99,7 +104,7 @@ experiment_list_view = ExperimentListView.as_view()
 
 class ExperimentCreateView(CreateView):
     model = Experiment
-    form_class = ExperimentForm
+    form_class = ExperimentCreateForm
     object: Experiment
 
     def get_initial(self) -> dict:
@@ -120,23 +125,11 @@ experiment_create_view = ExperimentCreateView.as_view()
 
 
 class ExperimentUpdateView(UpdateView):
-    fields = [
-        "name",
-        "description",
-        "code",
-        "owner",
-        "trial_length",
-        "rating_delay",
-        "iti_min_delay",
-        "iti_max_delay",
-        "rating_scale_anchor_label_left",
-        "rating_scale_anchor_label_center",
-        "rating_scale_anchor_label_right",
-    ]
+    form_class = ExperimentForm
     object: Experiment
     pk_url_kwarg = "experiment_pk"
     queryset = Experiment.objects.select_related("project")
-    template_name = "experiments/experiment_update_form.html"
+    template_name = "experiments/experiment_form.html"
 
     def form_valid(self, form: forms.BaseModelForm) -> HttpResponse:
         response = super().form_valid(form)

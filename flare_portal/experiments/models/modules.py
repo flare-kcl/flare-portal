@@ -94,12 +94,18 @@ class FearConditioningModule(BaseModule):
         ("extinction", "Extinction"),
         ("return_of_fear", "Return of fear"),
     )
+    CONTEXTS = Choices(
+        ("A", "Context A"),
+        ("B", "Context B"),
+        ("C", "Context C"),
+    )
     phase = models.CharField(max_length=24, choices=PHASES, default=PHASES.habituation)
     trials_per_stimulus = models.PositiveIntegerField(default=0)
     reinforcement_rate = models.PositiveIntegerField(
         default=0, verbose_name="Number of reinforced CS+ trials"
     )
     generalisation_stimuli_enabled = models.BooleanField(default=False)
+    context = models.CharField(max_length=1, choices=CONTEXTS, blank=True)
 
     def get_module_config(self) -> constants.ModuleConfigType:
         return constants.ModuleConfigType(
@@ -110,6 +116,7 @@ class FearConditioningModule(BaseModule):
                 "trials_per_stimulus": self.trials_per_stimulus,
                 "reinforcement_rate": self.reinforcement_rate,
                 "generalisation_stimuli_enabled": self.generalisation_stimuli_enabled,
+                "context": self.context,
             },
         )
 
@@ -121,6 +128,7 @@ class FearConditioningModule(BaseModule):
             f"Trials per stimulus: {self.trials_per_stimulus}",
             f"Number of reinforced CS+ trials: {self.reinforcement_rate}",
             f"GS: {'Enabled' if self.generalisation_stimuli_enabled else 'Disabled'}",
+            f"Context: {self.context if self.context else 'None'}",
         ]
         return ", ".join(details)
 
@@ -131,6 +139,17 @@ class FearConditioningModule(BaseModule):
                     "reinforcement_rate": "Number of reinforced CS+ trials "
                     "cannot be greater than the number of trials per stimulus."
                 }
+            )
+
+        # Check context selection. The selected context must be populated on
+        # the experiment to be configured.
+        if (
+            (self.context == "A" and not self.experiment.context_a)
+            or (self.context == "B" and not self.experiment.context_b)
+            or (self.context == "C" and not self.experiment.context_c)
+        ):
+            raise ValidationError(
+                {"context": "The selected context is not set on the experiment."}
             )
 
     def __str__(self) -> str:

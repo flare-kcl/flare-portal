@@ -1,5 +1,6 @@
-from typing import Dict, List
+from typing import Any, Dict, List
 
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.urls import reverse
 
@@ -24,6 +25,8 @@ from ..models import (
     Participant,
     Project,
 )
+
+test_file = "flare_portal/experiments/tests/assets/circle.png"
 
 
 class ProjectAuthorizationTest(TestCase):
@@ -353,7 +356,33 @@ class ExperimentCreateViewTest(TestCase):
         self.assertEqual(resp.context["form"].initial["project"], self.project.pk)
         self.assertEqual(resp.context["form"].initial["owner"], self.user.pk)
 
-        form_data: Dict[str, str] = {
+        # File uploads
+        us_file = SimpleUploadedFile(
+            "file.wav", b"wav content", content_type="audio/wav"
+        )
+        csa_file = SimpleUploadedFile(
+            "csa.png", open(test_file, "rb").read(), content_type="image/png"
+        )
+        csb_file = SimpleUploadedFile(
+            "csa.png", open(test_file, "rb").read(), content_type="image/png"
+        )
+        context_a_file = SimpleUploadedFile(
+            "context_a.png",
+            open(test_file, "rb").read(),
+            content_type="image/png",
+        )
+        context_b_file = SimpleUploadedFile(
+            "context_b.png",
+            open(test_file, "rb").read(),
+            content_type="image/png",
+        )
+        context_c_file = SimpleUploadedFile(
+            "context_c.png",
+            open(test_file, "rb").read(),
+            content_type="image/png",
+        )
+
+        form_data: Dict[str, Any] = {
             "name": "My experiment",
             "description": "This is my experiment",
             "code": "ABC123",
@@ -366,6 +395,12 @@ class ExperimentCreateViewTest(TestCase):
             "rating_scale_anchor_label_left": "Certain no beep",
             "rating_scale_anchor_label_center": "Uncertain",
             "rating_scale_anchor_label_right": "Certain beep",
+            "us": us_file,
+            "csa": csa_file,
+            "csb": csb_file,
+            "context_a": context_a_file,
+            "context_b": context_b_file,
+            "context_c": context_c_file,
         }
 
         resp = self.client.post(url, form_data, follow=True)
@@ -407,6 +442,14 @@ class ExperimentCreateViewTest(TestCase):
             str(list(resp.context["messages"])[0]),
             f'Added new experiment "{experiment}"',
         )
+
+        # Files exist
+        self.assertTrue(experiment.us)
+        self.assertTrue(experiment.csa)
+        self.assertTrue(experiment.csb)
+        self.assertTrue(experiment.context_a)
+        self.assertTrue(experiment.context_b)
+        self.assertTrue(experiment.context_c)
 
     def test_field_validation(self) -> None:
         url = reverse(
@@ -466,7 +509,18 @@ class ExperimentUpdateViewTest(TestCase):
         resp = self.client.get(url)
         self.assertEqual(200, resp.status_code)
 
-        form_data: Dict[str, str] = {
+        # Assets
+        us_file = SimpleUploadedFile(
+            "file.wav", b"wav content", content_type="audio/wav"
+        )
+        csa_file = SimpleUploadedFile(
+            "csa.png", open(test_file, "rb").read(), content_type="image/png"
+        )
+        csb_file = SimpleUploadedFile(
+            "csa.png", open(test_file, "rb").read(), content_type="image/png"
+        )
+
+        form_data: Dict[str, Any] = {
             "name": "My experiment",
             "description": "This is my experiment",
             "code": "ABC123",
@@ -478,6 +532,9 @@ class ExperimentUpdateViewTest(TestCase):
             "rating_scale_anchor_label_left": "Certain no beep",
             "rating_scale_anchor_label_center": "Uncertain",
             "rating_scale_anchor_label_right": "Certain beep",
+            "us": us_file,
+            "csa": csa_file,
+            "csb": csb_file,
         }
 
         resp = self.client.post(url, form_data, follow=True)
@@ -636,7 +693,13 @@ class ModuleCreateViewTest(TestCase):
 
         self.client.force_login(self.user)
 
-        self.experiment: Experiment = ExperimentFactory()
+        context_a_file = SimpleUploadedFile(
+            "context_a.png",
+            open("flare_portal/experiments/tests/assets/circle.png", "rb").read(),
+            content_type="image/png",
+        )
+
+        self.experiment: Experiment = ExperimentFactory(context_a=context_a_file)
         self.project = self.experiment.project
 
     def test_create_fear_conditioning_module(self) -> None:
@@ -658,6 +721,7 @@ class ModuleCreateViewTest(TestCase):
             "reinforcement_rate": 12,
             "generalisation_stimuli_enabled": True,
             "experiment": str(self.experiment.pk),
+            "context": "A",
         }
 
         resp = self.client.post(url, form_data, follow=True)
@@ -682,6 +746,7 @@ class ModuleCreateViewTest(TestCase):
             module.generalisation_stimuli_enabled,
             form_data["generalisation_stimuli_enabled"],
         )
+        self.assertEqual(module.context, "A")
 
         self.assertEqual(
             str(list(resp.context["messages"])[0]),

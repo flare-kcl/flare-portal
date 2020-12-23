@@ -1,4 +1,5 @@
-{% load widget_tweaks %}
+{% load util_tags widget_tweaks %}
+
 {% with show_required=show_required|default:"show" show_label=show_label|default:"show" %}
     {% if field|widget_type == 'hiddeninput' %}
         {{ field }}
@@ -31,6 +32,28 @@
                 {% with help_text_attr="placeholder:"|add:field.help_text %}
                     {{ field|add_class:"form-control"|add_error_class:"is-invalid"|attr:help_text_attr|attr:"rows:3" }}
                 {% endwith %}
+            {% elif field|widget_type == 'clearablefileinput' %}
+                <div class="form-group{% if field.errors %} has-errors{% endif %}">
+                    <div class="row gutter-xs">
+                        <div class="col-8">
+                            <div class="custom-file" x-data="fileInput()">
+                                <input type="file" name="{{ field.name }}"{% if accept %} accept="{{ accept }}"{% endif %} x-on:change="handleChange" class="custom-file-input{% if field.errors %} is-invalid{% endif %}" id="{{ field.id_for_label }}" style="display: none;">
+                                <label class="custom-file-label" for="{{ field.id_for_label }}" x-text="text">Choose file</label>
+                            </div>
+                            {% if field.value and field.value.url %}
+                                Currently: <a href="{{ field.value.url }}" target="_blank">{{ field.value|filename }}</a>
+                            {% endif %}
+                        </div>
+                        {% if field.value and not field.field.required %}
+                            <div class="col-4">
+                                <label class="custom-control custom-checkbox" for="{{ field.name }}-clear_id">
+                                    <input class="custom-control-input" type="checkbox" name="{{ field.name }}-clear" id="{{ field.name }}-clear_id">
+                                    <span class="custom-control-label">Clear</span>
+                                </label>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
             {% else %}
                 {% with help_text_attr="placeholder:"|add:field.help_text %}
                     {{ field|add_class:"form-control"|add_error_class:"is-invalid"|attr:help_text_attr }}

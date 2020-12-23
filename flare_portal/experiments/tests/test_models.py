@@ -93,7 +93,7 @@ class FearConditioningModuleTest(TestCase):
         self.assertEqual("fear_conditioning", module.get_module_snake_case())
         self.assertEqual("FearConditioning", module.get_module_camel_case())
 
-    def test_validation(self) -> None:
+    def test_reinforcement_rate_validation(self) -> None:
         module: FearConditioningModule = FearConditioningModuleFactory.build(
             trials_per_stimulus=12, reinforcement_rate=13
         )
@@ -102,6 +102,16 @@ class FearConditioningModuleTest(TestCase):
             module.clean()
 
         self.assertIn("reinforcement_rate", e.exception.error_dict)
+
+    def test_context_vaildation(self) -> None:
+        module: FearConditioningModule = FearConditioningModuleFactory.build(
+            context="A"
+        )
+
+        with self.assertRaises(ValidationError) as e:
+            module.clean()
+
+        self.assertIn("context", e.exception.error_dict)
 
 
 class FearConditioningDataTest(TestCase):
