@@ -52,6 +52,10 @@ class ConfigurationAPIView(APIView):
                         context_c=(
                             experiment.context_c.url if experiment.context_c else None
                         ),
+                        gsa=experiment.gsa.url if experiment.gsa else None,
+                        gsb=experiment.gsb.url if experiment.gsb else None,
+                        gsc=experiment.gsc.url if experiment.gsc else None,
+                        gsd=experiment.gsd.url if experiment.gsd else None,
                     ),
                     config=constants.SiteConfigurationType(
                         terms_and_conditions=config.terms_and_conditions,
