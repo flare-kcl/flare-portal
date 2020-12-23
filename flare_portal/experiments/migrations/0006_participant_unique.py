@@ -11,7 +11,8 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AlterModelOptions(
-            name="basemodule", options={"ordering": ["sortorder"]},
+            name="basemodule",
+            options={"ordering": ["sortorder"]},
         ),
         migrations.AlterField(
             model_name="participant",

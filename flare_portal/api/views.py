@@ -7,7 +7,7 @@ from flare_portal.experiments.models import Experiment
 from flare_portal.site_config.models import SiteConfiguration
 
 from . import constants
-from .forms import ConfigurationForm, TermsAndConditionsForm
+from .forms import ConfigurationForm, SubmissionForm, TermsAndConditionsForm
 
 
 class ConfigurationAPIView(APIView):
@@ -15,8 +15,12 @@ class ConfigurationAPIView(APIView):
         form = ConfigurationForm(request.data)
 
         if form.is_valid():
-            experiment: Experiment = form.cleaned_data["participant"].experiment
             config = SiteConfiguration.get_solo()
+            experiment: Experiment = form.cleaned_data["participant"].experiment
+
+            # Invalidate the current particpant ID
+            form.save()
+
             return Response(
                 constants.ConfigType(
                     experiment=constants.ExperimentType(
@@ -64,7 +68,22 @@ class ConfigurationAPIView(APIView):
         raise serializers.ValidationError(form.errors)
 
 
-configuration_api_view = ConfigurationAPIView.as_view()
+class SubmissionAPIView(APIView):
+    def post(self, request: Request, format: str = None) -> Response:
+        form = SubmissionForm(request.data)
+
+        if form.is_valid():
+            form.save()
+            participant = form.cleaned_data["participant"]
+
+            return Response(
+                constants.SubmissionType(
+                    participant_started_at=participant.started_at,
+                    participant_finished_at=participant.finished_at,
+                )
+            )
+
+        raise serializers.ValidationError(form.errors)
 
 
 class TermsAndConditionsAPIView(APIView):
@@ -85,4 +104,6 @@ class TermsAndConditionsAPIView(APIView):
         raise serializers.ValidationError(form.errors)
 
 
+submission_api_view = SubmissionAPIView.as_view()
+configuration_api_view = ConfigurationAPIView.as_view()
 terms_and_conditions_api_view = TermsAndConditionsAPIView.as_view()

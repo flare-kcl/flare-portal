@@ -128,6 +128,8 @@ class Participant(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     udpated_at = models.DateTimeField(auto_now=True)
+    started_at = models.DateTimeField(null=True)
+    finished_at = models.DateTimeField(null=True)
 
     def __str__(self) -> str:
         return self.participant_id
