@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.core import validators
 from django.core.exceptions import ValidationError
+from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.urls import reverse
 from django.utils.text import camel_case_to_spaces, slugify
@@ -19,6 +20,10 @@ class Project(models.Model):
 
     def __str__(self) -> str:
         return self.name
+
+
+def experiment_assets_path(instance: "Experiment", filename: str) -> str:
+    return f"experiment_assets/{instance.pk}/{filename}"
 
 
 class Experiment(models.Model):
@@ -48,6 +53,41 @@ class Experiment(models.Model):
     )
     rating_scale_anchor_label_right = models.CharField(
         max_length=255, default="Certain scream"
+    )
+
+    # Assets
+    us = models.FileField(
+        upload_to=experiment_assets_path,
+        verbose_name="US",
+        validators=[FileExtensionValidator(["mp3", "wav"])],
+    )
+    csa = models.ImageField(
+        upload_to=experiment_assets_path,
+        verbose_name="CS A",
+        validators=[FileExtensionValidator(["png"])],
+    )
+    csb = models.ImageField(
+        upload_to=experiment_assets_path,
+        verbose_name="CS B",
+        validators=[FileExtensionValidator(["png"])],
+    )
+    context_a = models.ImageField(
+        upload_to=experiment_assets_path,
+        blank=True,
+        verbose_name="context A",
+        validators=[FileExtensionValidator(["png"])],
+    )
+    context_b = models.ImageField(
+        upload_to=experiment_assets_path,
+        blank=True,
+        verbose_name="context B",
+        validators=[FileExtensionValidator(["png"])],
+    )
+    context_c = models.ImageField(
+        upload_to=experiment_assets_path,
+        blank=True,
+        verbose_name="context C",
+        validators=[FileExtensionValidator(["png"])],
     )
 
     created_at = models.DateTimeField(auto_now_add=True)
