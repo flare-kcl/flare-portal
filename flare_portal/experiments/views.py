@@ -129,7 +129,7 @@ class ExperimentUpdateView(UpdateView):
     object: Experiment
     pk_url_kwarg = "experiment_pk"
     queryset = Experiment.objects.select_related("project")
-    template_name = "experiments/experiment_update_form.html"
+    template_name = "experiments/experiment_form.html"
 
     def form_valid(self, form: forms.BaseModelForm) -> HttpResponse:
         response = super().form_valid(form)

@@ -1,50 +1,120 @@
 {% extends "base.html" %}
 
-{% block title %}Add experiment - {{ project.name }}{% endblock title %}
+{% load widget_tweaks %}
+
+{% block title %}{% if experiment %}{{ experiment.name}}{% else %}Add experiment - {{ project.name }}{% endif %}{% endblock title %}
 
 {% block content %}
     <div class="container">
         <div class="row">
             <div class="col-lg-4">
-                {% include "experiments/includes/project_sidebar.html" %}
+                {% if experiment %}
+                    {% include "experiments/includes/experiment_sidebar.html" %}
+                {% else %}
+                    {% include "experiments/includes/project_sidebar.html" %}
+                {% endif %}
             </div>
-            <div class="col-lg-8">
+            <form action="" method="POST" enctype="multipart/form-data" class="col-lg-8">
+                {% csrf_token %}
+                {{ form.project }}
+
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger my-3">
+                        {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+                    </div>
+                {% endif %}
+
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">Add new experiment</h3>
+                        <h3 class="card-title">{% if experiment %}Experiment settings{% else %}Add new experiment{% endif %}</h3>
                     </div>
 
-                    <form action="" method="POST" enctype="multipart/form-data">
-                        {% csrf_token %}
 
-                        <div class="card-body">
-                            {% if form.non_field_errors %}
-                                <div class="card-alert alert alert-danger my-3">
-                                    {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+                    <div class="card-body">
+
+                        {% include "includes/form-group.html" with field=form.name %}
+                        {% include "includes/form-group.html" with field=form.description %}
+                        {% include "includes/form-group.html" with field=form.code %}
+                        {% include "includes/form-group.html" with field=form.owner %}
+
+
+                        <div class="form-group">
+                            <label class="form-label">Rating scale anchors <span class="form-required">*</span></label>
+                            <div class="row gutter-xs">
+                                <div class="col-4">
+                                    {% include "includes/form-group.html" with field=form.rating_scale_anchor_label_left|attr:"placeholder:Left" show_label="hide" %}
                                 </div>
-                            {% endif %}
-
-                            {% include "experiments/includes/experiment_fields.html" %}
-                        </div>
-
-                        <div class="card-footer">
-                            <div class="d-flex">
-                                {% if experiment %}
-                                    <a href="{% url "experiments:experiment_detail" project_pk=experiment.project_id experiment_pk=experiment.pk %}" class="btn btn-link">Cancel</a>
-                                {% else %}
-                                    <a href="{% url "experiments:experiment_list" project_pk=view.kwargs.project_pk %}" class="btn btn-link">Cancel</a>
-                                {% endif %}
-                                <div class="btn-list ml-auto">
-                                    {% if experiment %}
-                                        <a href="{% url "experiments:experiment_delete" project_pk=experiment.project_id experiment_pk=experiment.pk %}" class="btn btn-link text-danger">Delete</a>
-                                    {% endif %}
-                                    <button type="submit" class="btn btn-primary ml-auto">{% if experiment %}Save{% else %}Add new experiment{% endif %}</button>
+                                <div class="col-4">
+                                    {% include "includes/form-group.html" with field=form.rating_scale_anchor_label_center|attr:"placeholder:Center" show_label="hide" %}
+                                </div>
+                                <div class="col-4">
+                                    {% include "includes/form-group.html" with field=form.rating_scale_anchor_label_right|attr:"placeholder:Right" show_label="hide" %}
                                 </div>
                             </div>
                         </div>
-                    </form>
+
+                    </div>
                 </div>
-            </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Fear conditioning settings</h3>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="row gutter-xs">
+                            <div class="col-6">
+                                {% include "includes/form-group.html" with field=form.trial_length %}
+                            </div>
+                            <div class="col-6">
+                                {% include "includes/form-group.html" with field=form.rating_delay %}
+                            </div>
+                        </div>
+
+                        <div class="row gutter-xs">
+                            <div class="col-6">
+                                {% include "includes/form-group.html" with field=form.iti_min_delay %}
+                            </div>
+                            <div class="col-6">
+                                {% include "includes/form-group.html" with field=form.iti_max_delay %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Assets</h3>
+                    </div>
+
+                    <div class="card-body">
+                        {% include "includes/form-group.html" with field=form.us accept="audio/wav,audio/mp3" %}
+
+                        <div class="card-alert alert alert-info my-3">Note: CS, GS, and context images should be in PNG format and their dimensions should be 800x800px.</div>
+
+                        {% include "includes/form-group.html" with field=form.csa accept="image/png" %}
+                        {% include "includes/form-group.html" with field=form.csb accept="image/png" %}
+                        {% include "includes/form-group.html" with field=form.context_a accept="image/png" %}
+                        {% include "includes/form-group.html" with field=form.context_b accept="image/png" %}
+                        {% include "includes/form-group.html" with field=form.context_c accept="image/png" %}
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-footer">
+                        <div class="d-flex">
+                            {% if experiment %}
+                                <a href="{% url "experiments:experiment_detail" project_pk=experiment.project_id experiment_pk=experiment.pk %}" class="btn btn-link">Cancel</a>
+                            {% else %}
+                                <a href="{% url "experiments:experiment_list" project_pk=view.kwargs.project_pk %}" class="btn btn-link">Cancel</a>
+                            {% endif %}
+                            <div class="btn-list ml-auto">
+                                {% if experiment %}
+                                    <a href="{% url "experiments:experiment_delete" project_pk=experiment.project_id experiment_pk=experiment.pk %}" class="btn btn-link text-danger">Delete</a>
+                                {% endif %}
+                                <button type="submit" class="btn btn-primary ml-auto">{% if experiment %}Save{% else %}Add new experiment{% endif %}</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
 {% endblock content %}

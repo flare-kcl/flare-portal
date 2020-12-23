@@ -37,7 +37,7 @@
                     <div class="row gutter-xs">
                         <div class="col-8">
                             <div class="custom-file" x-data="fileInput()">
-                                <input type="file" name="{{ field.name }}"{% if field|field_type == 'imagefield' %} accept="image/png"{% endif %} x-on:change="handleChange" class="custom-file-input{% if field.errors %} is-invalid{% endif %}" id="{{ field.id_for_label }}" style="display: none;">
+                                <input type="file" name="{{ field.name }}"{% if accept %} accept="{{ accept }}"{% endif %} x-on:change="handleChange" class="custom-file-input{% if field.errors %} is-invalid{% endif %}" id="{{ field.id_for_label }}" style="display: none;">
                                 <label class="custom-file-label" for="{{ field.id_for_label }}" x-text="text">Choose file</label>
                             </div>
                             {% if field.value and field.value.url %}

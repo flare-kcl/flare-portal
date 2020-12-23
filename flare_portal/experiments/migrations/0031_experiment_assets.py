@@ -9,7 +9,7 @@ import flare_portal.experiments.models.core
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("experiments", "0027_module_ordering"),
+        ("experiments", "0030_participant_agreed_to_terms_and_conditions"),
     ]
 
     operations = [
