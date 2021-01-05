@@ -299,6 +299,11 @@ class WebModule(BaseModule):
 class InstructionsScreen(models.Model):
     title = models.CharField(max_length=255)
     body = models.TextField(blank=True)
+    action_label = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text='This text appears just above the "Next" button.',
+    )
 
     module = models.ForeignKey(
         "experiments.InstructionsModule",
@@ -314,7 +319,7 @@ class InstructionsScreen(models.Model):
 
 class InstructionsScreenInline(InlineFormSetFactory):
     model = InstructionsScreen
-    fields = ["title", "body"]
+    fields = ["title", "body", "action_label"]
     factory_kwargs = {"extra": 0}
 
 
