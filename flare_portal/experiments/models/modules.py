@@ -321,7 +321,13 @@ class InstructionsScreenInline(InlineFormSetFactory):
 class InstructionsModule(BaseModule):
     include_volume_calibration = models.BooleanField(default=False)
     end_screen_title = models.CharField(max_length=255, blank=True)
-    end_screen_body = models.TextField(blank=True)
+    end_screen_body = models.TextField(
+        blank=True,
+        help_text=(
+            "The end screen will not be displayed if both the title and body "
+            "are left blank."
+        ),
+    )
 
     inlines = [InstructionsScreenInline]
 
