@@ -27,6 +27,7 @@ from .models import (
     FearConditioningModule,
     InstructionsModule,
     Participant,
+    VolumeCalibrationData,
     WebModule,
 )
 
@@ -366,3 +367,4 @@ data_viewset_registry.register(CriterionData, list_view_class=CriterionDataListV
 data_viewset_registry.register(
     FearConditioningData, list_view_class=FearConditioningDataListView
 )
+data_viewset_registry.register(VolumeCalibrationData)
