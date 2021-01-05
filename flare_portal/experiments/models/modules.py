@@ -294,3 +294,36 @@ class WebModule(BaseModule):
 
     def __str__(self) -> str:
         return "Web - " + super().__str__()
+
+
+class InstructionsScreen(models.Model):
+    title = models.CharField(max_length=255)
+    body = models.TextField(blank=True)
+
+    module = models.ForeignKey(
+        "experiments.InstructionsModule",
+        on_delete=models.CASCADE,
+        related_name="screens",
+    )
+
+    inline_label = "Screens"
+
+    def __str__(self) -> str:
+        return self.title
+
+
+class InstructionsScreenInline(InlineFormSetFactory):
+    model = InstructionsScreen
+    fields = ["title", "body"]
+    factory_kwargs = {"extra": 0}
+
+
+class InstructionsModule(BaseModule):
+    include_volume_calibration = models.BooleanField(default=False)
+    end_screen_title = models.CharField(max_length=255, blank=True)
+    end_screen_body = models.TextField(blank=True)
+
+    inlines = [InstructionsScreenInline]
+
+    def __str__(self) -> str:
+        return "Instructions - " + super().__str__()

@@ -25,6 +25,7 @@ from .models import (
     Experiment,
     FearConditioningData,
     FearConditioningModule,
+    InstructionsModule,
     Participant,
     WebModule,
 )
@@ -209,6 +210,7 @@ module_registry = ModuleRegistry()
 module_registry.register(BasicInfoModule)
 module_registry.register(CriterionModule)
 module_registry.register(FearConditioningModule)
+module_registry.register(InstructionsModule)
 module_registry.register(WebModule)
 
 
