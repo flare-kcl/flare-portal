@@ -331,5 +331,27 @@ class InstructionsModule(BaseModule):
 
     inlines = [InstructionsScreenInline]
 
+    def get_module_config(self) -> constants.ModuleConfigType:
+        return constants.ModuleConfigType(
+            id=self.pk,
+            type=self.get_module_tag(),
+            config={
+                "include_volume_calibration": self.include_volume_calibration,
+                "end_screen_title": self.end_screen_title,
+                "end_screen_body": self.end_screen_body,
+                "screens": [
+                    {
+                        "title": screen.title,
+                        "body": screen.body,
+                    }
+                    for screen in self.screens.all()
+                ],
+            },
+        )
+
+    def get_module_description(self) -> str:
+        screen_count = self.screens.count()
+        return f"{screen_count} screen{pluralize(screen_count)}"
+
     def __str__(self) -> str:
         return "Instructions - " + super().__str__()
