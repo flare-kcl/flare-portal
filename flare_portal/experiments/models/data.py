@@ -8,7 +8,7 @@ from django.db import models
 from model_utils import Choices
 
 from .core import Nameable
-from .modules import BaseModule
+from .modules import BaseModule, AffectiveRatingModule
 
 
 def get_field_value(instance: models.Model, field: str) -> Any:
@@ -299,3 +299,29 @@ class VolumeCalibrationData(BaseData):
     class Meta:
         # Each participant can only submit volume calibration data once per module
         unique_together = ("participant", "module")
+
+
+class AffectiveRatingData(BaseData):
+    stimulus = models.CharField(max_length=3)
+    rating = models.PositiveIntegerField()
+    module = models.ForeignKey(  # type: ignore
+        "experiments.AffectiveRatingModule",
+        on_delete=models.PROTECT,
+        related_name="data",
+    )
+
+    list_display = [
+        "stimulus",
+        "rating",
+    ]
+
+    class Meta:
+        # Each participant can only answer a question once
+        unique_together = ("participant", "module")
+
+    def clean(self) -> None:
+        if self.rating < 0 or self.rating > 10:
+            raise ValidationError("The rating must be between int between 0 & 10")
+
+        if self.stimulus not in AffectiveRatingModule.STIMULI:
+            raise ValidationError(f"Unknown stimuli {self.stimulus}")

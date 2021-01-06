@@ -16,6 +16,8 @@ from extra_views import (
 )
 
 from .models import (
+    AffectiveRatingData,
+    AffectiveRatingModule,
     BaseData,
     BaseModule,
     BasicInfoData,
@@ -208,6 +210,7 @@ class ModuleRegistry:
 
 module_registry = ModuleRegistry()
 
+module_registry.register(AffectiveRatingModule)
 module_registry.register(BasicInfoModule)
 module_registry.register(CriterionModule)
 module_registry.register(FearConditioningModule)
@@ -362,6 +365,7 @@ class CriterionDataListView(DataListView):
 
 data_viewset_registry = DataViewsetRegistry()
 
+data_viewset_registry.register(AffectiveRatingData)
 data_viewset_registry.register(BasicInfoData)
 data_viewset_registry.register(CriterionData, list_view_class=CriterionDataListView)
 data_viewset_registry.register(

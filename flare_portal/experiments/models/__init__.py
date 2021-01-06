@@ -1,5 +1,6 @@
 from .core import Experiment, Participant, Project
 from .data import (
+    AffectiveRatingData,
     BaseData,
     BasicInfoData,
     CriterionData,
@@ -7,6 +8,7 @@ from .data import (
     VolumeCalibrationData,
 )
 from .modules import (
+    AffectiveRatingModule,
     BaseModule,
     BasicInfoModule,
     CriterionModule,
@@ -17,6 +19,8 @@ from .modules import (
 )
 
 __all__ = [
+    "AffectiveRatingData",
+    "AffectiveRatingModule",
     "BaseData",
     "BaseModule",
     "BasicInfoData",

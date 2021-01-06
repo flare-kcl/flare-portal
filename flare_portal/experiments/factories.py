@@ -5,6 +5,7 @@ import factory
 from flare_portal.users.factories import UserFactory
 
 from .models import (
+    AffectiveRatingModule,
     CriterionModule,
     CriterionQuestion,
     Experiment,
@@ -104,3 +105,8 @@ class WebModuleFactory(factory.django.DjangoModelFactory):
     intro_text = factory.Faker("heading")
     help_text = factory.Faker("paragraph")
     append_participant_id = True
+
+
+class AffectiveRatingModuleFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = AffectiveRatingModule
