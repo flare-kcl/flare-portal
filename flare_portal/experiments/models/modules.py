@@ -388,8 +388,8 @@ class AffectiveRatingModule(BaseModule):
     )
 
     def __str__(self) -> str:
-        # self.get_stimuli_display is a magic Django method
-        return f"Affective Rating ({self.get_stimuli_display()})"
+        # self.get_stimulus_display is a magic Django method
+        return f"Affective Rating ({self.get_stimulus_display()})"
 
     def get_module_title(self) -> str:
         return self.__str__()
