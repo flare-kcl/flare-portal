@@ -388,7 +388,7 @@ class AffectiveRatingModule(BaseModule):
     )
 
     def __str__(self) -> str:
-        # self.get_stimuli_display is a magic Django method that gets the human readable choice label.
+        # self.get_stimuli_display is a magic Django method
         return f"Affective Rating ({self.get_stimuli_display()})"
 
     def get_module_title(self) -> str:
@@ -403,7 +403,7 @@ class AffectiveRatingModule(BaseModule):
              type=self.get_module_tag(),
              config={
                  "question": self.question,
-                 "stimulus": self.stimuli,
+                 "stimulus": self.stimulus,
                  "rating_scale_anchor_label_left": self.rating_scale_anchor_label_left,
                  "rating_scale_anchor_label_center":
                      self.rating_scale_anchor_label_center,
