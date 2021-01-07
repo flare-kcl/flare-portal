@@ -360,3 +360,55 @@ class InstructionsModule(BaseModule):
 
     def __str__(self) -> str:
         return "Instructions - " + super().__str__()
+
+
+class AffectiveRatingModule(BaseModule):
+    STIMULI = Choices(
+        ("csa", "CSA"),
+        ("csb", "CSB"),
+        ("gsa", "GSA"),
+        ("gsb", "GSB"),
+        ("gsc", "GSC"),
+        ("gsd", "GSD"),
+    )
+
+    stimulus = models.CharField(max_length=3, choices=STIMULI, default=STIMULI.csa)
+    question = models.CharField(
+        max_length=255, default="Have you seen this image before?"
+    )
+
+    rating_scale_anchor_label_left = models.CharField(
+        max_length=255, default="Definitely never seen before"
+    )
+    rating_scale_anchor_label_center = models.CharField(
+        max_length=255, default="Neutral"
+    )
+    rating_scale_anchor_label_right = models.CharField(
+        max_length=255, default="Definitely have seen before"
+    )
+
+    def __str__(self) -> str:
+        # self.get_stimulus_display is a magic Django method
+        return f"Affective Rating ({self.get_stimulus_display()})"
+
+    def get_module_title(self) -> str:
+        return self.__str__()
+
+    def get_module_description(self) -> str:
+        return self.question
+
+    def get_module_config(self) -> constants.ModuleConfigType:
+        return constants.ModuleConfigType(
+            id=self.pk,
+            type=self.get_module_tag(),
+            config={
+                # fmt: off
+                "question": self.question,
+                "stimulus": self.stimulus,
+                "rating_scale_anchor_label_left": self.rating_scale_anchor_label_left,
+                "rating_scale_anchor_label_center":
+                    self.rating_scale_anchor_label_center,
+                "rating_scale_anchor_label_right": self.rating_scale_anchor_label_right,
+                # fmt: on
+            },
+        )

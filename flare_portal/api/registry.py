@@ -6,6 +6,7 @@ from rest_framework import serializers
 from rest_framework.generics import CreateAPIView
 
 from flare_portal.experiments.models import (
+    AffectiveRatingData,
     BaseData,
     BasicInfoData,
     CriterionData,
@@ -83,6 +84,7 @@ class DataAPIRegistry:
 
 data_api_registry = DataAPIRegistry()
 
+data_api_registry.register(AffectiveRatingData)
 data_api_registry.register(BasicInfoData)
 data_api_registry.register(CriterionData)
 data_api_registry.register(FearConditioningData)

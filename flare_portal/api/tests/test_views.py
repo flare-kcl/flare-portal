@@ -8,6 +8,7 @@ from django.utils.dateparse import parse_datetime
 from rest_framework.serializers import DateTimeField
 
 from flare_portal.experiments.factories import (
+    AffectiveRatingModuleFactory,
     CriterionModuleFactory,
     CriterionQuestionFactory,
     ExperimentFactory,
@@ -482,3 +483,29 @@ class CriterionDataAPIViewTest(TestCase):
         self.assertEqual(
             resp.json(), {"question": ["This question does not belong to that module."]}
         )
+
+
+class AffectiveRatingAPIViewTest(TestCase):
+    def test_post(self) -> None:
+        experiment = ExperimentFactory()
+        participant = ParticipantFactory(experiment=experiment)
+        module = AffectiveRatingModuleFactory(experiment=experiment)
+
+        url = reverse("api:affective_rating_data")
+
+        json_data = {
+            "participant": participant.participant_id,
+            "module": module.pk,
+            "rating": 5,
+            "stimulus": "csa",
+        }
+
+        resp = self.client.post(url, json_data, content_type="application/json")
+
+        # Check valid submission
+        self.assertEqual(201, resp.status_code)
+
+        # Check submitted data is valid
+        data = module.data.first()
+        self.assertEqual(data.rating, json_data["rating"])
+        self.assertEqual(data.stimulus, json_data["stimulus"])
