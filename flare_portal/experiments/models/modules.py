@@ -294,3 +294,69 @@ class WebModule(BaseModule):
 
     def __str__(self) -> str:
         return "Web - " + super().__str__()
+
+
+class InstructionsScreen(models.Model):
+    title = models.CharField(max_length=255)
+    body = models.TextField(blank=True)
+    action_label = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text='This text appears just above the "Next" button.',
+    )
+
+    module = models.ForeignKey(
+        "experiments.InstructionsModule",
+        on_delete=models.CASCADE,
+        related_name="screens",
+    )
+
+    inline_label = "Screens"
+
+    def __str__(self) -> str:
+        return self.title
+
+
+class InstructionsScreenInline(InlineFormSetFactory):
+    model = InstructionsScreen
+    fields = ["title", "body", "action_label"]
+    factory_kwargs = {"extra": 0}
+
+
+class InstructionsModule(BaseModule):
+    include_volume_calibration = models.BooleanField(default=False)
+    end_screen_title = models.CharField(max_length=255, blank=True)
+    end_screen_body = models.TextField(
+        blank=True,
+        help_text=(
+            "The end screen will not be displayed if both the title and body "
+            "are left blank."
+        ),
+    )
+
+    inlines = [InstructionsScreenInline]
+
+    def get_module_config(self) -> constants.ModuleConfigType:
+        return constants.ModuleConfigType(
+            id=self.pk,
+            type=self.get_module_tag(),
+            config={
+                "include_volume_calibration": self.include_volume_calibration,
+                "end_screen_title": self.end_screen_title,
+                "end_screen_body": self.end_screen_body,
+                "screens": [
+                    {
+                        "title": screen.title,
+                        "body": screen.body,
+                    }
+                    for screen in self.screens.all()
+                ],
+            },
+        )
+
+    def get_module_description(self) -> str:
+        screen_count = self.screens.count()
+        return f"{screen_count} screen{pluralize(screen_count)}"
+
+    def __str__(self) -> str:
+        return "Instructions - " + super().__str__()

@@ -226,7 +226,7 @@ class BasicInfoData(BaseData):
     ]
 
     class Meta:
-        # Each participant can only submit basic info once
+        # Each participant can only submit basic info once per module
         unique_together = ("participant", "module")
 
     def get_date_of_birth_display(self) -> str:
@@ -278,3 +278,24 @@ class CriterionData(BaseData):
             or (self.question.required_answer is None and self.answer is not None)
             or False
         )
+
+
+class VolumeCalibrationData(BaseData):
+    calibrated_volume_level = models.DecimalField(max_digits=3, decimal_places=2)
+    rating = models.PositiveIntegerField()
+
+    module = models.ForeignKey(  # type: ignore
+        "experiments.InstructionsModule",
+        on_delete=models.PROTECT,
+        related_name="data",
+    )
+
+    list_display = [
+        "participant",
+        "calibrated_volume_level",
+        "rating",
+    ]
+
+    class Meta:
+        # Each participant can only submit volume calibration data once per module
+        unique_together = ("participant", "module")

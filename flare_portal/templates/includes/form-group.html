@@ -17,21 +17,15 @@
             {% if field|widget_type == 'horizontalcheckboxselectmultiple' %}
                 {{ field|add_error_class:"is-invalid" }}
             {% elif field|widget_type == 'checkboxinput' %}
-                <label class="custom-switch {% if field.help_text %}custom-switch--with-description{% endif %}">
+                <label class="custom-switch">
                     {{ field|add_class:"custom-switch-input" }}
                     <span class="custom-switch-indicator"></span>
                     <span class="custom-switch-description">{{ field.label }}</span>
-
-                    {% if field.help_text %}
-                        <p class="custom-switch-description">{{ field.help_text }}</p>
-                    {% endif %}
                 </label>
             {% elif field|widget_type == 'select' %}
                 {{ field|add_class:"form-control custom-select"|add_error_class:"is-invalid"|attr:"data-selectize" }}
             {% elif field|widget_type == 'textarea' %}
-                {% with help_text_attr="placeholder:"|add:field.help_text %}
-                    {{ field|add_class:"form-control"|add_error_class:"is-invalid"|attr:help_text_attr|attr:"rows:3" }}
-                {% endwith %}
+                {{ field|add_class:"form-control"|add_error_class:"is-invalid"|attr:"rows:3" }}
             {% elif field|widget_type == 'clearablefileinput' %}
                 <div class="form-group{% if field.errors %} has-errors{% endif %}">
                     <div class="row gutter-xs">
@@ -55,9 +49,11 @@
                     </div>
                 </div>
             {% else %}
-                {% with help_text_attr="placeholder:"|add:field.help_text %}
-                    {{ field|add_class:"form-control"|add_error_class:"is-invalid"|attr:help_text_attr }}
-                {% endwith %}
+                {{ field|add_class:"form-control"|add_error_class:"is-invalid" }}
+            {% endif %}
+
+            {% if field.help_text %}
+                <div class="mt-2 text-muted"><small>{{ field.help_text }}</small></div>
             {% endif %}
 
             {% for error in field.errors %}

@@ -25,7 +25,9 @@ from .models import (
     Experiment,
     FearConditioningData,
     FearConditioningModule,
+    InstructionsModule,
     Participant,
+    VolumeCalibrationData,
     WebModule,
 )
 
@@ -209,6 +211,7 @@ module_registry = ModuleRegistry()
 module_registry.register(BasicInfoModule)
 module_registry.register(CriterionModule)
 module_registry.register(FearConditioningModule)
+module_registry.register(InstructionsModule)
 module_registry.register(WebModule)
 
 
@@ -364,3 +367,4 @@ data_viewset_registry.register(CriterionData, list_view_class=CriterionDataListV
 data_viewset_registry.register(
     FearConditioningData, list_view_class=FearConditioningDataListView
 )
+data_viewset_registry.register(VolumeCalibrationData)
