@@ -8,7 +8,7 @@ from django.db import models
 from model_utils import Choices
 
 from .core import Nameable
-from .modules import BaseModule, AffectiveRatingModule
+from .modules import AffectiveRatingModule, BaseModule
 
 
 def get_field_value(instance: models.Model, field: str) -> Any:

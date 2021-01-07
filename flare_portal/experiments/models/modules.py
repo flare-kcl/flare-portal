@@ -398,15 +398,15 @@ class AffectiveRatingModule(BaseModule):
         return self.question
 
     def get_module_config(self) -> constants.ModuleConfigType:
-         return constants.ModuleConfigType(
-             id=self.pk,
-             type=self.get_module_tag(),
-             config={
-                 "question": self.question,
-                 "stimulus": self.stimulus,
-                 "rating_scale_anchor_label_left": self.rating_scale_anchor_label_left,
-                 "rating_scale_anchor_label_center":
-                     self.rating_scale_anchor_label_center,
-                 "rating_scale_anchor_label_right": self.rating_scale_anchor_label_right,
-             },
-         )
+        return constants.ModuleConfigType(
+            id=self.pk,
+            type=self.get_module_tag(),
+            config={
+                "question": self.question,
+                "stimulus": self.stimulus,
+                "rating_scale_anchor_label_left": self.rating_scale_anchor_label_left,
+                "rating_scale_anchor_label_center":
+                    self.rating_scale_anchor_label_center,
+                "rating_scale_anchor_label_right": self.rating_scale_anchor_label_right,
+            },
+        )
