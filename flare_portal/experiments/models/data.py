@@ -316,7 +316,7 @@ class AffectiveRatingData(BaseData):
     ]
 
     class Meta:
-        # Each participant can only answer a question once
+        # Data for this module can only be submitted once.
         unique_together = ("participant", "module")
 
     def clean(self) -> None:
