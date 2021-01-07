@@ -18,6 +18,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='fearconditioningdata',
             name='response_recorded_at',
-            field=models.DateTimeField(blank=True),
+            field=models.DateTimeField(blank=True, null=True),
         ),
     ]

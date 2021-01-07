@@ -133,7 +133,7 @@ class FearConditioningData(BaseData):
     conditional_stimulus = models.CharField(max_length=24, verbose_name="CS/GS")
     unconditional_stimulus = models.BooleanField(verbose_name="US")
     trial_started_at = models.DateTimeField()
-    response_recorded_at = models.DateTimeField(blank=True)
+    response_recorded_at = models.DateTimeField(blank=True, null=True)
     volume_level = models.DecimalField(max_digits=3, decimal_places=2)
     calibrated_volume_level = models.DecimalField(max_digits=3, decimal_places=2)
     headphones = models.BooleanField()
