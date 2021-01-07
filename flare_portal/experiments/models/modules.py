@@ -402,11 +402,13 @@ class AffectiveRatingModule(BaseModule):
             id=self.pk,
             type=self.get_module_tag(),
             config={
+                # fmt: off
                 "question": self.question,
                 "stimulus": self.stimulus,
                 "rating_scale_anchor_label_left": self.rating_scale_anchor_label_left,
                 "rating_scale_anchor_label_center":
                     self.rating_scale_anchor_label_center,
                 "rating_scale_anchor_label_right": self.rating_scale_anchor_label_right,
+                # fmt: on
             },
         )
