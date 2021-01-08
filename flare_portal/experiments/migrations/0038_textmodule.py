@@ -7,7 +7,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('experiments', '0036_optional_rating'),
+        ('experiments', '0037_affectiveratingmodule'),
     ]
 
     operations = [
