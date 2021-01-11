@@ -317,7 +317,7 @@ class AffectiveRatingData(BaseData):
 
     class Meta:
         # Data for this module can only be submitted once.
-        unique_together = ("participant", "module")
+        unique_together = ("participant", "module", "stimulus")
 
     def clean(self) -> None:
         if self.rating < 0 or self.rating > 10:
