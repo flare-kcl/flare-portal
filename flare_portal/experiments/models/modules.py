@@ -412,3 +412,21 @@ class AffectiveRatingModule(BaseModule):
                 # fmt: on
             },
         )
+
+
+class TextModule(BaseModule):
+    heading = models.CharField(max_length=255)
+    body = models.TextField(blank=True)
+
+    def get_module_config(self) -> constants.ModuleConfigType:
+        return constants.ModuleConfigType(
+            id=self.pk,
+            type=self.get_module_tag(),
+            config={"heading": self.heading, "body": self.body},
+        )
+
+    def __str__(self) -> str:
+        return f"Text - {self.heading}"
+
+    def get_module_title(self) -> str:
+        return self.__str__()
