@@ -29,6 +29,7 @@ from .models import (
     FearConditioningModule,
     InstructionsModule,
     Participant,
+    TextModule,
     VolumeCalibrationData,
     WebModule,
 )
@@ -215,6 +216,7 @@ module_registry.register(BasicInfoModule)
 module_registry.register(CriterionModule)
 module_registry.register(FearConditioningModule)
 module_registry.register(InstructionsModule)
+module_registry.register(TextModule)
 module_registry.register(WebModule)
 
 

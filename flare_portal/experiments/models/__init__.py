@@ -15,6 +15,7 @@ from .modules import (
     CriterionQuestion,
     FearConditioningModule,
     InstructionsModule,
+    TextModule,
     WebModule,
 )
 
@@ -34,6 +35,7 @@ __all__ = [
     "InstructionsModule",
     "Participant",
     "Project",
+    "TextModule",
     "VolumeCalibrationData",
     "WebModule",
 ]
