@@ -363,15 +363,6 @@ class InstructionsModule(BaseModule):
 
 
 class AffectiveRatingModule(BaseModule):
-    STIMULI = Choices(
-        ("csa", "CSA"),
-        ("csb", "CSB"),
-        ("gsa", "GSA"),
-        ("gsb", "GSB"),
-        ("gsc", "GSC"),
-        ("gsd", "GSD"),
-    )
-
     question = models.CharField(
         max_length=255, default="Have you seen this image before?"
     )
@@ -388,7 +379,9 @@ class AffectiveRatingModule(BaseModule):
     )
 
     def __str__(self) -> str:
-        return f"Affective Rating (CS{'/GS' if self.generalisation_stimuli_enabled else ''})"
+        return "Affective Rating (CS" + {
+            "/GS)" if self.generalisation_stimuli_enabled else ")"
+        }
 
     def get_module_title(self) -> str:
         return self.__str__()
