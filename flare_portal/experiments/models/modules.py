@@ -363,19 +363,10 @@ class InstructionsModule(BaseModule):
 
 
 class AffectiveRatingModule(BaseModule):
-    STIMULI = Choices(
-        ("csa", "CSA"),
-        ("csb", "CSB"),
-        ("gsa", "GSA"),
-        ("gsb", "GSB"),
-        ("gsc", "GSC"),
-        ("gsd", "GSD"),
-    )
-
-    stimulus = models.CharField(max_length=3, choices=STIMULI, default=STIMULI.csa)
     question = models.CharField(
         max_length=255, default="Have you seen this image before?"
     )
+    generalisation_stimuli_enabled = models.BooleanField(default=False)
 
     rating_scale_anchor_label_left = models.CharField(
         max_length=255, default="Definitely never seen before"
@@ -388,8 +379,11 @@ class AffectiveRatingModule(BaseModule):
     )
 
     def __str__(self) -> str:
-        # self.get_stimulus_display is a magic Django method
-        return f"Affective Rating ({self.get_stimulus_display()})"
+        return (
+            "Affective Rating (CS" + "/GS)"
+            if self.generalisation_stimuli_enabled
+            else ")"
+        )
 
     def get_module_title(self) -> str:
         return self.__str__()
@@ -404,7 +398,7 @@ class AffectiveRatingModule(BaseModule):
             config={
                 # fmt: off
                 "question": self.question,
-                "stimulus": self.stimulus,
+                "generalisation_stimuli_enabled": self.generalisation_stimuli_enabled,
                 "rating_scale_anchor_label_left": self.rating_scale_anchor_label_left,
                 "rating_scale_anchor_label_center":
                     self.rating_scale_anchor_label_center,

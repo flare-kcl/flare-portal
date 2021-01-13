@@ -8,7 +8,7 @@ from django.db import models
 from model_utils import Choices
 
 from .core import Nameable
-from .modules import AffectiveRatingModule, BaseModule
+from .modules import BaseModule
 
 
 def get_field_value(instance: models.Model, field: str) -> Any:
@@ -317,11 +317,8 @@ class AffectiveRatingData(BaseData):
 
     class Meta:
         # Data for this module can only be submitted once.
-        unique_together = ("participant", "module")
+        unique_together = ("participant", "module", "stimulus")
 
     def clean(self) -> None:
         if self.rating < 0 or self.rating > 10:
             raise ValidationError("The rating must be between int between 0 & 10")
-
-        if self.stimulus not in AffectiveRatingModule.STIMULI:
-            raise ValidationError(f"Unknown stimuli {self.stimulus}")
