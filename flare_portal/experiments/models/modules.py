@@ -380,11 +380,10 @@ class AffectiveRatingModule(BaseModule):
     )
 
     def __str__(self) -> str:
-        return (
-            "Affective Rating (CS" + "/GS)"
-            if self.generalisation_stimuli_enabled
-            else ")"
-        )
+        if self.generalisation_stimuli_enabled:
+            return "Affective Rating (CS/GS)"
+
+        return "Affective Rating (CS)"
 
     def get_module_title(self) -> str:
         return self.__str__()
