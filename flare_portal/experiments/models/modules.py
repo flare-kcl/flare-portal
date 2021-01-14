@@ -379,18 +379,6 @@ class AffectiveRatingModule(BaseModule):
         max_length=255, default="Definitely have seen before"
     )
 
-    def __str__(self) -> str:
-        if self.generalisation_stimuli_enabled:
-            return "Affective Rating (CS/GS)"
-
-        return "Affective Rating (CS)"
-
-    def get_module_title(self) -> str:
-        return self.__str__()
-
-    def get_module_description(self) -> str:
-        return self.question
-
     def get_module_config(self) -> constants.ModuleConfigType:
         return constants.ModuleConfigType(
             id=self.pk,
@@ -407,6 +395,18 @@ class AffectiveRatingModule(BaseModule):
             },
         )
 
+    def get_module_title(self) -> str:
+        return self.__str__()
+
+    def get_module_description(self) -> str:
+        return self.question
+
+    def __str__(self) -> str:
+        if self.generalisation_stimuli_enabled:
+            return "Affective Rating (CS/GS)"
+
+        return "Affective Rating (CS)"
+
 
 class TextModule(BaseModule):
     heading = models.CharField(max_length=255)
@@ -419,8 +419,84 @@ class TextModule(BaseModule):
             config={"heading": self.heading, "body": self.body},
         )
 
+    def get_module_title(self) -> str:
+        return self.__str__()
+
     def __str__(self) -> str:
         return f"Text - {self.heading}"
 
+
+class BreakStartModule(BaseModule):
+    # Note: In a future ticket, all modules with have labels so this field
+    # needs to be deleted
+    label = models.CharField(
+        max_length=255,
+        help_text=(
+            "Helps with identifying modules. The label isn't displayed "
+            "to the participant."
+        ),
+        blank=True,
+    )
+
+    duration = models.PositiveIntegerField(
+        help_text="How long the break should last in seconds. (e.g. 300 is 5 minutes)",
+    )
+    start_title = models.CharField(
+        max_length=255,
+        help_text="Displays on the start break screen.",
+    )
+    start_body = models.TextField(
+        blank=True,
+        help_text="Displays on the start break screen.",
+    )
+    end_title = models.CharField(
+        max_length=255,
+        help_text="Displays on the end break screen.",
+    )
+    end_body = models.TextField(
+        blank=True,
+        help_text="Displays on the end break screen.",
+    )
+    end_module = models.OneToOneField(
+        "experiments.BreakEndModule",
+        on_delete=models.CASCADE,
+        related_name="start_module",
+    )
+
     def get_module_title(self) -> str:
-        return self.__str__()
+        return f"Break start - {self.label}"
+
+    def get_module_config(self) -> constants.ModuleConfigType:
+        return constants.ModuleConfigType(
+            id=self.pk,
+            type=self.get_module_tag(),
+            config={
+                "duration": self.duration,
+                "start_title": self.start_title,
+                "start_body": self.start_body,
+            },
+        )
+
+    def get_module_description(self) -> str:
+        return f"Duration: {self.duration} second{pluralize(self.duration)}"
+
+    def __str__(self) -> str:
+        return "Break start - " + super().__str__()
+
+
+class BreakEndModule(BaseModule):
+    def get_module_title(self) -> str:
+        return f"Break end - {self.start_module.label}"
+
+    def get_module_config(self) -> constants.ModuleConfigType:
+        return constants.ModuleConfigType(
+            id=self.pk,
+            type=self.get_module_tag(),
+            config={
+                "end_title": self.start_module.end_title,
+                "end_body": self.start_module.end_body,
+            },
+        )
+
+    def __str__(self) -> str:
+        return "Break end - " + super().__str__()

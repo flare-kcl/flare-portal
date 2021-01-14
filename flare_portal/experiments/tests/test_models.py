@@ -83,6 +83,21 @@ class ParticipantTest(TestCase):
         self.assertEqual(participant.participant_id, "Flare.ABCDEF")
 
 
+class ModuleTest(TestCase):
+    def test_required_methods(self) -> None:
+        # Check all BaseModule subclasses have the required methods
+        for subclass in BaseModule.__subclasses__():
+            with self.subTest(subclass.__name__):
+                get_module_config = getattr(subclass, "get_module_config", None)
+
+                # Check that subclass has its own implementation
+                self.assertNotEqual(
+                    BaseModule.get_module_config,
+                    get_module_config,
+                    "Missing `get_module_config` implementation",
+                )
+
+
 class FearConditioningModuleTest(TestCase):
     def test_display_names(self) -> None:
         module: FearConditioningModule = FearConditioningModuleFactory()
@@ -205,21 +220,6 @@ class FearConditioningDataTest(TestCase):
         )
 
 
-class ModuleTest(TestCase):
-    def test_required_methods(self) -> None:
-        # Check all BaseModule subclasses have the required methods
-        for subclass in BaseModule.__subclasses__():
-            with self.subTest(subclass.__name__):
-                get_module_config = getattr(subclass, "get_module_config", None)
-
-                # Check that subclass has its own implementation
-                self.assertNotEqual(
-                    BaseModule.get_module_config,
-                    get_module_config,
-                    "Missing `get_module_config` implementation",
-                )
-
-
 class CriterionDataTest(TestCase):
     def test_model(self) -> None:
         participant: Participant = ParticipantFactory()
@@ -268,3 +268,9 @@ class CriterionDataTest(TestCase):
         data.question = non_required_question
         data.answer = None
         self.assertTrue(data.passed)
+
+
+class BreakModuleTest(TestCase):
+    def test_create(self):
+        # Creating a break module will create both the start and end modules
+        pass

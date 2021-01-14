@@ -22,6 +22,7 @@ from .models import (
     BaseModule,
     BasicInfoData,
     BasicInfoModule,
+    BreakStartModule,
     CriterionData,
     CriterionModule,
     Experiment,
@@ -213,6 +214,9 @@ module_registry = ModuleRegistry()
 
 module_registry.register(AffectiveRatingModule)
 module_registry.register(BasicInfoModule)
+# Note: Don't register BreakEndModule as it is automatically created/deleted
+# when the start module is created/deleted
+module_registry.register(BreakStartModule)
 module_registry.register(CriterionModule)
 module_registry.register(FearConditioningModule)
 module_registry.register(InstructionsModule)
