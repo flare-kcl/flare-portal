@@ -242,6 +242,7 @@ class CriterionModule(BaseModule):
                 "questions": [
                     {
                         "id": question.pk,
+                        "help_text": question.help_text,
                         "question_text": question.question_text,
                         "required_answer": question.required_answer,
                         "required": question.required,
