@@ -348,6 +348,7 @@ class InstructionsModule(BaseModule):
                     {
                         "title": screen.title,
                         "body": screen.body,
+                        "action_label": screen.action_label
                     }
                     for screen in self.screens.all()
                 ],
