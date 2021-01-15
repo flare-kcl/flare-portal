@@ -15,11 +15,11 @@ from ..factories import (
     ProjectFactory,
 )
 from ..models import (
-    BaseModule,
     CriterionData,
     Experiment,
     FearConditioningData,
     FearConditioningModule,
+    Module,
     Participant,
 )
 
@@ -86,13 +86,13 @@ class ParticipantTest(TestCase):
 class ModuleTest(TestCase):
     def test_required_methods(self) -> None:
         # Check all BaseModule subclasses have the required methods
-        for subclass in BaseModule.__subclasses__():
+        for subclass in Module.__subclasses__():
             with self.subTest(subclass.__name__):
                 get_module_config = getattr(subclass, "get_module_config", None)
 
                 # Check that subclass has its own implementation
                 self.assertNotEqual(
-                    BaseModule.get_module_config,
+                    Module.get_module_config,
                     get_module_config,
                     "Missing `get_module_config` implementation",
                 )
@@ -268,9 +268,3 @@ class CriterionDataTest(TestCase):
         data.question = non_required_question
         data.answer = None
         self.assertTrue(data.passed)
-
-
-class BreakModuleTest(TestCase):
-    def test_create(self):
-        # Creating a break module will create both the start and end modules
-        pass

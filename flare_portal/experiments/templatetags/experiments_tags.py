@@ -6,7 +6,7 @@ from django.urls import reverse
 
 from flare_portal.api.registry import data_api_registry
 
-from ..models import BaseData, BaseModule, Experiment
+from ..models import BaseData, BaseModule, Experiment, Module
 from ..registry import module_registry
 
 register = template.Library()
@@ -35,15 +35,18 @@ def get_module_create_url(
 
 @register.simple_tag
 def get_module_update_url(module: BaseModule) -> str:
-    update_path_name = module.get_update_path_name()
-    return reverse(
-        f"experiments:modules:{update_path_name}",
-        kwargs={
-            "project_pk": module.experiment.project_id,
-            "experiment_pk": module.experiment.pk,
-            "module_pk": module.pk,
-        },
-    )
+    if isinstance(module, Module):
+        update_path_name = module.get_update_path_name()
+        return reverse(
+            f"experiments:modules:{update_path_name}",
+            kwargs={
+                "project_pk": module.experiment.project_id,
+                "experiment_pk": module.experiment.pk,
+                "module_pk": module.pk,
+            },
+        )
+
+    return ""
 
 
 @register.simple_tag

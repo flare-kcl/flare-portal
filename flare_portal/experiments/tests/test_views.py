@@ -18,6 +18,8 @@ from ..factories import (
 )
 from ..models import (
     BaseModule,
+    BreakEndModule,
+    BreakStartModule,
     CriterionModule,
     Experiment,
     FearConditioningData,
@@ -836,6 +838,106 @@ class ModuleCreateViewTest(TestCase):
             str(list(resp.context["messages"])[0]),
             "Added criterion module",
         )
+
+    def test_create_break_module(self) -> None:
+        existing_module = FearConditioningModuleFactory(experiment=self.experiment)
+
+        url = reverse(
+            "experiments:modules:break_create",
+            kwargs={"project_pk": self.project.pk, "experiment_pk": self.experiment.pk},
+        )
+
+        resp = self.client.get(url)
+
+        self.assertEqual(200, resp.status_code)
+
+        self.assertEqual(BreakStartModule, resp.context["module_type"])
+        self.assertEqual(self.experiment.pk, resp.context["form"].initial["experiment"])
+
+        form_data = {
+            "experiment": str(self.experiment.pk),
+            "duration": "300",
+            "start_title": "This is the start title,",
+            "start_body": "This is the start body,",
+            "end_title": "This is the end title,",
+            "end_body": "This is the end body,",
+        }
+
+        resp = self.client.post(url, form_data, follow=True)
+
+        modules = self.experiment.modules.select_subclasses().all()  # type: ignore
+
+        self.assertRedirects(
+            resp,
+            reverse(
+                "experiments:experiment_detail",
+                kwargs={
+                    "project_pk": self.project.pk,
+                    "experiment_pk": self.experiment.pk,
+                },
+            ),
+        )
+
+        start_module = modules[0]
+        end_module = modules[1]
+
+        # Check ordering
+        self.assertIsInstance(start_module, BreakStartModule)
+        self.assertIsInstance(end_module, BreakEndModule)
+        self.assertEqual(existing_module, modules[2])
+
+        self.assertEqual(start_module.duration, int(form_data["duration"]))
+        self.assertEqual(start_module.start_title, form_data["start_title"])
+        self.assertEqual(start_module.start_body, form_data["start_body"])
+        self.assertEqual(start_module.end_title, form_data["end_title"])
+        self.assertEqual(start_module.end_body, form_data["end_body"])
+
+        # Should create end break module
+        self.assertEqual(start_module.end_module, end_module)
+
+        self.assertEqual(
+            str(list(resp.context["messages"])[0]),
+            "Added break module",
+        )
+
+    def test_update_ordering(self) -> None:
+        # When a new module is created, it is added as the first module in the
+        # list. All the other modules are shifted down in the order
+        existing_modules = FearConditioningModuleFactory.create_batch(
+            5,
+            experiment=self.experiment,
+        )
+
+        for index, module in enumerate(existing_modules):
+            module.sortorder = index
+            module.save()
+
+        url = reverse(
+            "experiments:modules:fear_conditioning_create",
+            kwargs={"project_pk": self.project.pk, "experiment_pk": self.experiment.pk},
+        )
+
+        form_data = {
+            "phase": "habituation",
+            # factory doesn't make modules with 42 trials per stimulus
+            "trials_per_stimulus": 42,
+            "reinforcement_rate": 12,
+            "generalisation_stimuli_enabled": True,
+            "experiment": str(self.experiment.pk),
+            "context": "A",
+        }
+
+        resp = self.client.post(url, form_data, follow=True)
+
+        self.assertEqual(6, len(resp.context["modules"]))
+
+        # Existing modules should have shifted down
+        self.assertEqual(resp.context["modules"][0].trials_per_stimulus, 42)
+        self.assertEqual(resp.context["modules"][1], existing_modules[0])
+        self.assertEqual(resp.context["modules"][2], existing_modules[1])
+        self.assertEqual(resp.context["modules"][3], existing_modules[2])
+        self.assertEqual(resp.context["modules"][4], existing_modules[3])
+        self.assertEqual(resp.context["modules"][5], existing_modules[4])
 
 
 class ModuleUpdateViewTest(TestCase):

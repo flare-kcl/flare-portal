@@ -4,7 +4,7 @@ import string
 from django import forms
 from django.forms import inlineformset_factory
 
-from .models import Experiment, Participant
+from .models import BreakEndModule, BreakStartModule, Experiment, Participant
 
 
 class ExperimentForm(forms.ModelForm):
@@ -71,3 +71,36 @@ class ParticipantBatchForm(forms.Form):
 ParticipantFormSet = inlineformset_factory(
     Experiment, Participant, fields=["participant_id"], extra=0
 )
+
+
+class BreakStartModuleForm(forms.ModelForm):
+    class Meta:
+        model = BreakStartModule
+        fields = [
+            "experiment",
+            "label",
+            "duration",
+            "start_title",
+            "start_body",
+            "end_title",
+            "end_body",
+        ]
+        widgets = {"experiment": forms.HiddenInput()}
+
+    def save(self, commit: bool = True) -> BreakStartModule:
+        # Automatically create a matching end module when the start module is
+        # created
+        module = super().save(commit=False)
+
+        if commit:
+            module.end_module = BreakEndModule.objects.create(
+                experiment=module.experiment, sortorder=1
+            )
+            module.save()
+        else:
+            module.end_module = BreakEndModule(
+                experiment=module.experiment,
+                sortorder=1,
+            )
+
+        return module
