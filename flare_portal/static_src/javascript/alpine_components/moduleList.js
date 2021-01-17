@@ -9,6 +9,7 @@ import { Sortable } from '@shopify/draggable';
  */
 const moduleList = () => {
     return {
+        showMessage: false,
         message: '',
         messageType: 'success',
         messageTimeout: null,
@@ -42,6 +43,7 @@ const moduleList = () => {
                 // Display Saving... message
                 this.message = 'Saving...';
                 this.messageType = 'saving';
+                this.showMessage = true;
 
                 const resp = await fetch(url, {
                     method: 'POST',
@@ -65,7 +67,7 @@ const moduleList = () => {
 
                 // Hide success message after 5 seconds
                 this.messageTimeout = setTimeout(() => {
-                    this.message = '';
+                    this.showMessage = false;
                 }, 5000);
             });
         },
