@@ -22,7 +22,7 @@ from .forms import (
     ParticipantBatchForm,
     ParticipantFormSet,
 )
-from .models import BreakStartModule, Experiment, Project
+from .models import BreakEndModule, Experiment, Project
 
 
 class ProjectListView(ListView):
@@ -310,10 +310,10 @@ class ModuleSortView(APIView):
 
         # Check break end modules dont come before their corresponding break
         # start modules
-        for start_module in filter(
-            lambda m: isinstance(m, BreakStartModule), sorted_modules
+        for end_module in filter(
+            lambda m: isinstance(m, BreakEndModule), sorted_modules
         ):
-            end_module = all_modules[start_module.end_module_id]
+            start_module = all_modules[end_module.start_module_id]
             if end_module.sortorder <= start_module.sortorder:
                 return Response(
                     {
@@ -325,10 +325,10 @@ class ModuleSortView(APIView):
 
         # Check breaks dont overlap
         break_ranges = []
-        for start_module in filter(
-            lambda m: isinstance(m, BreakStartModule), sorted_modules
+        for end_module in filter(
+            lambda m: isinstance(m, BreakEndModule), sorted_modules
         ):
-            end_module = all_modules[start_module.end_module_id]
+            start_module = all_modules[end_module.start_module_id]
             break_ranges.append(
                 set(range(start_module.sortorder, end_module.sortorder))
             )

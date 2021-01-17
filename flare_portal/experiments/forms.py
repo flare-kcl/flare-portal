@@ -93,12 +93,15 @@ class BreakStartModuleForm(forms.ModelForm):
         module = super().save(commit=False)
 
         if commit:
-            module.end_module = BreakEndModule.objects.create(
-                experiment=module.experiment, sortorder=1
-            )
             module.save()
+            BreakEndModule.objects.create(
+                start_module=module,
+                experiment=module.experiment,
+                sortorder=1,
+            )
         else:
             module.end_module = BreakEndModule(
+                start_module=module,
                 experiment=module.experiment,
                 sortorder=1,
             )

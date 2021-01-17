@@ -1,6 +1,9 @@
+from typing import Any, Dict
+
 from django.utils import timezone
 
 import factory
+from factory import post_generation
 
 from flare_portal.users.factories import UserFactory
 
@@ -114,11 +117,6 @@ class AffectiveRatingModuleFactory(factory.django.DjangoModelFactory):
         model = AffectiveRatingModule
 
 
-class BreakEndModuleFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = BreakEndModule
-
-
 class BreakStartModuleFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = BreakStartModule
@@ -126,4 +124,36 @@ class BreakStartModuleFactory(factory.django.DjangoModelFactory):
     duration = factory.Faker("random_int", min=60, max=600)
     start_title = factory.Faker("sentence")
     end_title = factory.Faker("sentence")
-    end_module = factory.SubFactory(BreakEndModuleFactory)
+
+    @post_generation
+    def end_module(
+        obj: BreakStartModule,
+        create: bool,
+        extracted: BreakEndModule,
+        **kwargs: Dict[str, Any],
+    ) -> None:
+        if extracted:
+            if create:
+                extracted.save()
+
+            return
+
+        if create:
+            BreakEndModuleFactory.create(
+                start_module=obj,
+                experiment=obj.experiment,
+                **kwargs,
+            )
+        else:
+            obj.end_module = BreakEndModuleFactory.build(
+                start_module=obj,
+                experiment=obj.experiment,
+                **kwargs,
+            )
+
+
+class BreakEndModuleFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = BreakEndModule
+
+    start_module = factory.SubFactory(BreakStartModuleFactory)

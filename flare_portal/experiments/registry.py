@@ -239,29 +239,13 @@ class BreakModuleCreateView(ModuleCreateView):
     form_class = BreakStartModuleForm
 
 
-class BreakModuleUpdateView(ModuleUpdateView):
-    model = BreakStartModule
-    fields = [
-        "label",
-        "duration",
-        "start_title",
-        "start_body",
-        "end_title",
-        "end_body",
-    ]
-
-
 module_registry = ModuleRegistry()
 
 module_registry.register(AffectiveRatingModule)
 module_registry.register(BasicInfoModule)
 # Note: Don't register BreakEndModule as it is automatically created/deleted
 # when the start module is created/deleted
-module_registry.register(
-    BreakStartModule,
-    create_view_class=BreakModuleCreateView,
-    update_view_class=BreakModuleUpdateView,
-)
+module_registry.register(BreakStartModule, create_view_class=BreakModuleCreateView)
 module_registry.register(CriterionModule)
 module_registry.register(FearConditioningModule)
 module_registry.register(InstructionsModule)

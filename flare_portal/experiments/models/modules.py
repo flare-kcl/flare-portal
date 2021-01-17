@@ -467,11 +467,6 @@ class BreakStartModule(Module):
         blank=True,
         help_text="Displays on the end break screen.",
     )
-    end_module = models.OneToOneField(
-        "experiments.BreakEndModule",
-        on_delete=models.CASCADE,
-        related_name="start_module",
-    )
 
     @classmethod
     def get_module_name(cls) -> str:
@@ -506,6 +501,14 @@ class BreakStartModule(Module):
 
 
 class BreakEndModule(BaseModule):
+    # Define one-to-one relationship from here so that when the start module is
+    # deleted, the end module is also deleted
+    start_module = models.OneToOneField(
+        "experiments.BreakStartModule",
+        on_delete=models.CASCADE,
+        related_name="end_module",
+    )
+
     def get_module_title(self) -> str:
         if self.start_module.label:
             return f"Break end - {self.start_module.label}"

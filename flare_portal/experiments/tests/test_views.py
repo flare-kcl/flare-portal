@@ -1373,7 +1373,6 @@ class ModuleSortViewTest(APITestCase):
         break_mod = BreakStartModuleFactory(
             sortorder=0,
             experiment=experiment,
-            end_module__experiment=experiment,
             end_module__sortorder=1,
         )
 
@@ -1384,7 +1383,7 @@ class ModuleSortViewTest(APITestCase):
 
         # Put break end after break start
         json_data = {
-            break_mod.end_module_id: 0,
+            break_mod.end_module.pk: 0,
             break_mod.pk: 1,
             modules[0].pk: 2,
             modules[1].pk: 3,
@@ -1416,19 +1415,16 @@ class ModuleSortViewTest(APITestCase):
         break_mod_1 = BreakStartModuleFactory(
             sortorder=0,
             experiment=experiment,
-            end_module__experiment=experiment,
             end_module__sortorder=1,
         )
         break_mod_2 = BreakStartModuleFactory(
             sortorder=2,
             experiment=experiment,
-            end_module__experiment=experiment,
             end_module__sortorder=3,
         )
         break_mod_3 = BreakStartModuleFactory(
             sortorder=3,
             experiment=experiment,
-            end_module__experiment=experiment,
             end_module__sortorder=3,
         )
 
@@ -1441,10 +1437,10 @@ class ModuleSortViewTest(APITestCase):
         json_data = {
             break_mod_3.pk: 0,
             break_mod_1.pk: 1,
-            break_mod_3.end_module_id: 2,
-            break_mod_1.end_module_id: 3,
+            break_mod_3.end_module.pk: 2,
+            break_mod_1.end_module.pk: 3,
             break_mod_2.pk: 4,
-            break_mod_2.end_module_id: 5,
+            break_mod_2.end_module.pk: 5,
             modules[0].pk: 6,
             modules[1].pk: 7,
             modules[2].pk: 8,
