@@ -39,6 +39,10 @@ const moduleList = () => {
                     return acc;
                 }, {});
 
+                // Display Saving... message
+                this.message = 'Saving...';
+                this.messageType = 'saving';
+
                 const resp = await fetch(url, {
                     method: 'POST',
                     headers: {

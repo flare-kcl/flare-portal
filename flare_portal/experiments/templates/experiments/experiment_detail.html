@@ -61,8 +61,11 @@
 
                     <div class="card-footer d-flex">
                         <div class="d-flex align-items-center">
-                            <span :class="{'text-success': messageType === 'success', 'text-danger': messageType === 'error'}" x-show.transition.out.opacity.duration.1000ms="message">
-                                <i class="fe fe-check mr-2"></i> <span x-text="message"></span>
+                            <span :class="{'text-success': messageType === 'success', 'text-danger': messageType === 'error', 'text-blue': messageType === 'saving'}" x-show.transition.out.opacity.duration.1000ms="message">
+                                <i class="fe fe-check mr-2" x-show="messageType === 'success'"></i>
+                                <i class="fe fe-alert-octagon mr-2" x-show="messageType === 'error'"></i>
+                                <i class="fe fe-refresh-cw mr-2" x-show="messageType === 'saving'"></i>
+                                <span x-text="message"></span>
                             </span>
                         </div>
                         <div class="ml-auto">
