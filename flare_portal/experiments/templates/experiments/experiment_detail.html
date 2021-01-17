@@ -42,8 +42,11 @@
                                                 <strong>{{ module.get_module_title|capfirst }}</strong>
                                                 <div class="small text-muted">{{ module.get_module_description }}</div>
                                             </td>
+                                            {% get_module_update_url module as update_url %}
                                             <td>
-                                                <a href="{% get_module_update_url module %}"><i class="fe fe-edit"></i></a>
+                                                {% if update_url %}
+                                                    <a href="{{ update_url }}"><i class="fe fe-edit"></i></a>
+                                                {% endif %}
                                             </td>
                                         </tr>
                                     {% endfor %}

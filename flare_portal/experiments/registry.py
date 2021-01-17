@@ -96,6 +96,7 @@ class ModuleCreateView(ModuleViewMixin, CreateWithInlinesView):
 
 class ModuleUpdateView(ModuleViewMixin, UpdateWithInlinesView):
     template_name = "experiments/module_form.html"
+    pk_url_kwarg = "module_pk"
 
     def forms_valid(
         self, form: forms.BaseModelForm, inlines: List[InlineFormSetFactory]
@@ -139,6 +140,7 @@ class ModuleRegistry:
         self,
         module_class: Type[Module],
         create_view_class: Type[ModuleCreateView] = None,
+        update_view_class: Type[ModuleUpdateView] = None,
     ) -> None:
         """
         Dynamically creates views for a module
@@ -188,23 +190,24 @@ class ModuleRegistry:
         )
 
         # Update view
-        update_view_class: UpdateView = type(  # type: ignore
-            f"{module_camel_case}UpdateView",
-            (ModuleUpdateView,),
-            {
-                "model": module_class,
-                "fields": [
-                    f.name
-                    for f in module_class._meta.fields
-                    if f.name not in ["sortorder", "experiment"]
-                ],
-                "pk_url_kwarg": "module_pk",
-                "inlines": module_class.inlines,
-            },
-        )
         update_view_name = module_class.get_update_path_name()
+        if update_view_class is not None:
+            self.views[update_view_name] = update_view_class.as_view()
+        else:
+            self.views[update_view_name]: UpdateView = type(  # type: ignore
+                f"{module_camel_case}UpdateView",
+                (ModuleUpdateView,),
+                {
+                    "model": module_class,
+                    "fields": [
+                        f.name
+                        for f in module_class._meta.fields
+                        if f.name not in ["sortorder", "experiment"]
+                    ],
+                    "inlines": module_class.inlines,
+                },
+            ).as_view()
 
-        self.views[update_view_name] = update_view_class.as_view()
         self.urls.append(
             path(
                 module_class.get_update_path(),
@@ -232,8 +235,20 @@ class ModuleRegistry:
 
 
 class BreakModuleCreateView(ModuleCreateView):
-    module = BreakStartModule
+    model = BreakStartModule
     form_class = BreakStartModuleForm
+
+
+class BreakModuleUpdateView(ModuleUpdateView):
+    model = BreakStartModule
+    fields = [
+        "label",
+        "duration",
+        "start_title",
+        "start_body",
+        "end_title",
+        "end_body",
+    ]
 
 
 module_registry = ModuleRegistry()
@@ -242,7 +257,11 @@ module_registry.register(AffectiveRatingModule)
 module_registry.register(BasicInfoModule)
 # Note: Don't register BreakEndModule as it is automatically created/deleted
 # when the start module is created/deleted
-module_registry.register(BreakStartModule, create_view_class=BreakModuleCreateView)
+module_registry.register(
+    BreakStartModule,
+    create_view_class=BreakModuleCreateView,
+    update_view_class=BreakModuleUpdateView,
+)
 module_registry.register(CriterionModule)
 module_registry.register(FearConditioningModule)
 module_registry.register(InstructionsModule)

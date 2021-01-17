@@ -278,11 +278,15 @@ class ModuleSortView(APIView):
         experiment = get_object_or_404(
             Experiment.objects.prefetch_related("modules"), pk=experiment_pk
         )
-        all_modules = {mod.pk: mod for mod in experiment.modules.select_subclasses()}
+        all_modules = {
+            mod.pk: mod
+            for mod in experiment.modules.select_subclasses()  # type: ignore
+        }
 
         # Dict[module_pk, sortorder]
         module_mapping = request.data
 
+        # Parse and build the list of sorted modules based on the request
         sorted_modules = []
 
         try:
