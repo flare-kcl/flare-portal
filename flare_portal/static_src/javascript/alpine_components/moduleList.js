@@ -1,5 +1,7 @@
 import Cookies from 'js-cookie';
 
+import debounce from 'lodash/debounce';
+
 import { Sortable } from '@shopify/draggable';
 
 /**
@@ -20,7 +22,7 @@ const moduleList = () => {
                 handle: 'i.fe-menu',
             });
 
-            sortable.on('sortable:stop', async () => {
+            const saveSorting = async () => {
                 // Get the module order based on the DOM order
                 const moduleOrder = Array.from($el.children)
                     .filter(
@@ -69,7 +71,9 @@ const moduleList = () => {
                 this.messageTimeout = setTimeout(() => {
                     this.showMessage = false;
                 }, 5000);
-            });
+            };
+
+            sortable.on('sortable:stop', debounce(saveSorting, 1000));
         },
     };
 };
