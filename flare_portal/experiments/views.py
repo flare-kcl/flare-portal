@@ -1,3 +1,4 @@
+from itertools import combinations
 from typing import Any
 
 from django import forms
@@ -21,7 +22,7 @@ from .forms import (
     ParticipantBatchForm,
     ParticipantFormSet,
 )
-from .models import Experiment, Project
+from .models import BreakStartModule, Experiment, Project
 
 
 class ProjectListView(ListView):
@@ -277,22 +278,79 @@ class ModuleSortView(APIView):
         experiment = get_object_or_404(
             Experiment.objects.prefetch_related("modules"), pk=experiment_pk
         )
-        all_modules = {mod.pk: mod for mod in experiment.modules.all()}
+        all_modules = {mod.pk: mod for mod in experiment.modules.select_subclasses()}
 
+        # Dict[module_pk, sortorder]
         module_mapping = request.data
 
-        for module_pk, sortorder in module_mapping.items():
-            try:
-                all_modules[int(module_pk)].sortorder = sortorder
-                all_modules[int(module_pk)].save()
-            except ValueError:
-                raise ParseError()
-            except KeyError:
-                raise ValidationError(
-                    f"Module with id {module_pk} not found in experiment with "
-                    f"id {experiment_pk}."
+        sorted_modules = []
+
+        try:
+            for module_pk, _ in sorted(
+                module_mapping.items(), key=lambda item: item[1]
+            ):
+                sorted_modules.append(all_modules[int(module_pk)])
+        except ValueError:
+            raise ParseError()
+        except KeyError:
+            raise ValidationError(
+                f"Module with id {module_pk} not found in experiment with "
+                f"id {experiment_pk}."
+            )
+
+        # Set ordering
+        for index, module in enumerate(sorted_modules):
+            module.sortorder = index
+
+        # Validate ordering
+
+        # Check break end modules dont come before their corresponding break
+        # start modules
+        for start_module in filter(
+            lambda m: isinstance(m, BreakStartModule), sorted_modules
+        ):
+            end_module = all_modules[start_module.end_module_id]
+            if end_module.sortorder <= start_module.sortorder:
+                return Response(
+                    {
+                        "message": "Invalid configuration. Breaks must not end "
+                        "before they start."
+                    },
+                    status=400,
                 )
-        return Response(module_mapping)
+
+        # Check breaks dont overlap
+        break_ranges = []
+        for start_module in filter(
+            lambda m: isinstance(m, BreakStartModule), sorted_modules
+        ):
+            end_module = all_modules[start_module.end_module_id]
+            break_ranges.append(
+                set(range(start_module.sortorder, end_module.sortorder))
+            )
+
+        if len(break_ranges) > 1:
+            # Need more than one break for this to ever be true
+            for set_a, set_b in combinations(break_ranges, 2):
+                # Check if any two breaks overlap
+                # This is checking if any two breaks intersect
+                # A: {1, 2, 3}
+                # B: {2, 3, 4}
+                # C: {5}
+                # This code will check A&B, A&C, then B&C
+                # NB. This is NOT the same as checking for the intersection of
+                # all breaks combined. e.g. `set.intersection(*break_ranges)`
+                if set_a.intersection(set_b):
+                    return Response(
+                        {"message": "Invalid configuration. Breaks must not overlap."},
+                        status=400,
+                    )
+
+        # Save ordering
+        for module in sorted_modules:
+            module.save()
+
+        return Response({"message": "Saved ordering."})
 
 
 module_sort_view = ModuleSortView.as_view()

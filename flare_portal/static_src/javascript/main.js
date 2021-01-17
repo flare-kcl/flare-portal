@@ -19,8 +19,9 @@ window.require(['jquery', 'selectize'], ($, selectize) => {
  */
 window.moduleList = () => {
     return {
-        successTimeout: null,
-        showSuccessMessage: false,
+        message: '',
+        messageType: 'success',
+        messageTimeout: null,
         draggable() {
             const $el = this.$refs.modules;
             const sortable = new Sortable($el, {
@@ -43,30 +44,34 @@ window.moduleList = () => {
                 // Update the module sort order on the server
                 const url = `${document.location.href}sort-modules/`;
 
-                const data = moduleOrder.reduce((acc, moduleId, index) => {
+                const postData = moduleOrder.reduce((acc, moduleId, index) => {
                     acc[moduleId] = index;
                     return acc;
                 }, {});
 
-                await fetch(url, {
+                const resp = await fetch(url, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'X-CSRFToken': Cookies.get('csrftoken'),
                     },
-                    body: JSON.stringify(data),
+                    body: JSON.stringify(postData),
                 });
 
-                // Display success message
-                this.showSuccessMessage = true;
+                const respData = await resp.json();
+
+                // Display message
+                this.message = respData.message;
+                this.messageType = resp.status === 200 ? 'success' : 'error';
 
                 // Clear out previous timeout if it exists
-                if (this.successTimeout) {
-                    clearTimeout(this.successTimeout);
+                if (this.messageTimeout) {
+                    clearTimeout(this.messageTimeout);
                 }
 
-                this.successTimeout = setTimeout(() => {
-                    this.showSuccessMessage = false;
+                // Hide success message after 5 seconds
+                this.messageTimeout = setTimeout(() => {
+                    this.message = '';
                 }, 5000);
             });
         },

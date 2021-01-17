@@ -6,6 +6,8 @@ from flare_portal.users.factories import UserFactory
 
 from .models import (
     AffectiveRatingModule,
+    BreakEndModule,
+    BreakStartModule,
     CriterionModule,
     CriterionQuestion,
     Experiment,
@@ -102,7 +104,7 @@ class WebModuleFactory(factory.django.DjangoModelFactory):
         model = WebModule
 
     url = "http://google.com"
-    intro_text = factory.Faker("heading")
+    intro_text = factory.Faker("sentence")
     help_text = factory.Faker("paragraph")
     append_participant_id = True
 
@@ -110,3 +112,18 @@ class WebModuleFactory(factory.django.DjangoModelFactory):
 class AffectiveRatingModuleFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = AffectiveRatingModule
+
+
+class BreakEndModuleFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = BreakEndModule
+
+
+class BreakStartModuleFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = BreakStartModule
+
+    duration = factory.Faker("random_int", min=60, max=600)
+    start_title = factory.Faker("sentence")
+    end_title = factory.Faker("sentence")
+    end_module = factory.SubFactory(BreakEndModuleFactory)

@@ -10,6 +10,7 @@ from flare_portal.users.factories import UserFactory
 from flare_portal.users.models import User
 
 from ..factories import (
+    BreakStartModuleFactory,
     ExperimentFactory,
     FearConditioningDataFactory,
     FearConditioningModuleFactory,
@@ -1353,6 +1354,8 @@ class ModuleSortViewTest(APITestCase):
 
         self.assertEqual(200, resp.status_code)
 
+        self.assertEqual(resp.json()["message"], "Saved ordering.")
+
         sorted_modules = experiment.modules.order_by("sortorder")
 
         self.assertEqual(sorted_modules[0].pk, modules[4].pk)
@@ -1360,3 +1363,105 @@ class ModuleSortViewTest(APITestCase):
         self.assertEqual(sorted_modules[2].pk, modules[2].pk)
         self.assertEqual(sorted_modules[3].pk, modules[1].pk)
         self.assertEqual(sorted_modules[4].pk, modules[0].pk)
+
+    def test_sorting_validation_break_end_validation(self) -> None:
+        # Break end cannot be before break start
+        project: Project = ProjectFactory()
+        experiment: Experiment = ExperimentFactory(project=project)
+        modules = FearConditioningModuleFactory.create_batch(5, experiment=experiment)
+
+        break_mod = BreakStartModuleFactory(
+            sortorder=0,
+            experiment=experiment,
+            end_module__experiment=experiment,
+            end_module__sortorder=1,
+        )
+
+        # Fix sort order of test objects
+        for index, mod in enumerate(modules):
+            mod.sortorder = index + 2
+            mod.save()
+
+        # Put break end after break start
+        json_data = {
+            break_mod.end_module_id: 0,
+            break_mod.pk: 1,
+            modules[0].pk: 2,
+            modules[1].pk: 3,
+            modules[2].pk: 4,
+            modules[3].pk: 5,
+            modules[4].pk: 6,
+        }
+
+        url = reverse(
+            "experiments:module_sort",
+            kwargs={"project_pk": project.pk, "experiment_pk": experiment.pk},
+        )
+
+        resp = self.client.post(url, json_data, format="json")
+
+        self.assertEqual(400, resp.status_code)
+
+        self.assertEqual(
+            resp.json()["message"],
+            "Invalid configuration. Breaks must not end before they start.",
+        )
+
+    def test_sorting_validation_break_overlap_validation(self) -> None:
+        # Breaks cannot overlap
+        project: Project = ProjectFactory()
+        experiment: Experiment = ExperimentFactory(project=project)
+        modules = FearConditioningModuleFactory.create_batch(5, experiment=experiment)
+
+        break_mod_1 = BreakStartModuleFactory(
+            sortorder=0,
+            experiment=experiment,
+            end_module__experiment=experiment,
+            end_module__sortorder=1,
+        )
+        break_mod_2 = BreakStartModuleFactory(
+            sortorder=2,
+            experiment=experiment,
+            end_module__experiment=experiment,
+            end_module__sortorder=3,
+        )
+        break_mod_3 = BreakStartModuleFactory(
+            sortorder=3,
+            experiment=experiment,
+            end_module__experiment=experiment,
+            end_module__sortorder=3,
+        )
+
+        # Fix sort order of test objects
+        for index, mod in enumerate(modules):
+            mod.sortorder = index + 5
+            mod.save()
+
+        # Overlap the three breaks
+        json_data = {
+            break_mod_3.pk: 0,
+            break_mod_1.pk: 1,
+            break_mod_3.end_module_id: 2,
+            break_mod_1.end_module_id: 3,
+            break_mod_2.pk: 4,
+            break_mod_2.end_module_id: 5,
+            modules[0].pk: 6,
+            modules[1].pk: 7,
+            modules[2].pk: 8,
+            modules[3].pk: 9,
+            modules[4].pk: 10,
+        }
+
+        url = reverse(
+            "experiments:module_sort",
+            kwargs={"project_pk": project.pk, "experiment_pk": experiment.pk},
+        )
+
+        resp = self.client.post(url, json_data, format="json")
+
+        self.assertEqual(400, resp.status_code)
+
+        self.assertEqual(
+            resp.json()["message"],
+            "Invalid configuration. Breaks must not overlap.",
+        )
