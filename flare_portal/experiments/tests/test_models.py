@@ -15,11 +15,11 @@ from ..factories import (
     ProjectFactory,
 )
 from ..models import (
-    BaseModule,
     CriterionData,
     Experiment,
     FearConditioningData,
     FearConditioningModule,
+    Module,
     Participant,
 )
 
@@ -81,6 +81,21 @@ class ParticipantTest(TestCase):
         participant: Participant = ParticipantFactory(participant_id="Flare.ABCDEF")
 
         self.assertEqual(participant.participant_id, "Flare.ABCDEF")
+
+
+class ModuleTest(TestCase):
+    def test_required_methods(self) -> None:
+        # Check all BaseModule subclasses have the required methods
+        for subclass in Module.__subclasses__():
+            with self.subTest(subclass.__name__):
+                get_module_config = getattr(subclass, "get_module_config", None)
+
+                # Check that subclass has its own implementation
+                self.assertNotEqual(
+                    Module.get_module_config,
+                    get_module_config,
+                    "Missing `get_module_config` implementation",
+                )
 
 
 class FearConditioningModuleTest(TestCase):
@@ -203,21 +218,6 @@ class FearConditioningDataTest(TestCase):
                 ("rating", data.rating),
             ],
         )
-
-
-class ModuleTest(TestCase):
-    def test_required_methods(self) -> None:
-        # Check all BaseModule subclasses have the required methods
-        for subclass in BaseModule.__subclasses__():
-            with self.subTest(subclass.__name__):
-                get_module_config = getattr(subclass, "get_module_config", None)
-
-                # Check that subclass has its own implementation
-                self.assertNotEqual(
-                    BaseModule.get_module_config,
-                    get_module_config,
-                    "Missing `get_module_config` implementation",
-                )
 
 
 class CriterionDataTest(TestCase):

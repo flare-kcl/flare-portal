@@ -6,14 +6,14 @@ from django.urls import reverse
 
 from flare_portal.api.registry import data_api_registry
 
-from ..models import BaseData, BaseModule, Experiment
+from ..models import BaseData, Experiment, Module
 from ..registry import module_registry
 
 register = template.Library()
 
 
 @register.simple_tag
-def get_module_types() -> List[Type[BaseModule]]:
+def get_module_types() -> List[Type[Module]]:
     return module_registry.modules
 
 
@@ -23,9 +23,7 @@ def get_module_data_types() -> List[Type[BaseData]]:
 
 
 @register.simple_tag
-def get_module_create_url(
-    module_class: Type[BaseModule], experiment: Experiment
-) -> str:
+def get_module_create_url(module_class: Type[Module], experiment: Experiment) -> str:
     create_path_name = module_class.get_create_path_name()
     return reverse(
         f"experiments:modules:{create_path_name}",
@@ -34,20 +32,23 @@ def get_module_create_url(
 
 
 @register.simple_tag
-def get_module_update_url(module: BaseModule) -> str:
-    update_path_name = module.get_update_path_name()
-    return reverse(
-        f"experiments:modules:{update_path_name}",
-        kwargs={
-            "project_pk": module.experiment.project_id,
-            "experiment_pk": module.experiment.pk,
-            "module_pk": module.pk,
-        },
-    )
+def get_module_update_url(module: Module) -> str:
+    if isinstance(module, Module):
+        update_path_name = module.get_update_path_name()
+        return reverse(
+            f"experiments:modules:{update_path_name}",
+            kwargs={
+                "project_pk": module.experiment.project_id,
+                "experiment_pk": module.experiment.pk,
+                "module_pk": module.pk,
+            },
+        )
+
+    return ""
 
 
 @register.simple_tag
-def get_module_delete_url(module: BaseModule) -> str:
+def get_module_delete_url(module: Module) -> str:
     delete_path_name = module.get_delete_path_name()
     return reverse(
         f"experiments:modules:{delete_path_name}",
