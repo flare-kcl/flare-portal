@@ -18,6 +18,7 @@ from .modules import (
     FearConditioningModule,
     InstructionsModule,
     Module,
+    TaskInstructionsModule,
     TextModule,
     WebModule,
 )
@@ -41,6 +42,7 @@ __all__ = [
     "Module",
     "Participant",
     "Project",
+    "TaskInstructionsModule",
     "TextModule",
     "VolumeCalibrationData",
     "WebModule",

@@ -528,3 +528,70 @@ class BreakEndModule(BaseModule):
 
     def __str__(self) -> str:
         return "Break end - " + super().__str__()
+
+
+class TaskInstructionsModule(Module):
+    intro_heading = models.CharField(
+        max_length=255,
+        default="Practice time",
+        help_text="Title on the task instructions intro screen",
+    )
+    intro_body = models.TextField(
+        blank=True,
+        default="Before you begin the experiment, we need to to practice using "
+        "the rating interface.",
+        help_text="Text on the task instructions intro screen",
+    )
+    rating_explanation_heading = models.CharField(
+        max_length=255,
+        default="A few seconds after each circle appears, this scale will appear "
+        "at the bottom of the screen.",
+        help_text="Title on the rating scale explanation screen",
+    )
+    rating_explanation_body = models.TextField(
+        blank=True,
+        default="Each time the scale appears, press the corresponding number on "
+        "the screen to rate how much you expect to hear a scream.",
+        help_text="Text on the rating scale explanation screen",
+    )
+    rating_practice_heading = models.TextField(
+        default="Press any number to practice making a rating with the scaling below.",
+        help_text="Text on the rating scale practice screen",
+    )
+    interval_explanation_body = models.TextField(
+        default="Before each circle is presented, you will see a white screen "
+        "with a cross in the middle like the one shown above. It is important "
+        "that you keep looking at the cross and wait for the next circle to appear.",
+        help_text="Text on the ITI explanation screen",
+    )
+    outro_heading = models.CharField(
+        max_length=255,
+        default="Instructions complete",
+        help_text="Title on the task instructions outro screen",
+    )
+    outro_body = models.TextField(
+        blank=True,
+        default="The experiment will now begin.\n\n You may occasionaly hear a "
+        "scream.\n\n Remember to rate how much you expect to hear a scream by "
+        "pressing a number every time the scale appears.",
+        help_text="Text on the task instructions outro screen",
+    )
+
+    def get_module_config(self) -> constants.ModuleConfigType:
+        return constants.ModuleConfigType(
+            id=self.pk,
+            type=self.get_module_tag(),
+            config={
+                "intro_heading": self.intro_heading,
+                "intro_body": self.intro_body,
+                "rating_explanation_heading": self.rating_explanation_heading,
+                "rating_explanation_body": self.rating_explanation_body,
+                "rating_practice_heading": self.rating_practice_heading,
+                "interval_explanation_body": self.interval_explanation_body,
+                "outro_heading": self.outro_heading,
+                "outro_body": self.outro_body,
+            },
+        )
+
+    def __str__(self) -> str:
+        return "Task instructions - " + super().__str__()
