@@ -31,6 +31,7 @@ from .models import (
     InstructionsModule,
     Module,
     Participant,
+    TaskInstructionsModule,
     TextModule,
     VolumeCalibrationData,
     WebModule,
@@ -249,6 +250,7 @@ module_registry.register(BreakStartModule, create_view_class=BreakModuleCreateVi
 module_registry.register(CriterionModule)
 module_registry.register(FearConditioningModule)
 module_registry.register(InstructionsModule)
+module_registry.register(TaskInstructionsModule)
 module_registry.register(TextModule)
 module_registry.register(WebModule)
 
