@@ -530,7 +530,7 @@ class BreakEndModule(BaseModule):
         return "Break end - " + super().__str__()
 
 
-class TaskInstructionsModule(BaseModule):
+class TaskInstructionsModule(Module):
     intro_heading = models.CharField(
         max_length=255,
         default="Practice time",

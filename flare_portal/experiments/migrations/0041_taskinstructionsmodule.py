@@ -7,7 +7,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('experiments', '0039_af_include_gs'),
+        ('experiments', '0040_break_modules'),
     ]
 
     operations = [
