@@ -15,18 +15,8 @@ from .. import constants
 from .core import Nameable
 
 
-class BaseModule(Nameable, models.Model):
-    experiment = models.ForeignKey(
-        "experiments.Experiment", on_delete=models.CASCADE, related_name="modules"
-    )
-    sortorder = models.PositiveIntegerField(default=0)
-
-    objects = InheritanceManager()
-
-    inlines: List[InlineFormSetFactory] = []
-
-    class Meta:
-        ordering = ["sortorder", "id"]
+class Manageable(Nameable):
+    """URL methods for modules that are managed through the admin"""
 
     @classmethod
     def get_module_camel_case(cls) -> str:
@@ -71,7 +61,30 @@ class BaseModule(Nameable, models.Model):
             f"{module_slug}/<int:module_pk>/delete/"
         )
 
+
+class BaseModule(models.Model):
+    experiment = models.ForeignKey(
+        "experiments.Experiment", on_delete=models.CASCADE, related_name="modules"
+    )
+    sortorder = models.PositiveIntegerField(default=0)
+
+    objects = InheritanceManager()
+
+    inlines: List[InlineFormSetFactory] = []
+
+    class Meta:
+        ordering = ["sortorder", "id"]
+
+    def __str__(self) -> str:
+        return f"PK: {self.pk} - Sort order: {self.sortorder}"
+
+
+class Module(Manageable, BaseModule):
+    class Meta:
+        abstract = True
+
     def get_module_config(self) -> constants.ModuleConfigType:
+        """Configuration returned by the config API for this module"""
         raise NotImplementedError()
 
     def get_module_title(self) -> str:
@@ -82,11 +95,8 @@ class BaseModule(Nameable, models.Model):
         """Short description of module configuration"""
         return ""
 
-    def __str__(self) -> str:
-        return f"PK: {self.pk} - Sort order: {self.sortorder}"
 
-
-class FearConditioningModule(BaseModule):
+class FearConditioningModule(Module):
     PHASES = Choices(
         ("habituation", "Habituation"),
         ("acquisition", "Acquisition"),
@@ -156,7 +166,7 @@ class FearConditioningModule(BaseModule):
         return "Fear conditioning - " + super().__str__()
 
 
-class BasicInfoModule(BaseModule):
+class BasicInfoModule(Module):
     collect_date_of_birth = models.BooleanField(default=False)
     collect_gender = models.BooleanField(default=False)
     collect_headphone_make = models.BooleanField(default=False)
@@ -228,7 +238,7 @@ class CriterionQuestionInline(InlineFormSetFactory):
     factory_kwargs = {"widgets": {"sortorder": forms.HiddenInput}, "extra": 0}
 
 
-class CriterionModule(BaseModule):
+class CriterionModule(Module):
     intro_text = models.TextField(blank=True)
 
     inlines = [CriterionQuestionInline]
@@ -260,7 +270,7 @@ class CriterionModule(BaseModule):
         return "Criterion - " + super().__str__()
 
 
-class WebModule(BaseModule):
+class WebModule(Module):
     heading = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     url = models.URLField(verbose_name="URL")
@@ -324,7 +334,7 @@ class InstructionsScreenInline(InlineFormSetFactory):
     factory_kwargs = {"extra": 0}
 
 
-class InstructionsModule(BaseModule):
+class InstructionsModule(Module):
     include_volume_calibration = models.BooleanField(default=False)
     end_screen_title = models.CharField(max_length=255, blank=True)
     end_screen_body = models.TextField(
@@ -364,7 +374,7 @@ class InstructionsModule(BaseModule):
         return "Instructions - " + super().__str__()
 
 
-class AffectiveRatingModule(BaseModule):
+class AffectiveRatingModule(Module):
     question = models.CharField(
         max_length=255, default="Have you seen this image before?"
     )
@@ -379,18 +389,6 @@ class AffectiveRatingModule(BaseModule):
     rating_scale_anchor_label_right = models.CharField(
         max_length=255, default="Definitely have seen before"
     )
-
-    def __str__(self) -> str:
-        if self.generalisation_stimuli_enabled:
-            return "Affective Rating (CS/GS)"
-
-        return "Affective Rating (CS)"
-
-    def get_module_title(self) -> str:
-        return self.__str__()
-
-    def get_module_description(self) -> str:
-        return self.question
 
     def get_module_config(self) -> constants.ModuleConfigType:
         return constants.ModuleConfigType(
@@ -408,8 +406,20 @@ class AffectiveRatingModule(BaseModule):
             },
         )
 
+    def get_module_title(self) -> str:
+        return self.__str__()
 
-class TextModule(BaseModule):
+    def get_module_description(self) -> str:
+        return self.question
+
+    def __str__(self) -> str:
+        if self.generalisation_stimuli_enabled:
+            return "Affective Rating (CS/GS)"
+
+        return "Affective Rating (CS)"
+
+
+class TextModule(Module):
     heading = models.CharField(max_length=255)
     body = models.TextField(blank=True)
 
@@ -420,8 +430,101 @@ class TextModule(BaseModule):
             config={"heading": self.heading, "body": self.body},
         )
 
+    def get_module_title(self) -> str:
+        return self.__str__()
+
     def __str__(self) -> str:
         return f"Text - {self.heading}"
 
+
+class BreakStartModule(Module):
+    # Note: In a future ticket, all modules with have labels so this field
+    # needs to be deleted
+    label = models.CharField(
+        max_length=255,
+        help_text=(
+            "Helps with identifying modules. The label isn't displayed "
+            "to the participant."
+        ),
+        blank=True,
+    )
+
+    duration = models.PositiveIntegerField(
+        help_text="How long the break should last in seconds. (e.g. 300 is 5 minutes)",
+    )
+    start_title = models.CharField(
+        max_length=255,
+        help_text="Displays on the start break screen.",
+    )
+    start_body = models.TextField(
+        blank=True,
+        help_text="Displays on the start break screen.",
+    )
+    end_title = models.CharField(
+        max_length=255,
+        help_text="Displays on the end break screen.",
+    )
+    end_body = models.TextField(
+        blank=True,
+        help_text="Displays on the end break screen.",
+    )
+
+    @classmethod
+    def get_module_name(cls) -> str:
+        return "break"
+
+    @classmethod
+    def get_module_tag(cls) -> str:
+        return "BREAK_START"
+
     def get_module_title(self) -> str:
-        return self.__str__()
+        if self.label:
+            return f"Break start - {self.label}"
+
+        return "Break start"
+
+    def get_module_config(self) -> constants.ModuleConfigType:
+        return constants.ModuleConfigType(
+            id=self.pk,
+            type=self.get_module_tag(),
+            config={
+                "duration": self.duration,
+                "start_title": self.start_title,
+                "start_body": self.start_body,
+            },
+        )
+
+    def get_module_description(self) -> str:
+        return f"Duration: {self.duration} second{pluralize(self.duration)}"
+
+    def __str__(self) -> str:
+        return "Break start - " + super().__str__()
+
+
+class BreakEndModule(BaseModule):
+    # Define one-to-one relationship from here so that when the start module is
+    # deleted, the end module is also deleted
+    start_module = models.OneToOneField(
+        "experiments.BreakStartModule",
+        on_delete=models.CASCADE,
+        related_name="end_module",
+    )
+
+    def get_module_title(self) -> str:
+        if self.start_module.label:
+            return f"Break end - {self.start_module.label}"
+
+        return "Break end"
+
+    def get_module_config(self) -> constants.ModuleConfigType:
+        return constants.ModuleConfigType(
+            id=self.pk,
+            type="BREAK_END",
+            config={
+                "end_title": self.start_module.end_title,
+                "end_body": self.start_module.end_body,
+            },
+        )
+
+    def __str__(self) -> str:
+        return "Break end - " + super().__str__()

@@ -15,19 +15,21 @@ from extra_views import (
     UpdateWithInlinesView,
 )
 
+from .forms import BreakStartModuleForm
 from .models import (
     AffectiveRatingData,
     AffectiveRatingModule,
     BaseData,
-    BaseModule,
     BasicInfoData,
     BasicInfoModule,
+    BreakStartModule,
     CriterionData,
     CriterionModule,
     Experiment,
     FearConditioningData,
     FearConditioningModule,
     InstructionsModule,
+    Module,
     Participant,
     TextModule,
     VolumeCalibrationData,
@@ -62,7 +64,7 @@ class ModuleViewMixin:
         return context
 
 
-class ModuleCreateViewMixin(ModuleViewMixin, CreateWithInlinesView):
+class ModuleCreateView(ModuleViewMixin, CreateWithInlinesView):
     template_name = "experiments/module_form.html"
 
     def get_initial(self) -> dict:
@@ -71,7 +73,20 @@ class ModuleCreateViewMixin(ModuleViewMixin, CreateWithInlinesView):
     def forms_valid(
         self, form: forms.BaseModelForm, inlines: List[InlineFormSetFactory]
     ) -> HttpResponse:
+        # Shift existing modules' sortorder down
+        existing_modules = list(self.experiment.modules.order_by("sortorder"))
+
         response = super().forms_valid(form, inlines)
+
+        # The amount of shifting necessary depends on how many new modules are
+        # created. Typically this will only be 1, but some modules (e.g. the break
+        # module) creates 2 modules.
+        new_module_count = self.experiment.modules.count() - len(existing_modules)
+
+        for index, existing_module in enumerate(existing_modules):
+            existing_module.sortorder = index + new_module_count
+            existing_module.save()
+
         messages.success(
             self.request,  # type:ignore
             f"Added {self.object.get_module_name()} module",  # type:ignore
@@ -79,8 +94,9 @@ class ModuleCreateViewMixin(ModuleViewMixin, CreateWithInlinesView):
         return response
 
 
-class ModuleUpdateViewMixin(ModuleViewMixin, UpdateWithInlinesView):
+class ModuleUpdateView(ModuleViewMixin, UpdateWithInlinesView):
     template_name = "experiments/module_form.html"
+    pk_url_kwarg = "module_pk"
 
     def forms_valid(
         self, form: forms.BaseModelForm, inlines: List[InlineFormSetFactory]
@@ -93,14 +109,14 @@ class ModuleUpdateViewMixin(ModuleViewMixin, UpdateWithInlinesView):
         return response
 
 
-class ModuleDeleteViewMixin(ModuleViewMixin):
+class ModuleDeleteView(ModuleViewMixin, DeleteView):
     pk_url_kwarg = "module_pk"
     template_name = "experiments/module_confirm_delete.html"
 
     def delete(
         self, request: HttpRequest, *args: Any, **kwargs: Any
     ) -> HttpResponse:  # type: ignore
-        module = self.get_object()  # type:ignore
+        module: Module = self.get_object()  # type:ignore
         response = super().delete(request, *args, **kwargs)  # type:ignore
         module_name = module.get_module_name()
         messages.success(self.request, f"Deleted {module_name} module")  # type:ignore
@@ -116,11 +132,16 @@ class ModuleRegistry:
     """
 
     def __init__(self) -> None:
-        self.modules: List[Type[BaseModule]] = []
+        self.modules: List[Type[Module]] = []
         self.urls: List[URLPattern] = []
         self.views: Dict[str, Callable] = {}
 
-    def register(self, module_class: Type[BaseModule]) -> None:
+    def register(
+        self,
+        module_class: Type[Module],
+        create_view_class: Type[ModuleCreateView] = None,
+        update_view_class: Type[ModuleUpdateView] = None,
+    ) -> None:
         """
         Dynamically creates views for a module
 
@@ -132,31 +153,34 @@ class ModuleRegistry:
         self.modules.append(module_class)
 
         # CreateView
-        class CreateMeta:
-            model = module_class
-            fields = [
-                f.name for f in module_class._meta.fields if f.name != "sortorder"
-            ]
-            widgets = {
-                "experiment": forms.HiddenInput(),
-            }
-
-        form_class = type(
-            f"{module_camel_case}Form", (forms.ModelForm,), {"Meta": CreateMeta}
-        )
-
-        create_view_class: CreateView = type(  # type: ignore
-            f"{module_camel_case}CreateView",
-            (ModuleCreateViewMixin,),
-            {
-                "model": module_class,
-                "form_class": form_class,
-                "inlines": module_class.inlines,
-            },
-        )
         create_view_name = module_class.get_create_path_name()
+        if create_view_class is not None:
+            self.views[create_view_name] = create_view_class.as_view()
+        else:
 
-        self.views[create_view_name] = create_view_class.as_view()
+            class CreateMeta:
+                model = module_class
+                fields = [
+                    f.name for f in module_class._meta.fields if f.name != "sortorder"
+                ]
+                widgets = {
+                    "experiment": forms.HiddenInput(),
+                }
+
+            form_class = type(
+                f"{module_camel_case}Form", (forms.ModelForm,), {"Meta": CreateMeta}
+            )
+
+            self.views[create_view_name]: CreateView = type(  # type: ignore
+                f"{module_camel_case}CreateView",
+                (ModuleCreateView,),
+                {
+                    "model": module_class,
+                    "form_class": form_class,
+                    "inlines": module_class.inlines,
+                },
+            ).as_view()
+
         self.urls.append(
             path(
                 module_class.get_create_path(),
@@ -166,23 +190,24 @@ class ModuleRegistry:
         )
 
         # Update view
-        update_view_class: UpdateView = type(  # type: ignore
-            f"{module_camel_case}UpdateView",
-            (ModuleUpdateViewMixin,),
-            {
-                "model": module_class,
-                "fields": [
-                    f.name
-                    for f in module_class._meta.fields
-                    if f.name not in ["sortorder", "experiment"]
-                ],
-                "pk_url_kwarg": "module_pk",
-                "inlines": module_class.inlines,
-            },
-        )
         update_view_name = module_class.get_update_path_name()
+        if update_view_class is not None:
+            self.views[update_view_name] = update_view_class.as_view()
+        else:
+            self.views[update_view_name]: UpdateView = type(  # type: ignore
+                f"{module_camel_case}UpdateView",
+                (ModuleUpdateView,),
+                {
+                    "model": module_class,
+                    "fields": [
+                        f.name
+                        for f in module_class._meta.fields
+                        if f.name not in ["sortorder", "experiment"]
+                    ],
+                    "inlines": module_class.inlines,
+                },
+            ).as_view()
 
-        self.views[update_view_name] = update_view_class.as_view()
         self.urls.append(
             path(
                 module_class.get_update_path(),
@@ -194,7 +219,7 @@ class ModuleRegistry:
         # Delete view
         delete_view_class: DeleteView = type(  # type: ignore
             f"{module_camel_case}DeleteView",
-            (ModuleDeleteViewMixin, DeleteView),
+            (ModuleDeleteView,),
             {"model": module_class},
         )
         delete_view_name = module_class.get_delete_path_name()
@@ -209,10 +234,18 @@ class ModuleRegistry:
         )
 
 
+class BreakModuleCreateView(ModuleCreateView):
+    model = BreakStartModule
+    form_class = BreakStartModuleForm
+
+
 module_registry = ModuleRegistry()
 
 module_registry.register(AffectiveRatingModule)
 module_registry.register(BasicInfoModule)
+# Note: Don't register BreakEndModule as it is automatically created/deleted
+# when the start module is created/deleted
+module_registry.register(BreakStartModule, create_view_class=BreakModuleCreateView)
 module_registry.register(CriterionModule)
 module_registry.register(FearConditioningModule)
 module_registry.register(InstructionsModule)
