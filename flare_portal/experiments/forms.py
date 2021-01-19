@@ -1,7 +1,10 @@
+import io
+import csv
 import random
 import string
 
 from django import forms
+from django.core.validators import FileExtensionValidator
 from django.forms import inlineformset_factory
 
 from .models import BreakEndModule, BreakStartModule, Experiment, Participant
@@ -65,6 +68,67 @@ class ParticipantBatchForm(forms.Form):
                 experiment=experiment,
             )
             for n in range(self.cleaned_data["participant_count"])
+        )
+
+
+class ParticipantUploadForm(forms.Form):
+    import_file = forms.FileField(
+        validators=[FileExtensionValidator(["csv"])],
+    )
+
+    @staticmethod
+    def open_csv(field):
+        # Open uploaded file
+        data = io.StringIO(field.read().decode("utf-8"))
+        return csv.DictReader(data)
+
+    def clean(self):
+        # Open uploaded file
+        upload = ParticipantUploadForm.open_csv(self.cleaned_data["import_file"])
+
+        # Build a list of ID's
+        pids = []
+        for row in upload:
+            if pid := row.get("pid"):
+                if len(pid) <= 24:
+                    pids.append(pid)
+                else:
+                    self.add_error(
+                        "import_file",
+                        "Participant ID's must be less than 25 characters.",
+                    )
+
+        # Validate and check if any ID's already exist
+        existing_participants = Participant.objects.filter(participant_id__in=pids)
+        if existing_participants.count() > 0:
+            self.add_error(
+                "import_file",
+                f"Particpant ID {existing_participants.first().participant_id} already exists.",
+            )
+
+        # Check that uploaded data isn't empty
+        if len(pids) == 0:
+            self.add_error("import_file", "No valid ID's could be created.")
+
+        # Update data object
+        self.cleaned_data["pids"] = pids
+        return self.cleaned_data
+
+    def save(self, *, experiment: Experiment) -> None:
+        """
+        Accepts an upload .csv file of Participants id's, validates it and creates the corresponding Participants.
+        """
+
+        if not self.is_valid():
+            raise ValueError("Form should be valid before calling .save()")
+
+        # Bulk create Participants in list
+        Participant.objects.bulk_create(
+            Participant(
+                participant_id=pid,
+                experiment=experiment,
+            )
+            for pid in self.cleaned_data["pids"]
         )
 
 
