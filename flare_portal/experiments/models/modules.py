@@ -80,6 +80,15 @@ class BaseModule(models.Model):
 
 
 class Module(Manageable, BaseModule):
+    label = models.CharField(
+        max_length=255,
+        help_text=(
+            "Helps with identifying modules. The label isn't displayed "
+            "to the participant."
+        ),
+        blank=True,
+    )
+
     class Meta:
         abstract = True
 
@@ -87,9 +96,23 @@ class Module(Manageable, BaseModule):
         """Configuration returned by the config API for this module"""
         raise NotImplementedError()
 
-    def get_module_title(self) -> str:
+    def get_module_default_title(self):
         """Short title for this module"""
         return self.get_module_name()
+
+    def get_module_title(self) -> str:
+        """Default or Reasearcher defined label"""
+        if self.label:
+            return self.label
+
+        return self.get_module_default_title()
+
+    def get_module_subtitle(self) -> str:
+        """Default or Reasearcher defined description"""
+        if self.label:
+            return f"{self.get_module_name()} - {self.get_module_description()}"
+
+        return self.get_module_description()
 
     def get_module_description(self) -> str:
         """Short description of module configuration"""
@@ -130,7 +153,7 @@ class FearConditioningModule(Module):
             },
         )
 
-    def get_module_title(self) -> str:
+    def get_module_default_title(self) -> str:
         return self.get_phase_display()
 
     def get_module_description(self) -> str:
@@ -406,7 +429,7 @@ class AffectiveRatingModule(Module):
             },
         )
 
-    def get_module_title(self) -> str:
+    def get_module_default_title(self) -> str:
         return self.__str__()
 
     def get_module_description(self) -> str:
@@ -430,7 +453,7 @@ class TextModule(Module):
             config={"heading": self.heading, "body": self.body},
         )
 
-    def get_module_title(self) -> str:
+    def get_module_default_title(self) -> str:
         return self.__str__()
 
     def __str__(self) -> str:
@@ -438,17 +461,6 @@ class TextModule(Module):
 
 
 class BreakStartModule(Module):
-    # Note: In a future ticket, all modules with have labels so this field
-    # needs to be deleted
-    label = models.CharField(
-        max_length=255,
-        help_text=(
-            "Helps with identifying modules. The label isn't displayed "
-            "to the participant."
-        ),
-        blank=True,
-    )
-
     duration = models.PositiveIntegerField(
         help_text="How long the break should last in seconds. (e.g. 300 is 5 minutes)",
     )
