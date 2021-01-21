@@ -83,14 +83,20 @@ class ParticipantUploadForm(forms.Form):
         return csv.DictReader(data)
 
     def clean(self):
+        # Don't continue if no upload
+        file = self.cleaned_data.get("import_file")
+        if file is None:
+            return
+
         # Open uploaded file
-        upload = ParticipantUploadForm.open_csv(self.cleaned_data["import_file"])
+        data = io.StringIO(file.read().decode("utf-8"))
+        upload = csv.DictReader(data)
 
         # Build a list of ID's
         pids = []
         for row in upload:
             if pid := row.get("pid"):
-                if len(pid) <= 24:
+                if len(pid) <= 24 and pid not in pids:
                     pids.append(pid)
                 else:
                     self.add_error(
@@ -98,38 +104,36 @@ class ParticipantUploadForm(forms.Form):
                         "Participant ID's must be less than 25 characters.",
                     )
 
-        # Validate and check if any ID's already exist
+        # Validate and remove any ID's that already exist
+        row_count = len(pids)
         existing_participants = Participant.objects.filter(participant_id__in=pids)
-        if existing_participants.count() > 0:
-            self.add_error(
-                "import_file",
-                f"Particpant ID {existing_participants.first().participant_id} already exists.",
-            )
-
-        # Check that uploaded data isn't empty
-        if len(pids) == 0:
-            self.add_error("import_file", "No valid ID's could be created.")
+        for participant in existing_participants:
+            pids.remove(participant.participant_id)
 
         # Update data object
         self.cleaned_data["pids"] = pids
+        self.cleaned_data["row_count"] = row_count
         return self.cleaned_data
 
     def save(self, *, experiment: Experiment) -> None:
         """
-        Accepts an upload .csv file of Participants id's, validates it and creates the corresponding Participants.
+        Accepts an upload .csv file and creates the corresponding Participants.
         """
 
         if not self.is_valid():
             raise ValueError("Form should be valid before calling .save()")
 
         # Bulk create Participants in list
-        Participant.objects.bulk_create(
+        participants = Participant.objects.bulk_create(
             Participant(
                 participant_id=pid,
                 experiment=experiment,
             )
             for pid in self.cleaned_data["pids"]
         )
+
+        # Return objects create and how many rows in file
+        return participants, self.cleaned_data["row_count"]
 
 
 ParticipantFormSet = inlineformset_factory(

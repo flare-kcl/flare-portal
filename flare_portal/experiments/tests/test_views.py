@@ -1,3 +1,4 @@
+import io
 import csv
 from typing import Any, Dict, List
 
@@ -7,7 +8,6 @@ from django.urls import reverse
 
 from rest_framework.test import APITestCase
 
-from flare_portal.experiments.forms import ParticipantUploadForm
 from flare_portal.users.factories import UserFactory
 from flare_portal.users.models import User
 
@@ -1140,7 +1140,8 @@ class ParticipantUploadViewTest(TestCase):
 
         # Check each Participant in the file has been created
         participants = Participant.objects.all()
-        for pid in ParticipantUploadForm.open_csv(csv_file):
+        data = io.StringIO(csv_file.read().decode("utf-8"))
+        for pid in csv.DictReader(data):
             self.assertEqual(participants.get(participant_id=pid).exists(), True)
 
 

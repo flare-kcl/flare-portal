@@ -237,7 +237,14 @@ class ParticipantUploadView(FormView):
         return context
 
     def form_valid(self, form: ParticipantUploadForm) -> HttpResponse:  # type: ignore
-        form.save(experiment=self.experiment)
+        # Parse Uploaded file
+        participants, row_count = form.save(experiment=self.experiment)
+
+        # If successful then add a message
+        messages.success(
+            self.request, f"{len(participants)}/{row_count} Participants Uploaded"
+        )
+
         return super().form_valid(form)
 
 
