@@ -57,6 +57,7 @@ class UpdateSiteSettings(TestCase):
 
         form_data = {
             "terms_and_conditions": "New terms",
+            "privacy_policy": "New policy",
         }
 
         resp = self.client.post(url, form_data, follow=True)
