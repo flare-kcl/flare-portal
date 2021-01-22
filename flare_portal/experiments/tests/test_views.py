@@ -1,3 +1,5 @@
+import csv
+import io
 from typing import Any, Dict, List
 
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -1095,6 +1097,52 @@ class ParticipantCreateBatchViewTest(TestCase):
                 )
                 self.assertEqual(experiment_code, experiment.code)
                 self.assertEqual(6, len(participant_code))
+
+
+class ParticipantUploadViewTest(TestCase):
+    def setUp(self) -> None:
+        self.user = UserFactory()
+        self.user.grant_role("RESEARCHER")
+        self.user.save()
+        self.client.force_login(self.user)
+
+    def test_upload(self) -> None:
+        project: Project = ProjectFactory()
+        experiment: Experiment = ExperimentFactory(project=project)
+        url = reverse(
+            "experiments:participant_upload",
+            kwargs={"project_pk": project.pk, "experiment_pk": experiment.pk},
+        )
+
+        # Check form view loads
+        resp = self.client.get(url)
+        self.assertEqual(200, resp.status_code)
+        self.assertEqual(resp.context["experiment"], experiment)
+
+        # Get the CSV import template
+        csv_file = open("flare_portal/static_src/misc/participant-template.csv", "rb")
+        template = SimpleUploadedFile(
+            "participant-template.csv", csv_file.read(), content_type="text/csv"
+        )
+        form_data = {"import_file": template}
+
+        # Submit upload form
+        resp = self.client.post(url, form_data)
+
+        # Check it redirects successfully
+        self.assertRedirects(
+            resp,
+            reverse(
+                "experiments:participant_list",
+                kwargs={"project_pk": project.pk, "experiment_pk": experiment.pk},
+            ),
+        )
+
+        # Check each Participant in the file has been created
+        participants = Participant.objects.all()
+        data = io.StringIO(csv_file.read().decode("utf-8"))
+        for pid in csv.DictReader(data):
+            self.assertEqual(participants.filter(participant_id=pid).exists(), True)
 
 
 class ParticipantFormSetViewTest(TestCase):

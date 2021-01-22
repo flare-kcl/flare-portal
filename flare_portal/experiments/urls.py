@@ -61,6 +61,12 @@ urlpatterns = [
         views.participant_create_batch_view,
         name="participant_create_batch",
     ),
+    path(
+        "projects/<int:project_pk>/experiments/<int:experiment_pk>/"
+        "participants/upload/",
+        views.participant_upload_view,
+        name="participant_upload",
+    ),
     path("", include((module_registry.urls, "modules"))),
     path("", include((data_viewset_registry.urls, "data"))),
 ]

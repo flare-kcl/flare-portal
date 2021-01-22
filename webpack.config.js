@@ -30,6 +30,12 @@ const options = {
                     context: path.resolve(`./${projectRoot}/static_src/`),
                     to: path.resolve(`./${projectRoot}/static_compiled/images`),
                 },
+                {
+                    // Copy misc files that don't need preprocessing to compiled src.
+                    from: 'misc',
+                    context: path.resolve(`./${projectRoot}/static_src/`),
+                    to: path.resolve(`./${projectRoot}/static_compiled/misc`),
+                },
             ],
         }),
         new CopyPlugin({

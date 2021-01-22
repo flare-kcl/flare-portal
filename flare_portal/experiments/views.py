@@ -21,6 +21,7 @@ from .forms import (
     ExperimentForm,
     ParticipantBatchForm,
     ParticipantFormSet,
+    ParticipantUploadForm,
 )
 from .models import BreakEndModule, Experiment, Project
 
@@ -211,6 +212,43 @@ class ParticipantCreateBatchView(FormView):
 
 
 participant_create_batch_view = ParticipantCreateBatchView.as_view()
+
+
+class ParticipantUploadView(FormView):
+    form_class = ParticipantUploadForm
+    template_name = "experiments/participant_upload_form.html"
+
+    def get_success_url(self) -> str:
+        return reverse(
+            "experiments:participant_list",
+            kwargs={
+                "project_pk": self.kwargs["project_pk"],
+                "experiment_pk": self.kwargs["experiment_pk"],
+            },
+        )
+
+    def dispatch(self, *args: Any, **kwargs: Any) -> HttpResponse:
+        self.experiment = get_object_or_404(Experiment, pk=kwargs["experiment_pk"])
+        return super().dispatch(*args, **kwargs)
+
+    def get_context_data(self, **kwargs: Any) -> dict:
+        context = super().get_context_data(**kwargs)
+        context["experiment"] = self.experiment
+        return context
+
+    def form_valid(self, form: ParticipantUploadForm) -> HttpResponse:  # type: ignore
+        # Parse Uploaded file
+        participants, row_count = form.save(experiment=self.experiment)
+
+        # If successful then add a message
+        messages.success(
+            self.request, f"{len(participants)}/{row_count} Participants Uploaded"
+        )
+
+        return super().form_valid(form)
+
+
+participant_upload_view = ParticipantUploadView.as_view()
 
 
 class ParticipantFormSetView(FormView):
