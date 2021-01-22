@@ -1,7 +1,8 @@
-import io
 import csv
+import io
 import random
 import string
+from typing import Any, Dict, List, Tuple
 
 from django import forms
 from django.core.validators import FileExtensionValidator
@@ -76,17 +77,11 @@ class ParticipantUploadForm(forms.Form):
         validators=[FileExtensionValidator(["csv"])],
     )
 
-    @staticmethod
-    def open_csv(field):
-        # Open uploaded file
-        data = io.StringIO(field.read().decode("utf-8"))
-        return csv.DictReader(data)
-
-    def clean(self):
+    def clean(self) -> Dict[str, Any]:
         # Don't continue if no upload
         file = self.cleaned_data.get("import_file")
         if file is None:
-            return
+            return self.cleaned_data
 
         # Open uploaded file
         data = io.StringIO(file.read().decode("utf-8"))
@@ -115,7 +110,7 @@ class ParticipantUploadForm(forms.Form):
         self.cleaned_data["row_count"] = row_count
         return self.cleaned_data
 
-    def save(self, *, experiment: Experiment) -> None:
+    def save(self, *, experiment: Experiment) -> Tuple[List[Participant], int]:
         """
         Accepts an upload .csv file and creates the corresponding Participants.
         """

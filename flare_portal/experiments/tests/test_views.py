@@ -1,5 +1,5 @@
-import io
 import csv
+import io
 from typing import Any, Dict, List
 
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -1142,7 +1142,7 @@ class ParticipantUploadViewTest(TestCase):
         participants = Participant.objects.all()
         data = io.StringIO(csv_file.read().decode("utf-8"))
         for pid in csv.DictReader(data):
-            self.assertEqual(participants.get(participant_id=pid).exists(), True)
+            self.assertEqual(participants.filter(participant_id=pid).exists(), True)
 
 
 class ParticipantFormSetViewTest(TestCase):
