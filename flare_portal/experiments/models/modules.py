@@ -96,16 +96,13 @@ class Module(Manageable, BaseModule):
         """Configuration returned by the config API for this module"""
         raise NotImplementedError()
 
-    def get_module_default_title(self):
+    def get_module_default_title(self) -> str:
         """Short title for this module"""
         return self.get_module_name()
 
     def get_module_title(self) -> str:
         """Default or Reasearcher defined label"""
-        if self.label:
-            return self.label
-
-        return self.get_module_default_title()
+        return self.label or self.get_module_default_title()
 
     def get_module_subtitle(self) -> str:
         """Default or Reasearcher defined description"""
