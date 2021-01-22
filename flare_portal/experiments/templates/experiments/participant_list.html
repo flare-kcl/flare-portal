@@ -44,7 +44,7 @@
                                         <th>Started</th>
                                         <th>Finished</th>
                                         <th>Agreed to T&amp;Cs</th>
-                                        <th>Delete</th>
+                                        <th></th>
                                         <th></th>
                                     </tr>
                                 </thead>
@@ -77,26 +77,24 @@
                                             </td>
 
                                             <td>
-                                                {% if form.instance.pk %}
-                                                    <label class="custom-control custom-checkbox" for="{{ form.DELETE.id_for_label }}">
-                                                        {{ form.DELETE|add_class:"custom-control-input" }}
-                                                        <span class="custom-control-label">Delete</span>
-                                                    </label>
-                                                {% endif %}
-                                                {{ form.id }}
-                                                {{ form.experiment }}
+                                                <a href="{% url 'experiments:participant_delete' project_pk=view.kwargs.project_pk experiment_pk=view.kwargs.experiment_pk participant_pk=form.instance.pk %}">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="20" height="20" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><line x1="4" y1="7" x2="20" y2="7" /><line x1="10" y1="11" x2="10" y2="17" /><line x1="14" y1="11" x2="14" y2="17" /><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" /><path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" /></svg>
+                                                </a>
                                             </td>
-                                            <td class="dropdown">
-                                                <button type="button" class="btn btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown">
-                                                    View data
-                                                </button>
-                                                <div class="dropdown-menu">
-                                                    {% get_module_data_types as data_types %}
-                                                    {% for data_type in data_types %}
-                                                        <a class="dropdown-item" href="{% get_data_list_url data_type %}?participant={{ form.instance.participant_id }}">{{ data_type.get_module_name|capfirst }}</a>
-                                                    {% endfor %}
+                                            <td>
+                                                <div class="dropdown">
+                                                    <button type="button" class="btn btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown">
+                                                        View data
+                                                    </button>
+                                                    <div class="dropdown-menu">
+                                                        {% get_module_data_types as data_types %}
+                                                        {% for data_type in data_types %}
+                                                            <a class="dropdown-item" href="{% get_data_list_url data_type %}?participant={{ form.instance.participant_id }}">{{ data_type.get_module_name|capfirst }}</a>
+                                                        {% endfor %}
+                                                    </div>
                                                 </div>
                                             </td>
+
                                         </tr>
                                     {% endfor %}
                                     <template x-for="(form, index) in forms" :key="index">

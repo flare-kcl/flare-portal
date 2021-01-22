@@ -136,6 +136,39 @@ ParticipantFormSet = inlineformset_factory(
 )
 
 
+class ParticipantDeleteForm(forms.Form):
+    participant: Participant = None
+    participant_id_confirm = forms.CharField(
+        max_length=25, label="Confirm Participant ID"
+    )
+
+    def __init__(self, participant, *args, **kwargs):
+        super(ParticipantDeleteForm, self).__init__(*args, **kwargs)
+        self.participant = participant
+
+    def clean(self):
+        super().clean()
+        # Check field matches participant_id
+        if (
+            self.cleaned_data["participant_id_confirm"]
+            != self.participant.participant_id
+        ):
+            self.add_error(
+                "participant_id_confirm", "Input does not match Participant ID"
+            )
+
+    def save(self) -> None:
+        """
+        Deletes a specific participant
+        """
+
+        if not self.is_valid():
+            raise ValueError("Form should be valid before calling .save()")
+
+        # Validation passes so delete Participant
+        self.participant.delete()
+
+
 class BreakStartModuleForm(forms.ModelForm):
     class Meta:
         model = BreakStartModule
