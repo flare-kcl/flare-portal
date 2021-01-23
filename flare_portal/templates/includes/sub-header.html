@@ -11,6 +11,12 @@
                     </li>
                     {% if request.user|has_role:"ADMIN" %}
                         <li class="nav-item">
+                            {% url "reimbursement:voucher_pool_list" as path %}
+                            <a href="{{ path }}" class="nav-link {% active path %}"><i class="fe fe-users"></i> Vouchers</a>
+                        </li>
+                    {% endif %}
+                    {% if request.user|has_role:"ADMIN" %}
+                        <li class="nav-item">
                             {% url "users:user_list" as path %}
                             <a href="{{ path }}" class="nav-link {% active path %}"><i class="fe fe-users"></i> Users</a>
                         </li>
