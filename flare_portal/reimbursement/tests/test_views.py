@@ -1,9 +1,10 @@
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.urls import reverse
 
 from flare_portal.users.factories import UserFactory
 
-from ..factories import VoucherPoolFactory
+from ..factories import VoucherFactory, VoucherPoolFactory
 from ..models import VoucherPool
 
 
@@ -102,3 +103,91 @@ class VoucherPoolViewTest(TestCase):
         self.assertEqual(200, resp.status_code)
 
         self.assertEqual(3, len(resp.context["object_list"]))
+
+    def test_permissions(self) -> None:
+        self.fail()
+
+
+class VoucherUploadViewTest(TestCase):
+    def setUp(self) -> None:
+        self.user = UserFactory()
+        self.user.grant_role("ADMIN")
+        self.user.save()
+        self.client.force_login(self.user)
+
+    def test_upload(self) -> None:
+        pool = VoucherPoolFactory()
+
+        url = reverse("reimbursement:voucher_upload", kwargs={"pk": pool.pk})
+
+        # Check form view loads
+        resp = self.client.get(url)
+        self.assertEqual(200, resp.status_code)
+
+        # Get the CSV import template
+        csv_file = open("flare_portal/static_src/misc/voucher-pool-template.csv", "rb")
+        template = SimpleUploadedFile(
+            "voucher-pool-template.csv", csv_file.read(), content_type="text/csv"
+        )
+        form_data = {"import_file": template}
+
+        # Submit upload form
+        resp = self.client.post(url, form_data, follow=True)
+
+        # Check it redirects successfully
+        self.assertRedirects(
+            resp,
+            reverse("reimbursement:voucher_pool_update", kwargs={"pk": pool.pk}),
+        )
+
+        # Check each code in the file has been created
+        vouchers = pool.vouchers.order_by("pk")
+
+        self.assertEqual("voucher code 1", vouchers[0].code)
+        self.assertEqual("voucher code 2", vouchers[1].code)
+        self.assertEqual("voucher code 3", vouchers[2].code)
+
+        self.assertEqual(
+            str(list(resp.context["messages"])[0]),
+            "3/3 voucher codes uploaded",
+        )
+
+    def test_upload_without_duplicates(self) -> None:
+        pool = VoucherPoolFactory()
+        VoucherFactory(pool=pool, code="voucher code 1")
+        VoucherFactory(pool=pool, code="voucher code 2")
+
+        url = reverse("reimbursement:voucher_upload", kwargs={"pk": pool.pk})
+
+        # Check form view loads
+        resp = self.client.get(url)
+        self.assertEqual(200, resp.status_code)
+
+        # Get the CSV import template
+        csv_file = open("flare_portal/static_src/misc/voucher-pool-template.csv", "rb")
+        template = SimpleUploadedFile(
+            "voucher-pool-template.csv", csv_file.read(), content_type="text/csv"
+        )
+        form_data = {"import_file": template}
+
+        # Submit upload form
+        resp = self.client.post(url, form_data, follow=True)
+
+        # Check it redirects successfully
+        self.assertRedirects(
+            resp,
+            reverse("reimbursement:voucher_pool_update", kwargs={"pk": pool.pk}),
+        )
+
+        # Check each code in the file has been created
+        vouchers = pool.vouchers.order_by("pk")
+
+        self.assertEqual(3, len(vouchers))
+        self.assertEqual("voucher code 1", vouchers[0].code)
+        self.assertEqual("voucher code 2", vouchers[1].code)
+        self.assertEqual("voucher code 3", vouchers[2].code)
+
+        self.assertEqual(
+            str(list(resp.context["messages"])[0]),
+            "1/3 voucher codes uploaded",
+        )

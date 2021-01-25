@@ -3,12 +3,14 @@ from typing import Any, Dict, List
 from django import forms
 from django.contrib import messages
 from django.http import HttpRequest, HttpResponse
+from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import ListView
-from django.views.generic.edit import CreateView, DeleteView
+from django.views.generic.edit import CreateView, DeleteView, FormView
 
 from extra_views import InlineFormSetFactory, UpdateWithInlinesView
 
+from .forms import VoucherUploadForm
 from .models import Voucher, VoucherPool
 
 
@@ -70,3 +72,38 @@ class VoucherPoolListView(ListView):
 
 
 voucher_pool_list_view = VoucherPoolListView.as_view()
+
+
+class VoucherUploadView(FormView):
+    form_class = VoucherUploadForm
+    template_name = "reimbursement/voucher_upload_form.html"
+    voucher_pool: VoucherPool
+
+    def get_success_url(self) -> str:
+        return self.voucher_pool.get_absolute_url()
+
+    def dispatch(self, *args: Any, **kwargs: Any) -> HttpResponse:
+        self.voucher_pool = get_object_or_404(VoucherPool, pk=kwargs["pk"])
+        return super().dispatch(*args, **kwargs)
+
+    def get_context_data(self, **kwargs: Any) -> dict:
+        context = super().get_context_data(**kwargs)
+        context["voucher_pool"] = self.voucher_pool
+        return context
+
+    def form_valid(  # type: ignore[override]
+        self, form: VoucherUploadForm
+    ) -> HttpResponse:
+        # Parse Uploaded file
+        row_count = form.cleaned_data["row_count"]
+        vouchers = form.save(voucher_pool=self.voucher_pool)
+
+        # If successful then add a message
+        messages.success(
+            self.request, f"{len(vouchers)}/{row_count} voucher codes uploaded"
+        )
+
+        return super().form_valid(form)
+
+
+voucher_upload_view = VoucherUploadView.as_view()

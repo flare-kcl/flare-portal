@@ -14,4 +14,9 @@ urlpatterns = [
         views.voucher_pool_delete_view,
         name="voucher_pool_delete",
     ),
+    path(
+        "vouchers/<int:pk>/upload/",
+        views.voucher_upload_view,
+        name="voucher_upload",
+    ),
 ]

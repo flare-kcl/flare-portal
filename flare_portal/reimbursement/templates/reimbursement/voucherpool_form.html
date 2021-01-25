@@ -34,7 +34,6 @@
                         {% endif %}
                     </div>
 
-
                     <div class="card-footer">
                         <div class="d-flex">
                             <a href="{% url 'reimbursement:voucher_pool_list' %}" class="btn btn-link">Cancel</a>
@@ -50,16 +49,22 @@
                 </div>
             </div>
             <div class="col-lg-8">
-                {% for formset in inlines %}
+                {% with formset=inlines.0 %}
                     <div class="card" x-data="{ forms: [], startIndex: {{ formset.management_form.TOTAL_FORMS.value }}, prefix: '{{ formset.prefix }}' }">
                         {{ formset.management_form.TOTAL_FORMS|attr:"x-bind::value:startIndex + forms.length" }}
                         {{ formset.management_form.INITIAL_FORMS }}
                         {{ formset.management_form.MIN_NUM_FORMS }}
                         {{ formset.management_form.MAX_NUM_FORMS }}
+
                         {% get_formset_form formset as formset_form %}
 
                         <div class="card-header">
                             <h3 class="card-title">Vouchers</h3>
+                            <div class="ml-auto">
+                                <a class="btn btn-sm btn-primary" href="{% url 'reimbursement:voucher_upload' pk=object.pk %}">
+                                    Upload
+                                </a>
+                            </div>
                         </div>
 
                         <div class="table-responsive">
@@ -125,8 +130,8 @@
                             <button class="btn btn-sm btn-secondary" @click.prevent="forms.push({% alpine_field_defaults formset_form %})">Add more vouchers</button>
                         </div>
                     </div>
-                {% endfor %}
+                {% endwith %}
             </div>
-    </div>
+        </form>
     </div>
 {% endblock content %}
