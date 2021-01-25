@@ -33,6 +33,13 @@ class VoucherInline(InlineFormSetFactory):
     fields = ["code"]
     factory_kwargs = {"extra": 0}
 
+    def get_formset_kwargs(self) -> Dict[str, Any]:
+        kwargs = super().get_formset_kwargs()
+        kwargs["queryset"] = self.object.vouchers.select_related(
+            "participant", "participant__experiment"
+        )
+        return kwargs
+
 
 class VoucherPoolUpdateView(UpdateWithInlinesView):
     model = VoucherPool
