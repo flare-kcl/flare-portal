@@ -63,6 +63,7 @@ class Manageable(Nameable):
 
 
 class BaseModule(models.Model):
+    exclude_fields = []
     experiment = models.ForeignKey(
         "experiments.Experiment", on_delete=models.CASCADE, related_name="modules"
     )
@@ -193,6 +194,12 @@ class BasicInfoModule(Module):
     collect_headphone_model = models.BooleanField(default=False)
     collect_headphone_label = models.BooleanField(default=False)
 
+    exclude_fields = [
+        "collect_headphone_label",
+        "collect_headphone_model",
+        "collect_headphone_make",
+    ]
+
     def get_module_config(self) -> constants.ModuleConfigType:
         return constants.ModuleConfigType(
             id=self.pk,
@@ -211,9 +218,9 @@ class BasicInfoModule(Module):
             "date of birth": self.collect_date_of_birth,
             "gender": self.collect_gender,
             "headphone type": True,
-            "headphone make": self.collect_headphone_make,
-            "headphone model": self.collect_headphone_model,
-            "headphone label": self.collect_headphone_label,
+            # "headphone make": self.collect_headphone_make,
+            # "headphone model": self.collect_headphone_model,
+            # "headphone label": self.collect_headphone_label,
             "device make and model": True,
             "OS name and version": True,
         }

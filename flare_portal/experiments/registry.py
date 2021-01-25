@@ -162,8 +162,12 @@ class ModuleRegistry:
             class CreateMeta:
                 model = module_class
                 fields = [
-                    f.name for f in module_class._meta.fields if f.name != "sortorder"
+                    f.name
+                    for f in module_class._meta.fields
+                    if f.name != "sortorder"
+                    and (f.name not in module_class.exclude_fields)
                 ]
+
                 widgets = {
                     "experiment": forms.HiddenInput(),
                 }
@@ -204,6 +208,7 @@ class ModuleRegistry:
                         f.name
                         for f in module_class._meta.fields
                         if f.name not in ["sortorder", "experiment"]
+                        and (f.name not in module_class.exclude_fields)
                     ],
                     "inlines": module_class.inlines,
                 },
