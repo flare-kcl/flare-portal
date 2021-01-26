@@ -24,7 +24,7 @@ from .forms import (
     ParticipantFormSet,
     ParticipantUploadForm,
 )
-from .models import BreakEndModule, Experiment, Project, Participant
+from .models import BreakEndModule, Experiment, Participant, Project
 
 
 class ProjectListView(ListView):
