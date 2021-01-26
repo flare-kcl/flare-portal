@@ -165,7 +165,7 @@ class ModuleRegistry:
                     f.name
                     for f in module_class._meta.fields
                     if f.name != "sortorder"
-                    and (f.name not in module_class.exclude_fields)
+                    and f.name not in module_class.exclude_fields
                 ]
 
                 widgets = {
@@ -208,7 +208,7 @@ class ModuleRegistry:
                         f.name
                         for f in module_class._meta.fields
                         if f.name not in ["sortorder", "experiment"]
-                        and (f.name not in module_class.exclude_fields)
+                        and f.name not in module_class.exclude_fields
                     ],
                     "inlines": module_class.inlines,
                 },
