@@ -68,6 +68,7 @@ urlpatterns = [
         name="participant_upload",
     ),
     path(
+        "projects/<int:project_pk>/experiments/<int:experiment_pk>/"
         "participants/<int:participant_pk>/delete/",
         views.participant_delete_view,
         name="participant_delete",
