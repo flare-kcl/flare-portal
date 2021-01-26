@@ -1,5 +1,5 @@
 from itertools import combinations
-from typing import Any
+from typing import Any, Dict
 
 from django import forms
 from django.contrib import messages
@@ -228,7 +228,7 @@ class ParticipantDeleteView(FormView):
             },
         )
 
-    def get_form_kwargs(self):
+    def get_form_kwargs(self) -> Dict[str, Any]:
         kwargs = super(ParticipantDeleteView, self).get_form_kwargs()
         kwargs["participant"] = self.participant
         return kwargs

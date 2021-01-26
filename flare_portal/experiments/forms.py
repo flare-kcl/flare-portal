@@ -142,20 +142,19 @@ class ParticipantDeleteForm(forms.Form):
         max_length=25, label="Confirm Participant ID"
     )
 
-    def __init__(self, participant, *args, **kwargs):
+    def __init__(self, participant: Participant, *args: Any, **kwargs: Any) -> None:
         super(ParticipantDeleteForm, self).__init__(*args, **kwargs)
         self.participant = participant
 
-    def clean(self):
-        super().clean()
+    def clean(self) -> Dict[str, Any]:
         # Check field matches participant_id
-        if (
-            self.cleaned_data["participant_id_confirm"]
-            != self.participant.participant_id
-        ):
+        cleaned_data = super().clean()
+        if cleaned_data["participant_id_confirm"] != self.participant.participant_id:
             self.add_error(
                 "participant_id_confirm", "Input does not match Participant ID"
             )
+
+        return cleaned_data
 
     def save(self) -> None:
         """
