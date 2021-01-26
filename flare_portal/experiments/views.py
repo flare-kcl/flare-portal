@@ -251,7 +251,7 @@ class ParticipantDeleteView(FormView):
         # Add message
         messages.success(
             self.request,
-            f"Particpant {self.participant.participant_id} deleted!",
+            f'Deleted participant "{self.participant.participant_id}"',
         )
 
         # Return redirect
