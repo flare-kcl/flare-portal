@@ -63,7 +63,7 @@ class Manageable(Nameable):
 
 
 class BaseModule(models.Model):
-    exclude_fields = []
+    exclude_fields: List[str] = []
     experiment = models.ForeignKey(
         "experiments.Experiment", on_delete=models.CASCADE, related_name="modules"
     )
