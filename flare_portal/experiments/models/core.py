@@ -55,6 +55,14 @@ class Experiment(models.Model):
         max_length=255, default="Certain scream"
     )
 
+    voucher_pool = models.ForeignKey(
+        "reimbursement.VoucherPool",
+        on_delete=models.SET_NULL,
+        related_name="experiments",
+        blank=True,
+        null=True,
+    )
+
     # Assets
     us = models.FileField(
         upload_to=experiment_assets_path,
