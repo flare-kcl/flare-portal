@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}Delete Participant - {{ experiment.name }}{% endblock title %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4">
+                {% include "experiments/includes/experiment_sidebar.html" %}
+            </div>
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title text-danger">Delete Participant</h3>
+                    </div>
+
+                    <form action="" method="POST">
+                        {% csrf_token %}
+
+                        <div class="card-body">
+                            <p class="mb-6">Deleting a participant will delete all of the data attached to them. Please enter the participant ID you want to delete below to confirm the action: <span class="text-danger"><strong>{{ participant.participant_id }}</strong></span></p>
+
+                            {% if form.non_field_errors %}
+                                <div class="card-alert alert alert-danger my-3">
+                                    {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+
+                            {% for field in form %}
+                                {% include "includes/form-group.html" %}
+                            {% endfor %}
+                        </div>
+
+                        <div class="card-footer">
+                            <div class="d-flex">
+                                <a href="{% url "experiments:participant_list" project_pk=view.kwargs.project_pk experiment_pk=view.kwargs.experiment_pk %}" class="btn btn-link">Cancel</a>
+                                <div class="btn-list ml-auto">
+                                    <button type="submit" class="btn btn-primary btn-danger ml-auto">Delete Participant</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

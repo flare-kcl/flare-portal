@@ -44,7 +44,7 @@
                                         <th>Started</th>
                                         <th>Finished</th>
                                         <th>Agreed to T&amp;Cs</th>
-                                        <th>Delete</th>
+                                        <th></th>
                                         <th></th>
                                     </tr>
                                 </thead>
@@ -77,26 +77,24 @@
                                             </td>
 
                                             <td>
-                                                {% if form.instance.pk %}
-                                                    <label class="custom-control custom-checkbox" for="{{ form.DELETE.id_for_label }}">
-                                                        {{ form.DELETE|add_class:"custom-control-input" }}
-                                                        <span class="custom-control-label">Delete</span>
-                                                    </label>
-                                                {% endif %}
-                                                {{ form.id }}
-                                                {{ form.experiment }}
+                                                <a class="text-danger" href="{% url 'experiments:participant_delete' project_pk=view.kwargs.project_pk experiment_pk=view.kwargs.experiment_pk participant_pk=form.instance.pk %}">
+                                                    <i class="fe fe-trash-2"></i>
+                                                </a>
                                             </td>
-                                            <td class="dropdown">
-                                                <button type="button" class="btn btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown">
-                                                    View data
-                                                </button>
-                                                <div class="dropdown-menu">
-                                                    {% get_module_data_types as data_types %}
-                                                    {% for data_type in data_types %}
-                                                        <a class="dropdown-item" href="{% get_data_list_url data_type %}?participant={{ form.instance.participant_id }}">{{ data_type.get_module_name|capfirst }}</a>
-                                                    {% endfor %}
+                                            <td>
+                                                <div class="dropdown">
+                                                    <button type="button" class="btn btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown">
+                                                        View data
+                                                    </button>
+                                                    <div class="dropdown-menu">
+                                                        {% get_module_data_types as data_types %}
+                                                        {% for data_type in data_types %}
+                                                            <a class="dropdown-item" href="{% get_data_list_url data_type %}?participant={{ form.instance.participant_id }}">{{ data_type.get_module_name|capfirst }}</a>
+                                                        {% endfor %}
+                                                    </div>
                                                 </div>
                                             </td>
+
                                         </tr>
                                     {% endfor %}
                                     <template x-for="(form, index) in forms" :key="index">
