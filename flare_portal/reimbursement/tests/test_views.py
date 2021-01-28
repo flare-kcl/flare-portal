@@ -105,7 +105,38 @@ class VoucherPoolViewTest(TestCase):
         self.assertEqual(3, len(resp.context["object_list"]))
 
     def test_permissions(self) -> None:
-        self.fail()
+        pool = VoucherPoolFactory()
+
+        # Only admins can access vouchers
+        researcher = UserFactory()
+        researcher.grant_role("RESEARCHER")
+        researcher.save()
+
+        admin = UserFactory()
+        admin.grant_role("ADMIN")
+        admin.save()
+
+        urls = [
+            reverse("reimbursement:voucher_pool_list"),
+            reverse("reimbursement:voucher_pool_create"),
+            reverse("reimbursement:voucher_pool_update", kwargs={"pk": pool.pk}),
+            reverse("reimbursement:voucher_pool_delete", kwargs={"pk": pool.pk}),
+            reverse("reimbursement:voucher_upload", kwargs={"pk": pool.pk}),
+        ]
+
+        self.client.force_login(researcher)
+
+        for url in urls:
+            with self.subTest(url):
+                resp = self.client.get(url)
+                self.assertEqual(302, resp.status_code)
+
+        self.client.force_login(admin)
+
+        for url in urls:
+            with self.subTest(url):
+                resp = self.client.get(url)
+                self.assertEqual(200, resp.status_code)
 
 
 class VoucherUploadViewTest(TestCase):

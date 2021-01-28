@@ -1,5 +1,8 @@
 from django.urls import path
 
+from flare_portal.users.decorators import role_required
+from flare_portal.utils.urls import decorate_urlpatterns
+
 from . import views
 
 app_name = "reimbursement"
@@ -20,3 +23,4 @@ urlpatterns = [
         name="voucher_upload",
     ),
 ]
+urlpatterns = decorate_urlpatterns(urlpatterns, role_required, "ADMIN")
