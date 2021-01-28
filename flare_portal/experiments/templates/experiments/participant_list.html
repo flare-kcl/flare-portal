@@ -77,6 +77,8 @@
                                             </td>
 
                                             <td>
+                                                {{ form.id }}
+                                                {{ form.experiment }}
                                                 <a class="text-danger" href="{% url 'experiments:participant_delete' project_pk=view.kwargs.project_pk experiment_pk=view.kwargs.experiment_pk participant_pk=form.instance.pk %}">
                                                     <i class="fe fe-trash-2"></i>
                                                 </a>
@@ -103,6 +105,8 @@
                                             <td>
                                                 <input type="text" :name="`participants-${index + startIndex}-participant_id`" maxlength="24" placeholder="New participant" class="form-control" :id="`id_participants-${index + startIndex}-participant_id`" x-model="forms[index]">
                                             </td>
+                                            <td></td>
+                                            <td></td>
                                             <td></td>
                                             <td>
                                                 <a class="icon" href="#" @click.prevent="forms.splice(index, 1)"><i class="fe fe-trash text-danger"></i></a>
