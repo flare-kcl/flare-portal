@@ -141,6 +141,7 @@ class VoucherAPIView(APIView):
                 {
                     "status": "success",
                     "voucher": voucher.code,
+                    "success_message": voucher.pool.success_message,
                 }
             )
 

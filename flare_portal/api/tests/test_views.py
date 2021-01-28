@@ -518,7 +518,7 @@ class VoucherAPIViewTest(TestCase):
         self.url = reverse("api:voucher")
 
     def test_get_voucher(self) -> None:
-        voucher = VoucherFactory()
+        voucher = VoucherFactory(pool__success_message="Use this on Amazon")
         experiment = ExperimentFactory(voucher_pool=voucher.pool)
         participant = ParticipantFactory(
             experiment=experiment,

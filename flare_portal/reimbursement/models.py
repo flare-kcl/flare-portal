@@ -24,9 +24,14 @@ class Voucher(models.Model):
 class VoucherPool(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
+    success_message = models.TextField(
+        blank=True,
+        help_text="Message to display to participants when claiming a voucher. "
+        "Useful for instructions on how to use the vouchers.",
+    )
     empty_pool_message = models.TextField(
         blank=True,
-        help_text="Message to display to a participant when the voucher pool "
+        help_text="Message to display to participants when the voucher pool "
         "has run out of vouchers.",
     )
 
