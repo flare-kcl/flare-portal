@@ -22,5 +22,10 @@ urlpatterns = [
         views.voucher_upload_view,
         name="voucher_upload",
     ),
+    path(
+        "vouchers/<int:pk>/export/",
+        views.voucher_export_view,
+        name="voucher_export",
+    ),
 ]
 urlpatterns = decorate_urlpatterns(urlpatterns, role_required, "ADMIN")

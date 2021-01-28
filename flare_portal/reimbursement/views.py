@@ -1,3 +1,4 @@
+import csv
 from typing import Any, Dict, List
 
 from django import forms
@@ -5,7 +6,9 @@ from django.contrib import messages
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
-from django.views.generic import ListView
+from django.utils.text import slugify
+from django.views.generic import ListView, View
+from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import CreateView, DeleteView, FormView
 
 from extra_views import InlineFormSetFactory, UpdateWithInlinesView
@@ -114,3 +117,41 @@ class VoucherUploadView(FormView):
 
 
 voucher_upload_view = VoucherUploadView.as_view()
+
+
+class VoucherExportView(SingleObjectMixin, View):
+    model = VoucherPool
+
+    def get(self, *args: Any, **kwargs: Dict[str, Any]) -> HttpResponse:
+        pool: VoucherPool = self.get_object()  # type: ignore
+
+        response = HttpResponse(content_type="text/csv")
+        response[
+            "Content-Disposition"
+        ] = f"attachment;filename={slugify(pool.name)}-vouchers.csv"
+
+        writer = csv.DictWriter(
+            response, fieldnames=["voucher_code", "experiment_code", "participant_id"]
+        )
+        writer.writeheader()
+
+        vouchers = pool.vouchers.select_related(
+            "participant", "participant__experiment"
+        ).order_by("pk")
+        for voucher in vouchers:
+            writer.writerow(
+                {
+                    "voucher_code": voucher.code,
+                    "experiment_code": voucher.participant.experiment.code
+                    if voucher.participant
+                    else "",
+                    "participant_id": voucher.participant.participant_id
+                    if voucher.participant
+                    else "",
+                }
+            )
+
+        return response
+
+
+voucher_export_view = VoucherExportView.as_view()

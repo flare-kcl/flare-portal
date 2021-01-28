@@ -1,7 +1,11 @@
+import csv
+import io
+
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.urls import reverse
 
+from flare_portal.experiments.factories import ExperimentFactory, ParticipantFactory
 from flare_portal.users.factories import UserFactory
 
 from ..factories import VoucherFactory, VoucherPoolFactory
@@ -221,4 +225,42 @@ class VoucherUploadViewTest(TestCase):
         self.assertEqual(
             str(list(resp.context["messages"])[0]),
             "1/3 voucher codes uploaded",
+        )
+
+
+class VoucherExportViewTest(TestCase):
+    def setUp(self) -> None:
+        self.user = UserFactory()
+        self.user.grant_role("ADMIN")
+        self.user.save()
+        self.client.force_login(self.user)
+
+    def test_export(self) -> None:
+        pool = VoucherPoolFactory()
+        vouchers = VoucherFactory.create_batch(10, pool=pool)
+        experiment = ExperimentFactory(voucher_pool=pool)
+        participant = ParticipantFactory(experiment=experiment)
+        vouchers[0].participant = participant
+        vouchers[0].save()
+
+        url = reverse("reimbursement:voucher_export", kwargs={"pk": pool.pk})
+
+        resp = self.client.get(url)
+
+        reader = csv.DictReader(io.StringIO(resp.content.decode("utf-8")))
+
+        rows = [row for row in reader]
+
+        self.assertEqual(10, len(rows))
+
+        for index, voucher in enumerate(vouchers):
+            self.assertEqual(voucher.code, rows[index]["voucher_code"])
+
+        self.assertEqual(
+            rows[0],
+            {
+                "voucher_code": vouchers[0].code,
+                "experiment_code": experiment.code,
+                "participant_id": participant.participant_id,
+            },
         )

@@ -65,6 +65,9 @@
                                     <a class="btn btn-sm btn-primary" href="{% url 'reimbursement:voucher_upload' pk=object.pk %}">
                                         Upload
                                     </a>
+                                    <a class="btn btn-sm btn-secondary ml-2" href="{% url 'reimbursement:voucher_export' pk=object.pk %}">
+                                        Export
+                                    </a>
                                 </div>
                             </div>
 
