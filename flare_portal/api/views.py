@@ -62,6 +62,7 @@ class ConfigurationAPIView(APIView):
                         gsb=experiment.gsb.url if experiment.gsb else None,
                         gsc=experiment.gsc.url if experiment.gsc else None,
                         gsd=experiment.gsd.url if experiment.gsd else None,
+                        reimbursements=bool(experiment.voucher_pool),
                     ),
                     config=constants.SiteConfigurationType(
                         terms_and_conditions=config.terms_and_conditions,

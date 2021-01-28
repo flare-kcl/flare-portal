@@ -25,6 +25,7 @@ ExperimentType = TypedDict(
         "gsb": str,
         "gsc": str,
         "gsd": str,
+        "reimbursements": bool,
     },
 )
 
