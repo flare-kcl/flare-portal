@@ -8,4 +8,5 @@ register = template.Library()
 
 @register.filter
 def has_role(user: User, role_name: constants.Roles) -> bool:
-    return user.has_role(role_name)
+    """Returns true if the user has the given role, or if they're a superuser"""
+    return user.has_role(role_name) or user.is_superuser
