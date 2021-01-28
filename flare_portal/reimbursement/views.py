@@ -16,7 +16,7 @@ from .models import Voucher, VoucherPool
 
 class VoucherPoolCreateView(CreateView):
     model = VoucherPool
-    fields = ["name", "description", "empty_pool_message"]
+    fields = ["name", "description", "success_message", "empty_pool_message"]
     object = None
 
     def form_valid(self, form: forms.BaseModelForm) -> HttpResponse:
@@ -43,7 +43,7 @@ class VoucherInline(InlineFormSetFactory):
 
 class VoucherPoolUpdateView(UpdateWithInlinesView):
     model = VoucherPool
-    fields = ["name", "description", "empty_pool_message"]
+    fields = ["name", "description", "success_message", "empty_pool_message"]
     object = None
     inlines = [VoucherInline]
 
