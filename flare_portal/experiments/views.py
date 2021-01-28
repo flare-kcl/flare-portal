@@ -310,6 +310,9 @@ class ParticipantFormSetView(FormView):
         return {
             **super().get_form_kwargs(),
             "instance": self.experiment,
+            "queryset": Participant.objects.filter(
+                experiment=self.experiment,
+            ).select_related("experiment", "voucher"),
         }
 
     def get_success_url(self) -> str:

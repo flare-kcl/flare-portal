@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.core import validators
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.urls import reverse
@@ -162,6 +162,22 @@ class Participant(models.Model):
     udpated_at = models.DateTimeField(auto_now=True)
     started_at = models.DateTimeField(null=True)
     finished_at = models.DateTimeField(null=True)
+
+    def get_voucher_display(self) -> str:
+        """Displays the voucher code
+
+        This could also display a message telling the researcher that this
+        participant should have gotten a voucher but didn't.
+
+        When irrelevant, this displays an empty string
+        """
+        if self.finished_at and self.experiment.voucher_pool_id:
+            try:
+                return str(self.voucher)
+            except ObjectDoesNotExist:
+                return "Unable to disburse voucher."
+
+        return ""
 
     def __str__(self) -> str:
         return self.participant_id
