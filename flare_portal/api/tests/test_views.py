@@ -3,6 +3,7 @@ from decimal import Decimal
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 
 from rest_framework.serializers import DateTimeField
@@ -20,6 +21,7 @@ from flare_portal.experiments.models import (
     FearConditioningModule,
     Participant,
 )
+from flare_portal.reimbursement.factories import VoucherFactory, VoucherPoolFactory
 from flare_portal.site_config.models import SiteConfiguration
 
 test_file = "flare_portal/experiments/tests/assets/circle.png"
@@ -509,3 +511,142 @@ class AffectiveRatingAPIViewTest(TestCase):
         data = module.data.first()
         self.assertEqual(data.rating, json_data["rating"])
         self.assertEqual(data.stimulus, json_data["stimulus"])
+
+
+class VoucherAPIViewTest(TestCase):
+    def setUp(self) -> None:
+        self.url = reverse("api:voucher")
+
+    def test_get_voucher(self) -> None:
+        voucher = VoucherFactory()
+        experiment = ExperimentFactory(voucher_pool=voucher.pool)
+        participant = ParticipantFactory(
+            experiment=experiment,
+            started_at=timezone.now(),
+            finished_at=timezone.now(),
+        )
+
+        post_data = {
+            "participant": participant.participant_id,
+        }
+
+        resp = self.client.post(self.url, post_data)
+
+        self.assertEqual(200, resp.status_code)
+
+        self.assertEqual(
+            resp.json(),
+            {
+                "status": "success",
+                "voucher": voucher.code,
+                "success_message": voucher.pool.success_message,
+            },
+        )
+
+        voucher.refresh_from_db()
+
+        self.assertEqual(voucher.participant, participant)
+
+    def test_voucher_pool_empty(self) -> None:
+        voucher = VoucherFactory(pool__empty_pool_message="No codes left.")
+        pool = voucher.pool
+        experiment = ExperimentFactory(voucher_pool=pool)
+        participant_1 = ParticipantFactory(
+            experiment=experiment,
+            started_at=timezone.now(),
+            finished_at=timezone.now(),
+        )
+        participant_2 = ParticipantFactory(
+            experiment=experiment,
+            started_at=timezone.now(),
+            finished_at=timezone.now(),
+        )
+
+        # Fetch voucher
+        post_data = {
+            "participant": participant_1.participant_id,
+        }
+
+        resp = self.client.post(self.url, post_data)
+
+        self.assertEqual(200, resp.status_code)
+
+        # Fetch voucher again, this time no more vouchers available
+        post_data = {
+            "participant": participant_2.participant_id,
+        }
+
+        resp = self.client.post(self.url, post_data)
+
+        self.assertEqual(200, resp.status_code)
+
+        self.assertEqual(
+            resp.json(),
+            {
+                "status": "error",
+                "error_code": "pool_empty",
+                "error_message": pool.empty_pool_message,
+            },
+        )
+
+    def test_voucher_pool_unassigned(self) -> None:
+        experiment = ExperimentFactory()
+        participant_1 = ParticipantFactory(
+            experiment=experiment,
+            started_at=timezone.now(),
+            finished_at=timezone.now(),
+        )
+
+        post_data = {
+            "participant": participant_1.participant_id,
+        }
+
+        resp = self.client.post(self.url, post_data)
+
+        self.assertEqual(400, resp.status_code)
+
+        self.assertEqual(
+            resp.json(),
+            {
+                "status": "error",
+                "error_code": "pool_unassigned",
+                "error_message": "This experiment is not assigned a voucher pool",
+            },
+        )
+
+    def test_participant_not_completed_experiment(self) -> None:
+        voucher = VoucherFactory()
+        experiment = ExperimentFactory(voucher_pool=voucher.pool)
+        participant = ParticipantFactory(experiment=experiment)
+
+        post_data = {
+            "participant": participant.participant_id,
+        }
+
+        resp = self.client.post(self.url, post_data)
+
+        self.assertEqual(400, resp.status_code)
+
+    def test_participant_already_claimed_voucher(self) -> None:
+        pool = VoucherPoolFactory()
+        VoucherFactory.create_batch(5, pool=pool)
+        experiment = ExperimentFactory(voucher_pool=pool)
+        participant = ParticipantFactory(
+            experiment=experiment,
+            started_at=timezone.now(),
+            finished_at=timezone.now(),
+        )
+
+        # Fetch voucher
+        post_data = {
+            "participant": participant.participant_id,
+        }
+
+        resp = self.client.post(self.url, post_data)
+
+        self.assertEqual(200, resp.status_code)
+
+        # Fetch voucher again, should return error
+        resp = self.client.post(self.url, post_data)
+
+        self.assertEqual(400, resp.status_code)

@@ -50,86 +50,88 @@
             </div>
             <div class="col-lg-8">
                 {% with formset=inlines.0 %}
-                    <div class="card" x-data="{ forms: [], startIndex: {{ formset.management_form.TOTAL_FORMS.value }}, prefix: '{{ formset.prefix }}' }">
-                        {{ formset.management_form.TOTAL_FORMS|attr:"x-bind::value:startIndex + forms.length" }}
-                        {{ formset.management_form.INITIAL_FORMS }}
-                        {{ formset.management_form.MIN_NUM_FORMS }}
-                        {{ formset.management_form.MAX_NUM_FORMS }}
+                    {% if formset %}
+                        <div class="card" x-data="{ forms: [], startIndex: {{ formset.management_form.TOTAL_FORMS.value }}, prefix: '{{ formset.prefix }}' }">
+                            {{ formset.management_form.TOTAL_FORMS|attr:"x-bind::value:startIndex + forms.length" }}
+                            {{ formset.management_form.INITIAL_FORMS }}
+                            {{ formset.management_form.MIN_NUM_FORMS }}
+                            {{ formset.management_form.MAX_NUM_FORMS }}
 
-                        {% get_formset_form formset as formset_form %}
+                            {% get_formset_form formset as formset_form %}
 
-                        <div class="card-header">
-                            <h3 class="card-title">Vouchers</h3>
-                            <div class="ml-auto">
-                                <a class="btn btn-sm btn-primary" href="{% url 'reimbursement:voucher_upload' pk=object.pk %}">
-                                    Upload
-                                </a>
+                            <div class="card-header">
+                                <h3 class="card-title">Vouchers</h3>
+                                <div class="ml-auto">
+                                    <a class="btn btn-sm btn-primary" href="{% url 'reimbursement:voucher_upload' pk=object.pk %}">
+                                        Upload
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="table-responsive">
+                                <table class="table card-table table-vcenter">
+                                    <thead>
+                                        <tr>
+                                            <th>Code</th>
+                                            <th>Experiment</th>
+                                            <th>Participant</th>
+                                            <th>Delete</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                        {% for inline_form in formset %}
+                                            <tr>
+                                                <td>
+                                                    {% if inline_form.non_field_errors %}
+                                                        {% for error in inline_form.non_field_errors %}
+                                                            <div class="text-danger small mb-2">{{ error }}</div>
+                                                        {% endfor %}
+                                                    {% endif %}
+
+                                                    {{ inline_form.code|add_class:"form-control"|add_error_class:"is-invalid" }}
+                                                    {% for error in inline_form.code.errors %}
+                                                        <div class="invalid-feedback">{{ error }}</div>
+                                                    {% endfor %}
+                                                </td>
+                                                <td>{{ inline_form.instance.participant.experiment }}</td>
+                                                <td>{{ inline_form.instance.participant|default:"" }}</td>
+                                                <td>
+
+                                                    {% if inline_form.instance.pk %}
+                                                        <label class="custom-control custom-checkbox" for="{{ inline_form.DELETE.id_for_label }}">
+                                                            {{ inline_form.DELETE|add_class:"custom-control-input" }}
+                                                            <span class="custom-control-label">Delete</span>
+                                                        </label>
+                                                    {% endif %}
+                                                    {{ inline_form.id }}
+                                                </td>
+                                            </tr>
+
+                                        {% endfor %}
+
+                                        <template x-for="(form, index) in forms" :key="index">
+                                            <tr>
+                                                <td>
+                                                    <input type="text" :name="`vouchers-${index + startIndex}-code`" class="form-control" :id="`id_vouchers-${index + startIndex}-code`" x-model="forms[index].code">
+                                                </td>
+                                                <td></td>
+                                                <td></td>
+                                                <td>
+                                                    <a class="text-danger" href="#" @click.prevent="forms.splice(index, 1)"><i class="fe fe-trash"></i> Remove</a>
+                                                </td>
+                                            </tr>
+                                        </template>
+                                    </tbody>
+
+                                </table>
+
+                            </div>
+                            <div class="card-footer">
+                                <button class="btn btn-sm btn-secondary" @click.prevent="forms.push({% alpine_field_defaults formset_form %})">Add more vouchers</button>
                             </div>
                         </div>
-
-                        <div class="table-responsive">
-                            <table class="table card-table table-vcenter">
-                                <thead>
-                                    <tr>
-                                        <th>Code</th>
-                                        <th>Experiment</th>
-                                        <th>Participant</th>
-                                        <th>Delete</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-
-                                    {% for inline_form in formset %}
-                                        <tr>
-                                            <td>
-                                                {% if inline_form.non_field_errors %}
-                                                    {% for error in inline_form.non_field_errors %}
-                                                        <div class="text-danger small mb-2">{{ error }}</div>
-                                                    {% endfor %}
-                                                {% endif %}
-
-                                                {{ inline_form.code|add_class:"form-control"|add_error_class:"is-invalid" }}
-                                                {% for error in inline_form.code.errors %}
-                                                    <div class="invalid-feedback">{{ error }}</div>
-                                                {% endfor %}
-                                            </td>
-                                            <td>{{ inline_form.instance.participant.experiment }}</td>
-                                            <td>{{ inline_form.instance.participant|default:"" }}</td>
-                                            <td>
-
-                                                {% if inline_form.instance.pk %}
-                                                    <label class="custom-control custom-checkbox" for="{{ inline_form.DELETE.id_for_label }}">
-                                                        {{ inline_form.DELETE|add_class:"custom-control-input" }}
-                                                        <span class="custom-control-label">Delete</span>
-                                                    </label>
-                                                {% endif %}
-                                                {{ inline_form.id }}
-                                            </td>
-                                        </tr>
-
-                                    {% endfor %}
-
-                                    <template x-for="(form, index) in forms" :key="index">
-                                        <tr>
-                                            <td>
-                                                <input type="text" :name="`vouchers-${index + startIndex}-code`" class="form-control" :id="`id_vouchers-${index + startIndex}-code`" x-model="forms[index].code">
-                                            </td>
-                                            <td></td>
-                                            <td></td>
-                                            <td>
-                                                <a class="text-danger" href="#" @click.prevent="forms.splice(index, 1)"><i class="fe fe-trash"></i> Remove</a>
-                                            </td>
-                                        </tr>
-                                    </template>
-                                </tbody>
-
-                            </table>
-
-                        </div>
-                        <div class="card-footer">
-                            <button class="btn btn-sm btn-secondary" @click.prevent="forms.push({% alpine_field_defaults formset_form %})">Add more vouchers</button>
-                        </div>
-                    </div>
+                    {% endif %}
                 {% endwith %}
             </div>
         </form>
