@@ -16,7 +16,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .exports import ZipExport
+from .exports import ZipExporter
 from .forms import (
     ExperimentCreateForm,
     ExperimentForm,
@@ -468,8 +468,8 @@ class ExportDownloadView(View):
 
         response = HttpResponse()
 
-        zip_export = ZipExport(experiment)
-        filename = zip_export.write(response)  # type: ignore
+        exporter = ZipExporter(experiment)
+        filename = exporter.write(response)  # type: ignore
 
         response["Content-Disposition"] = f"attachment; filename={filename}"
 

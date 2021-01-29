@@ -219,7 +219,7 @@ class ParticipantExporter(Exporter):
         return Participant.objects.filter(experiment=self.experiment).order_by("pk")
 
 
-class ZipExport:
+class ZipExporter:
     exporters: List[Type[Exporter]] = [
         AffectiveRatingDataExporter,
         BasicInfoDataExporter,
