@@ -4,8 +4,10 @@ from django import forms
 from django.utils import timezone
 
 from rest_framework import serializers
+from rest_framework.exceptions import APIException
 
 from flare_portal.experiments.models import Participant
+from flare_portal.reimbursement.models import Voucher, VoucherPool
 
 
 class ConfigurationForm(forms.Form):
@@ -92,3 +94,62 @@ class TermsAndConditionsForm(forms.Form):
         participant.agreed_to_terms_and_conditions = True
         participant.save()
         return participant
+
+
+class VoucherPoolEmpty(APIException):
+    status_code = 200
+    default_detail = ""  # Detail is taken from VoucherPool.empty_pool_message
+    default_code = "pool_empty"
+
+
+class VoucherPoolUnassigned(APIException):
+    status_code = 400
+    default_detail = "This experiment is not assigned a voucher pool"
+    default_code = "pool_unassigned"
+
+
+class VoucherForm(forms.Form):
+    participant = forms.ModelChoiceField(
+        queryset=Participant.objects.all(),
+        to_field_name="participant_id",
+    )
+
+    def clean(self) -> Dict[str, Any]:
+        cleaned_data = super().clean()
+
+        if participant := cleaned_data.get("participant"):
+            if participant.started_at is None:
+                self.add_error(
+                    "participant", "Participant has not yet started the experiment."
+                )
+
+            if participant.finished_at is None:
+                self.add_error(
+                    "participant", "Participant has not yet finished the experiment."
+                )
+
+            if hasattr(participant, "voucher"):
+                self.add_error(
+                    "participant", "Participant has already claimed voucher."
+                )
+
+        return cleaned_data
+
+    def save(self) -> Voucher:
+        if not self.is_valid():
+            raise ValueError("Form should be valid before calling .save()")
+
+        participant = self.cleaned_data["participant"]
+        try:
+            pool = VoucherPool.objects.get(experiments=participant.experiment_id)
+        except VoucherPool.DoesNotExist:
+            raise VoucherPoolUnassigned()
+        voucher = pool.vouchers.filter(participant__isnull=True).first()
+
+        if voucher:
+            voucher.participant = participant
+            voucher.save()
+        else:
+            raise VoucherPoolEmpty(detail=pool.empty_pool_message)
+
+        return voucher

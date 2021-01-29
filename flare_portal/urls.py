@@ -10,6 +10,7 @@ from django.views.generic import TemplateView
 
 from flare_portal.api import urls as api_urls
 from flare_portal.experiments import urls as experiment_urls
+from flare_portal.reimbursement import urls as reimbursement_urls
 from flare_portal.site_config import urls as site_config_urls
 from flare_portal.site_config.views import privacy_policy
 from flare_portal.users import urls as users_urls
@@ -20,6 +21,7 @@ from flare_portal.utils.urls import decorate_urlpatterns
 private_urlpatterns = [
     path("django-admin/", admin.site.urls),
     path("configuration/", include(site_config_urls)),
+    path("", include(reimbursement_urls)),
     path("", include(experiment_urls)),
     path("", include(users_urls)),
     path("", TemplateView.as_view(template_name="home.html"), name="home"),
