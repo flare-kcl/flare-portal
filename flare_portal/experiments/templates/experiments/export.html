@@ -14,11 +14,21 @@
                         <h3 class="card-title">Data export</h3>
                     </div>
 
-                    <div class="card-body">
-                        <p class="mb-6">Download data from all modules.</p>
-                        <a href="{% url 'experiments:export_download' project_pk=view.kwargs.project_pk experiment_pk=view.kwargs.experiment_pk %}" class="btn btn-primary">
-                            <i class="fe fe-download-cloud mr-2"></i> Download data export
-                        </a>
+                    <div class="card-body" x-data="{clicked: false}">
+                        <p>
+                            Downloads data from all modules.
+                        </p>
+                        <p class="mb-6">
+                            The download may not start immediately. Please be
+                            patient while the system generates the data export.
+                        </p>
+                        <form action="{% url 'experiments:export_download' project_pk=view.kwargs.project_pk experiment_pk=view.kwargs.experiment_pk %}">
+                            <button type="submit" class="btn btn-primary" x-on:click="clicked = true" :disabled="clicked">
+                                <i class="fe fe-download-cloud mr-2"></i>
+                                <span x-show="!clicked">Download data export</span>
+                                <span x-show="clicked">Downloading...</span>
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>
