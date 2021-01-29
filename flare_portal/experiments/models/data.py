@@ -308,6 +308,7 @@ class AffectiveRatingData(BaseData):
     )
 
     list_display = [
+        "participant",
         "stimulus",
         "rating",
     ]
