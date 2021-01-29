@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Data export - {{ experiment.name }}{% endblock title %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4">
+                {% include "experiments/includes/experiment_sidebar.html" %}
+            </div>
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Data export</h3>
+                    </div>
+
+                    <div class="card-body">
+                        <p class="mb-6">Download data from all modules.</p>
+                        <a href="{% url 'experiments:export_download' project_pk=view.kwargs.project_pk experiment_pk=view.kwargs.experiment_pk %}" class="btn btn-primary">
+                            <i class="fe fe-download-cloud mr-2"></i> Download data export
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
