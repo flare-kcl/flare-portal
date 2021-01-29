@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.exceptions import APIException
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -7,7 +8,12 @@ from flare_portal.experiments.models import Experiment
 from flare_portal.site_config.models import SiteConfiguration
 
 from . import constants
-from .forms import ConfigurationForm, SubmissionForm, TermsAndConditionsForm
+from .forms import (
+    ConfigurationForm,
+    SubmissionForm,
+    TermsAndConditionsForm,
+    VoucherForm,
+)
 
 
 class ConfigurationAPIView(APIView):
@@ -56,6 +62,7 @@ class ConfigurationAPIView(APIView):
                         gsb=experiment.gsb.url if experiment.gsb else None,
                         gsc=experiment.gsc.url if experiment.gsc else None,
                         gsd=experiment.gsd.url if experiment.gsd else None,
+                        reimbursements=bool(experiment.voucher_pool),
                     ),
                     config=constants.SiteConfigurationType(
                         terms_and_conditions=config.terms_and_conditions,
@@ -70,6 +77,9 @@ class ConfigurationAPIView(APIView):
             )
 
         raise serializers.ValidationError(form.errors)
+
+
+configuration_api_view = ConfigurationAPIView.as_view()
 
 
 class SubmissionAPIView(APIView):
@@ -90,6 +100,9 @@ class SubmissionAPIView(APIView):
         raise serializers.ValidationError(form.errors)
 
 
+submission_api_view = SubmissionAPIView.as_view()
+
+
 class TermsAndConditionsAPIView(APIView):
     def post(self, request: Request, format: str = None) -> Response:
         form = TermsAndConditionsForm(request.data)
@@ -108,6 +121,32 @@ class TermsAndConditionsAPIView(APIView):
         raise serializers.ValidationError(form.errors)
 
 
-submission_api_view = SubmissionAPIView.as_view()
-configuration_api_view = ConfigurationAPIView.as_view()
 terms_and_conditions_api_view = TermsAndConditionsAPIView.as_view()
+
+
+class VoucherAPIView(APIView):
+    def handle_exception(self, exc: APIException) -> Response:
+        response = super().handle_exception(exc)
+        response.data["status"] = "error"
+        response.data["error_code"] = exc.get_codes()
+        response.data["error_message"] = exc.detail
+        del response.data["detail"]
+        return response
+
+    def post(self, request: Request, format: str = None) -> Response:
+        form = VoucherForm(request.data)
+
+        if form.is_valid():
+            voucher = form.save()
+            return Response(
+                {
+                    "status": "success",
+                    "voucher": voucher.code,
+                    "success_message": voucher.pool.success_message,
+                }
+            )
+
+        return Response({"status": "error"}, status=400)
+
+
+voucher_api_view = VoucherAPIView.as_view()

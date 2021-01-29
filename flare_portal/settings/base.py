@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     "scout_apm.django",
     "flare_portal.api",
     "flare_portal.experiments",
+    "flare_portal.reimbursement",
     "flare_portal.site_config",
     "flare_portal.users",
     "flare_portal.utils",

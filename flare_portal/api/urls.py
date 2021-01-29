@@ -12,4 +12,5 @@ urlpatterns = [
         views.terms_and_conditions_api_view,
         name="terms_and_conditions",
     ),
+    path("vouchers/", views.voucher_api_view, name="voucher"),
 ] + data_api_registry.urls
