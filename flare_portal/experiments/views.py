@@ -8,7 +8,7 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404
 from django.template.defaultfilters import pluralize
 from django.urls import reverse, reverse_lazy
-from django.views.generic import DetailView, ListView
+from django.views.generic import DetailView, ListView, View
 from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateView
 
 from rest_framework.exceptions import ParseError, ValidationError
@@ -16,6 +16,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from .exports import ZipExporter
 from .forms import (
     ExperimentCreateForm,
     ExperimentForm,
@@ -446,3 +447,33 @@ class ModuleSortView(APIView):
 
 
 module_sort_view = ModuleSortView.as_view()
+
+
+class ExportView(DetailView):
+    context_object_name = "experiment"
+    pk_url_kwarg = "experiment_pk"
+    queryset = Experiment.objects.select_related("project")
+    object: Experiment
+    template_name = "experiments/export.html"
+
+
+export_view = ExportView.as_view()
+
+
+class ExportDownloadView(View):
+    def get(
+        self, request: HttpRequest, project_pk: int, experiment_pk: int
+    ) -> HttpResponse:
+        experiment = get_object_or_404(Experiment, pk=experiment_pk)
+
+        response = HttpResponse()
+
+        exporter = ZipExporter(experiment)
+        filename = exporter.write(response)  # type: ignore
+
+        response["Content-Disposition"] = f"attachment; filename={filename}"
+
+        return response
+
+
+export_download_view = ExportDownloadView.as_view()
