@@ -46,6 +46,16 @@ urlpatterns = [
         name="experiment_delete",
     ),
     path(
+        "projects/<int:project_pk>/experiments/<int:experiment_pk>/export/",
+        views.export_view,
+        name="export",
+    ),
+    path(
+        "projects/<int:project_pk>/experiments/<int:experiment_pk>/export/download/",
+        views.export_download_view,
+        name="export_download",
+    ),
+    path(
         "projects/<int:project_pk>/experiments/<int:experiment_pk>/sort-modules/",
         views.module_sort_view,
         name="module_sort",

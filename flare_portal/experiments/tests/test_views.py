@@ -6,6 +6,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.urls import reverse
 
+from freezegun import freeze_time
 from rest_framework.test import APITestCase
 
 from flare_portal.users.factories import UserFactory
@@ -1508,4 +1509,43 @@ class ModuleSortViewTest(APITestCase):
         self.assertEqual(
             resp.json()["message"],
             "Invalid configuration. Breaks must not overlap.",
+        )
+
+
+class ExportViewTest(TestCase):
+    def setUp(self) -> None:
+        self.user: User = UserFactory()
+        self.user.grant_role("RESEARCHER")
+        self.user.save()
+
+        self.client.force_login(self.user)
+
+        self.experiment: Experiment = ExperimentFactory(code="DEMO1")
+        self.project = self.experiment.project
+
+    def test_get(self) -> None:
+        url = reverse(
+            "experiments:export",
+            kwargs={"project_pk": self.project.pk, "experiment_pk": self.experiment.pk},
+        )
+
+        resp = self.client.get(url)
+
+        self.assertEqual(200, resp.status_code)
+
+    def test_download(self) -> None:
+        url = reverse(
+            "experiments:export_download",
+            kwargs={"project_pk": self.project.pk, "experiment_pk": self.experiment.pk},
+        )
+
+        with freeze_time("20210101T1200"):
+            resp = self.client.get(url)
+
+        # Not actually checking the contents of the zip because it's hard to
+        # test
+        self.assertEqual(200, resp.status_code)
+        self.assertEqual(
+            resp.get("Content-Disposition"),
+            "attachment; filename=DEMO1-20210101T120000Z.zip",
         )
