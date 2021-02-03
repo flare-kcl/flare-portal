@@ -31,6 +31,7 @@ from .models import (
     InstructionsModule,
     Module,
     Participant,
+    PostExperimentQuestionsModule,
     TaskInstructionsModule,
     TextModule,
     VolumeCalibrationData,
@@ -258,6 +259,7 @@ module_registry.register(InstructionsModule)
 module_registry.register(TaskInstructionsModule)
 module_registry.register(TextModule)
 module_registry.register(WebModule)
+module_registry.register(PostExperimentQuestionsModule)
 
 
 class DataViewMixin:

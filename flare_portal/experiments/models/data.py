@@ -320,3 +320,14 @@ class AffectiveRatingData(BaseData):
     def clean(self) -> None:
         if self.rating < 0 or self.rating > 10:
             raise ValidationError("The rating must be between int between 0 & 10")
+
+
+class PostExperimentQuestionsData(BaseData):
+    experiment_unpleasant_scale = models.PositiveIntegerField()
+    did_follow_insuctions = models.BooleanField(null=True)
+    were_headphones_removed = models.BooleanField(null=True)
+    headphones_removal_reason = models.CharField(max_length=255, null=True)
+    were_paying_attention = models.BooleanField(null=True)
+    task_enviroment = models.CharField(max_length=255, null=True)
+    was_alone = models.BooleanField(null=True)
+    was_interrupted = models.BooleanField(null=True)
