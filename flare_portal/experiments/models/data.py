@@ -323,11 +323,39 @@ class AffectiveRatingData(BaseData):
 
 
 class PostExperimentQuestionsData(BaseData):
-    experiment_unpleasant_scale = models.PositiveIntegerField()
-    did_follow_insuctions = models.BooleanField(null=True)
-    were_headphones_removed = models.BooleanField(null=True)
+    experiment_unpleasant_rating = models.PositiveIntegerField()
+    did_follow_instructions = models.BooleanField(null=True)
+    did_remove_headphones = models.BooleanField(null=True)
     headphones_removal_reason = models.CharField(max_length=255, null=True)
-    were_paying_attention = models.BooleanField(null=True)
-    task_enviroment = models.CharField(max_length=255, null=True)
+    did_pay_attention = models.BooleanField(null=True)
+    task_environment = models.CharField(max_length=255, null=True)
     was_alone = models.BooleanField(null=True)
     was_interrupted = models.BooleanField(null=True)
+    module = models.ForeignKey(  # type: ignore
+        "experiments.PostExperimentQuestionsModule",
+        on_delete=models.PROTECT,
+        related_name="data",
+    )
+
+    list_display = [
+        "experiment_unpleasant_rating",
+        "did_follow_instructions",
+        "did_remove_headphones",
+        "task_environment",
+        "was_alone",
+        "was_interrupted",
+    ]
+
+    fields = [
+        "experiment_unpleasant_rating",
+        "did_follow_instructions",
+        "did_remove_headphones",
+        "headphones_removal_reason",
+        "task_environment",
+        "was_alone",
+        "was_interrupted",
+    ]
+
+    class Meta:
+        # Data for this module can only be submitted once.
+        unique_together = ("participant", "module")

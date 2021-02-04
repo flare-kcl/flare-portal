@@ -614,43 +614,41 @@ class TaskInstructionsModule(Module):
 
 
 class PostExperimentQuestionsModule(Module):
-    experiment_unpleasant_scale = models.BooleanField(
-        # verbose_name="Show experiment unpleasent scale",
-        verbose_name="How unpleasant did you find the experiment with the loud noises?",
+    heading = models.CharField(
+        max_length=255,
+        default="Review Questions",
+        help_text="Title at the top of the questions screen",
+    )
+
+    experiment_unpleasant_rating = models.BooleanField(
+        verbose_name="How unpleasant did you find the experiment with the loud "
+        "noises?",
     )
 
     did_follow_instructions = models.BooleanField(
-        # verbose_name="Ask did they follow instructions?",
         verbose_name="Did you follow the instructions fully during the session?",
     )
 
-    were_headphones_removed = models.BooleanField(
-        # verbose_name="Ask did they remove their headphones?",
-        verbose_name="Did you remove your headphones at any point during the experiment?",
+    did_remove_headphones = models.BooleanField(
+        verbose_name="Did you remove your headphones at any point during the "
+        "experiment?",
     )
 
-    headphones_removal_reason = models.BooleanField(
-        # verbose_name="Ask why they removed their headphones?",
-        verbose_name="At what point did you remove your headphones?",
-    )
-
-    rating_attention = models.BooleanField(
-        # verbose_name="Ask were they paying attention while rating images?",
-        verbose_name="Were you paying attention throughout the task where you were rating images?",
+    did_pay_attention = models.BooleanField(
+        verbose_name="Were you paying attention throughout the task where you "
+        "were rating images?",
     )
 
     task_environment = models.BooleanField(
-        # verbose_name="Ask where were they when conducted the experiment?",
         verbose_name="Where did you do the task?",
     )
 
     was_alone = models.BooleanField(
-        # verbose_name="Ask were they alone during the experiment?",
-        verbose_name="Were there any other people in the room (or passing by) while you were doing the task?",
+        verbose_name="Were there any other people in the room (or passing by) "
+        "while you were doing the task?",
     )
 
     was_interrupted = models.BooleanField(
-        # verbose_name="Ask if they were interupted during the experiment?",
         verbose_name="Were you interrupted during the task?",
     )
 
@@ -659,13 +657,15 @@ class PostExperimentQuestionsModule(Module):
             id=self.pk,
             type=self.get_module_tag(),
             config={
-                "experiment_unpleasant_scale": self.experiment_unpleasant_scale,
-                "did_follow_instructions": self.did_follow_instructions,
-                "were_headphones_removed": self.were_headphones_removed,
-                "headphones_removal_reason": self.headphones_removal_reason,
-                "rating_attention": self.rating_attention,
-                "task_environment": self.task_environment,
-                "was_alone": self.was_alone,
-                "was_interrupted": self.was_interrupted,
+                "heading": self.heading,
+                "questions": {
+                    "experiment_unpleasant_rating": self.experiment_unpleasant_rating,
+                    "did_follow_instructions": self.did_follow_instructions,
+                    "did_remove_headphones": self.did_remove_headphones,
+                    "did_pay_attention": self.did_pay_attention,
+                    "task_environment": self.task_environment,
+                    "was_alone": self.was_alone,
+                    "was_interrupted": self.was_interrupted,
+                },
             },
         )

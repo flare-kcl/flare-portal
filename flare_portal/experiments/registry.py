@@ -31,6 +31,7 @@ from .models import (
     InstructionsModule,
     Module,
     Participant,
+    PostExperimentQuestionsData,
     PostExperimentQuestionsModule,
     TaskInstructionsModule,
     TextModule,
@@ -416,3 +417,4 @@ data_viewset_registry.register(
     FearConditioningData, list_view_class=FearConditioningDataListView
 )
 data_viewset_registry.register(VolumeCalibrationData)
+data_viewset_registry.register(PostExperimentQuestionsData)
