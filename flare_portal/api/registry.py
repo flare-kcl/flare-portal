@@ -12,8 +12,8 @@ from flare_portal.experiments.models import (
     CriterionData,
     FearConditioningData,
     Participant,
-    VolumeCalibrationData,
     PostExperimentQuestionsData,
+    VolumeCalibrationData,
 )
 
 
