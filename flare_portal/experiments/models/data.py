@@ -374,6 +374,29 @@ class USUnpleasantnessData(BaseData):
         "rating",
     ]
 
+
+class ContingencyAwarenessData(BaseData):
+    awareness_answer = models.BooleanField()
+    confirmation_answer = models.CharField(max_length=3)
+    is_aware = models.BooleanField()
+    module = models.ForeignKey(  # type: ignore
+        "experiments.ContingencyAwarenessModule",
+        on_delete=models.PROTECT,
+        related_name="data",
+    )
+
+    list_display = [
+        "participant",
+        "is_aware",
+    ]
+
+    fields = [
+        "participant",
+        "awareness_answer",
+        "confirmation_answer",
+        "is_aware",
+    ]
+
     class Meta:
         # Data for this module can only be submitted once.
         unique_together = ("participant", "module")
