@@ -17,6 +17,12 @@ class Voucher(models.Model):
         blank=True,
     )
 
+    class Meta:
+        unique_together = (
+            "code",
+            "pool",
+        )
+
     def __str__(self) -> str:
         return self.code
 
