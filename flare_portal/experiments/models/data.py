@@ -337,6 +337,10 @@ class PostExperimentQuestionsData(BaseData):
         related_name="data",
     )
 
+    class Meta:
+        # Data for this module can only be submitted once.
+        unique_together = ("participant", "module")
+
     list_display = [
         "experiment_unpleasant_rating",
         "did_follow_instructions",
@@ -354,6 +358,20 @@ class PostExperimentQuestionsData(BaseData):
         "task_environment",
         "was_alone",
         "was_interrupted",
+    ]
+
+
+class USUnpleasantnessData(BaseData):
+    rating = models.PositiveIntegerField()
+    module = models.ForeignKey(  # type: ignore
+        "experiments.USUnpleasantnessModule",
+        on_delete=models.PROTECT,
+        related_name="data",
+    )
+
+    list_display = [
+        "participant",
+        "rating",
     ]
 
     class Meta:

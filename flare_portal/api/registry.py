@@ -13,6 +13,7 @@ from flare_portal.experiments.models import (
     FearConditioningData,
     Participant,
     PostExperimentQuestionsData,
+    USUnpleasantnessData,
     VolumeCalibrationData,
 )
 
@@ -91,3 +92,4 @@ data_api_registry.register(CriterionData)
 data_api_registry.register(FearConditioningData)
 data_api_registry.register(VolumeCalibrationData)
 data_api_registry.register(PostExperimentQuestionsData)
+data_api_registry.register(USUnpleasantnessData)

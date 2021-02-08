@@ -6,6 +6,7 @@ from .data import (
     CriterionData,
     FearConditioningData,
     PostExperimentQuestionsData,
+    USUnpleasantnessData,
     VolumeCalibrationData,
 )
 from .modules import (
@@ -22,6 +23,7 @@ from .modules import (
     PostExperimentQuestionsModule,
     TaskInstructionsModule,
     TextModule,
+    USUnpleasantnessModule,
     WebModule,
 )
 
@@ -48,6 +50,8 @@ __all__ = [
     "PostExperimentQuestionsModule",
     "TaskInstructionsModule",
     "TextModule",
+    "USUnpleasantnessData",
+    "USUnpleasantnessModule",
     "VolumeCalibrationData",
     "WebModule",
 ]
