@@ -692,7 +692,7 @@ class USUnpleasantnessModule(Module):
 
 def construct_awareness_question(first_keyword: str, second_keyword: str) -> str:
     return "Did you happen to notice whether you heard the "
-    f"{first_keyword} after seeing a certain {second_keyword}?"
+    +f"{first_keyword} after seeing a certain {second_keyword}?"
 
 
 class ContingencyAwarenessModule(Module):
