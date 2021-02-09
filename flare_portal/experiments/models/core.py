@@ -29,6 +29,7 @@ def experiment_assets_path(instance: "Experiment", filename: str) -> str:
 class Experiment(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
+    contact_email = models.EmailField(blank=True)
     code = models.CharField(
         max_length=6,
         unique=True,
