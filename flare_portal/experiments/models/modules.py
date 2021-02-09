@@ -669,3 +669,22 @@ class PostExperimentQuestionsModule(Module):
                 },
             },
         )
+
+
+class USUnpleasantnessModule(Module):
+    audible_keyword = models.CharField(
+        max_length=255, help_text="How unpleasent did you find the ......?"
+    )
+
+    def get_module_config(self) -> constants.ModuleConfigType:
+        return constants.ModuleConfigType(
+            id=self.pk,
+            type=self.get_module_tag(),
+            config={"question": self.construct_question()},
+        )
+
+    def construct_question(self) -> str:
+        return f"How unpleasent did you find the {self.audible_keyword}?"
+
+    def get_module_description(self) -> str:
+        return self.construct_question()
