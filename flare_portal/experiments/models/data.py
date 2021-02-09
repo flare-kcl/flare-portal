@@ -369,6 +369,10 @@ class USUnpleasantnessData(BaseData):
         related_name="data",
     )
 
+    class Meta:
+        # Data for this module can only be submitted once.
+        unique_together = ("participant", "module")
+
     list_display = [
         "participant",
         "rating",
@@ -385,6 +389,10 @@ class ContingencyAwarenessData(BaseData):
         related_name="data",
     )
 
+    class Meta:
+        # Data for this module can only be submitted once.
+        unique_together = ("participant", "module")
+
     list_display = [
         "participant",
         "is_aware",
@@ -396,7 +404,3 @@ class ContingencyAwarenessData(BaseData):
         "confirmation_answer",
         "is_aware",
     ]
-
-    class Meta:
-        # Data for this module can only be submitted once.
-        unique_together = ("participant", "module")
