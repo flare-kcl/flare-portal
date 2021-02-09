@@ -688,3 +688,37 @@ class USUnpleasantnessModule(Module):
 
     def get_module_description(self) -> str:
         return self.construct_question()
+
+
+def construct_awareness_question(first_keyword: str, second_keyword: str) -> str:
+    return (
+        "Did you happen to notice whether you heard the "
+        + f"{first_keyword} after seeing a certain {second_keyword}?"
+    )
+
+
+class ContingencyAwarenessModule(Module):
+    audible_keyword = models.CharField(
+        max_length=255,
+        help_text=construct_awareness_question("......", "stimuli"),
+    )
+    visual_keyword = models.CharField(
+        max_length=255,
+        help_text=construct_awareness_question("sound", "......"),
+    )
+
+    def get_module_config(self) -> constants.ModuleConfigType:
+        return constants.ModuleConfigType(
+            id=self.pk,
+            type=self.get_module_tag(),
+            config={
+                "awareness_question": construct_awareness_question(
+                    self.audible_keyword, self.visual_keyword
+                ),
+                "confirmation_question": f"Which {self.visual_keyword} "
+                f"did you associate with the {self.audible_keyword}?",
+            },
+        )
+
+    def get_module_description(self) -> str:
+        return construct_awareness_question(self.audible_keyword, self.visual_keyword)
