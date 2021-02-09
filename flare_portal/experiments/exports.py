@@ -209,7 +209,7 @@ class PostExperimentQuestionsDataSerializer(DataSerializer):
 class PostExperimentQuestionsDataExporter(DataExporter):
     serializer_class = BasicInfoDataSerializer
 
-    def get_queryset(self) -> QuerySet[BasicInfoData]:
+    def get_queryset(self) -> QuerySet[PostExperimentQuestionsData]:
         return (
             PostExperimentQuestionsData.objects.filter(
                 module__experiment=self.experiment
