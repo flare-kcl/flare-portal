@@ -16,6 +16,7 @@ from .models import (
     Experiment,
     FearConditioningData,
     Participant,
+    PostExperimentQuestionsData,
     VolumeCalibrationData,
 )
 
@@ -190,6 +191,34 @@ class VolumeCalibrationDataExporter(DataExporter):
         )
 
 
+class PostExperimentQuestionsDataSerializer(DataSerializer):
+    class Meta:
+        model = BasicInfoData
+        fields = DataSerializer.Meta.fields + [
+            "experiment_unpleasant_rating",
+            "did_follow_instructions",
+            "did_remove_headphones",
+            "headphones_removal_reason",
+            "did_pay_attention",
+            "task_environment",
+            "was_alone",
+            "was_interrupted",
+        ]
+
+
+class PostExperimentQuestionsDataExporter(DataExporter):
+    serializer_class = BasicInfoDataSerializer
+
+    def get_queryset(self) -> QuerySet[PostExperimentQuestionsData]:
+        return (
+            PostExperimentQuestionsData.objects.filter(
+                module__experiment=self.experiment
+            )
+            .select_related("participant", "module")
+            .order_by("participant_id", "module__sortorder")
+        )
+
+
 class ParticipantSerializer(serializers.ModelSerializer):
     experiment_code = serializers.CharField(source="experiment.code")
     voucher = serializers.CharField(source="get_voucher_display")
@@ -227,6 +256,7 @@ class ZipExporter:
         CriterionDataExporter,
         VolumeCalibrationDataExporter,
         ParticipantExporter,
+        PostExperimentQuestionsDataExporter,
     ]
 
     def __init__(self, experiment: Experiment):
