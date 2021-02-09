@@ -12,6 +12,7 @@ from rest_framework import serializers
 from .models import (
     AffectiveRatingData,
     BasicInfoData,
+    ContingencyAwarenessData,
     CriterionData,
     Experiment,
     FearConditioningData,
@@ -147,6 +148,27 @@ class BasicInfoDataExporter(DataExporter):
         )
 
 
+class ContingencyAwarenessDataSerializer(DataSerializer):
+    class Meta:
+        model = ContingencyAwarenessData
+        fields = DataSerializer.Meta.fields + [
+            "awareness_answer",
+            "confirmation_answer",
+            "is_aware",
+        ]
+
+
+class ContingencyAwarenessDataExporter(DataExporter):
+    serializer_class = ContingencyAwarenessDataSerializer
+
+    def get_queryset(self) -> QuerySet[ContingencyAwarenessData]:
+        return (
+            ContingencyAwarenessData.objects.filter(module__experiment=self.experiment)
+            .select_related("participant", "module")
+            .order_by("participant_id", "module__sortorder")
+        )
+
+
 class CriterionDataSerializer(DataSerializer):
     question_id = serializers.CharField(source="question.pk")
     question = serializers.CharField(source="question.question_text")
@@ -274,6 +296,8 @@ class ZipExporter:
         BasicInfoDataExporter,
         FearConditioningDataExporter,
         CriterionDataExporter,
+        ContingencyAwarenessDataExporter,
+        VolumeCalibrationDataExporter,
         ParticipantExporter,
         PostExperimentQuestionsDataExporter,
         USUnpleasantnessDataExporter,

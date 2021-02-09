@@ -23,6 +23,8 @@ from .models import (
     BasicInfoData,
     BasicInfoModule,
     BreakStartModule,
+    ContingencyAwarenessData,
+    ContingencyAwarenessModule,
     CriterionData,
     CriterionModule,
     Experiment,
@@ -257,6 +259,7 @@ module_registry.register(BasicInfoModule)
 # when the start module is created/deleted
 module_registry.register(BreakStartModule, create_view_class=BreakModuleCreateView)
 module_registry.register(CriterionModule)
+module_registry.register(ContingencyAwarenessModule)
 module_registry.register(FearConditioningModule)
 module_registry.register(InstructionsModule)
 module_registry.register(TaskInstructionsModule)
@@ -416,6 +419,7 @@ data_viewset_registry = DataViewsetRegistry()
 data_viewset_registry.register(AffectiveRatingData)
 data_viewset_registry.register(BasicInfoData)
 data_viewset_registry.register(CriterionData, list_view_class=CriterionDataListView)
+data_viewset_registry.register(ContingencyAwarenessData)
 data_viewset_registry.register(
     FearConditioningData, list_view_class=FearConditioningDataListView
 )

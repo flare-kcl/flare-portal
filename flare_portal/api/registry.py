@@ -9,6 +9,7 @@ from flare_portal.experiments.models import (
     AffectiveRatingData,
     BaseData,
     BasicInfoData,
+    ContingencyAwarenessData,
     CriterionData,
     FearConditioningData,
     Participant,
@@ -89,6 +90,7 @@ data_api_registry = DataAPIRegistry()
 data_api_registry.register(AffectiveRatingData)
 data_api_registry.register(BasicInfoData)
 data_api_registry.register(CriterionData)
+data_api_registry.register(ContingencyAwarenessData)
 data_api_registry.register(FearConditioningData)
 data_api_registry.register(VolumeCalibrationData)
 data_api_registry.register(PostExperimentQuestionsData)
