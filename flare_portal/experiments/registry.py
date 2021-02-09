@@ -35,6 +35,8 @@ from .models import (
     PostExperimentQuestionsModule,
     TaskInstructionsModule,
     TextModule,
+    USUnpleasantnessData,
+    USUnpleasantnessModule,
     VolumeCalibrationData,
     WebModule,
 )
@@ -261,6 +263,7 @@ module_registry.register(TaskInstructionsModule)
 module_registry.register(TextModule)
 module_registry.register(WebModule)
 module_registry.register(PostExperimentQuestionsModule)
+module_registry.register(USUnpleasantnessModule)
 
 
 class DataViewMixin:
@@ -418,3 +421,4 @@ data_viewset_registry.register(
 )
 data_viewset_registry.register(VolumeCalibrationData)
 data_viewset_registry.register(PostExperimentQuestionsData)
+data_viewset_registry.register(USUnpleasantnessData)
