@@ -611,3 +611,61 @@ class TaskInstructionsModule(Module):
 
     def __str__(self) -> str:
         return "Task instructions - " + super().__str__()
+
+
+class PostExperimentQuestionsModule(Module):
+    heading = models.CharField(
+        max_length=255,
+        default="Review Questions",
+        help_text="Title at the top of the questions screen",
+    )
+
+    experiment_unpleasant_rating = models.BooleanField(
+        verbose_name="How unpleasant did you find the experiment with the loud "
+        "noises?",
+    )
+
+    did_follow_instructions = models.BooleanField(
+        verbose_name="Did you follow the instructions fully during the session?",
+    )
+
+    did_remove_headphones = models.BooleanField(
+        verbose_name="Did you remove your headphones at any point during the "
+        "experiment?",
+    )
+
+    did_pay_attention = models.BooleanField(
+        verbose_name="Were you paying attention throughout the task where you "
+        "were rating images?",
+    )
+
+    task_environment = models.BooleanField(
+        verbose_name="Where did you do the task?",
+    )
+
+    was_alone = models.BooleanField(
+        verbose_name="Were there any other people in the room (or passing by) "
+        "while you were doing the task?",
+    )
+
+    was_interrupted = models.BooleanField(
+        verbose_name="Were you interrupted during the task?",
+    )
+
+    def get_module_config(self) -> constants.ModuleConfigType:
+        return constants.ModuleConfigType(
+            id=self.pk,
+            type=self.get_module_tag(),
+            config={
+                "heading": self.heading,
+                "questions": {
+                    "experiment_unpleasant_rating": self.experiment_unpleasant_rating,
+                    "did_follow_instructions": self.did_follow_instructions,
+                    "did_remove_headphones": self.did_remove_headphones,
+                    "did_pay_attention": self.did_pay_attention,
+                    "task_environment": self.task_environment,
+                    "was_alone": self.was_alone,
+                    "was_interrupted": self.was_interrupted,
+                },
+            },
+        )
