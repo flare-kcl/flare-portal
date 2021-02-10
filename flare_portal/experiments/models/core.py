@@ -157,11 +157,13 @@ class Participant(models.Model):
     experiment = models.ForeignKey(
         "experiments.Experiment", on_delete=models.CASCADE, related_name="participants"
     )
+
     current_module = models.ForeignKey(
         "experiments.BaseModule", on_delete=models.CASCADE, null=True
     )
     current_trial_index = models.PositiveIntegerField(null=True)
     agreed_to_terms_and_conditions = models.BooleanField(default=False)
+    rejection_reason = models.CharField(max_length=255, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     udpated_at = models.DateTimeField(auto_now=True)

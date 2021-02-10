@@ -163,8 +163,13 @@ class ParticipantTrackingAPIView(APIView):
             return Response(
                 {
                     "participant": participant.participant_id,
-                    "current_module": participant.current_module.pk,
-                    "current_trial": participant.current_trial_index,
+                    "rejection_reason": participant.rejection_reason or None,
+                    "current_module": participant.current_module.pk
+                    if participant.current_module
+                    else None,
+                    "current_trial": participant.current_trial_index
+                    if participant.current_trial_index
+                    else None,
                 }
             )
 

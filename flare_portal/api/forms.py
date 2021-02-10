@@ -165,12 +165,13 @@ class ParticipantTrackingForm(forms.Form):
         queryset=Participant.objects.all(),
         to_field_name="participant_id",
     )
-
-    trial_index = forms.IntegerField(required=False)
     module = forms.ModelChoiceField(
         queryset=BaseModule.objects.all(),
         to_field_name="pk",
     )
+
+    trial_index = forms.IntegerField(required=False)
+    rejection_reason = forms.CharField(max_length=255, required=False)
 
     def clean(self) -> Dict[str, Any]:
         cleaned_data = super().clean()
@@ -188,12 +189,17 @@ class ParticipantTrackingForm(forms.Form):
 
                 # Check trial index is supplied
                 if type(module.specific()) == FearConditioningModule:
-                    if cleaned_data["trial_index"] is None:
+                    if cleaned_data["trial_index"] == None:
                         self.add_error(
                             "trial_index",
                             "trial_index missing for Fear Conditioning module.",
                         )
                 else:
+                    cleaned_data["trial_index"] = None
+
+                # Invalidate tracking if locked out
+                if cleaned_data["rejection_reason"]:
+                    cleaned_data["module"] = None
                     cleaned_data["trial_index"] = None
 
         return cleaned_data
@@ -206,6 +212,7 @@ class ParticipantTrackingForm(forms.Form):
         participant: Participant = self.cleaned_data["participant"]
         participant.current_module = self.cleaned_data["module"]
         participant.current_trial_index = self.cleaned_data["trial_index"]
+        participant.rejection_reason = self.cleaned_data["rejection_reason"]
         participant.save()
 
         return participant
