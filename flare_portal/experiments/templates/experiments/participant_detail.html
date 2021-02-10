@@ -2,23 +2,23 @@
 
 {% load experiments_tags %}
 
-{% block title %}{{ data.participant }} - {{ data_type.get_module_name|capfirst }} - {{ experiment.name }}{% endblock title %}
+{% block title %}{{ participant.participant_id }} - {{ experiment.name }}{% endblock title %}
 
 {% block content %}
     <div class="container">
         <div class="row">
             <div class="col-lg-4">
-
+                {% include "experiments/includes/experiment_sidebar.html" %}
             </div>
             <div class="col-lg-8">
                 <div class="card">
                     <div class="card-body">
                         <h3 class="mb-1">{{ data_type.get_module_name|capfirst }}</h3>
-                        <div><i class="fe fe-user"></i> {{ data.participant }}</div>
+                        <div><i class="fe fe-user"></i> {{ participant.participant_id }}</div>
                     </div>
                     <div class="card-body">
                         <div class="row">
-                            {% for name, value in data.get_data_values %}
+                            {% for name, value in participant.get_data_values %}
                                 <dt class="col-3">{{ name|capfirst }}</dt>
                                 <dd class="col-9">
                                     {% if value|is_boolean %}

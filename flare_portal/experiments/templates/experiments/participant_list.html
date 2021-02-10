@@ -52,7 +52,7 @@
                                 <tbody>
                                     {% for form in formset %}
                                         <tr>
-                                            <td><span class="text-muted">{{ forloop.counter }}</span></td>
+                                            <td><a href="{% url "experiments:participant_detail" project_pk=view.kwargs.project_pk experiment_pk=view.kwargs.experiment_pk participant_pk=form.instance.pk %}"><span class="text-muted">{{ forloop.counter }}</span></a></td>
                                             <td>
                                                 {% if form.non_field_errors %}
                                                     {% for error in form.non_field_errors %}

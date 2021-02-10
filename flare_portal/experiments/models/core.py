@@ -186,6 +186,24 @@ class Participant(models.Model):
 
         return ""
 
+    def get_data_values(self):
+        """Returns data for the data detail view"""
+        fields = [
+            ("Experiment", self.experiment),
+            ("Last Updated", self.udpated_at),
+            ("Started At", self.started_at),
+            ("Finished At", self.finished_at),
+            ("Rejection Reason", self.rejection_reason),
+            ("Agreed to T&C's", self.agreed_to_terms_and_conditions),
+            (
+                "Current Module",
+                self.current_module.label if self.current_module else None,
+            ),
+            ("Current Trial Index", self.current_trial_index),
+        ]
+
+        return fields
+
     def __str__(self) -> str:
         return self.participant_id
 

@@ -83,6 +83,12 @@ urlpatterns = [
         views.participant_delete_view,
         name="participant_delete",
     ),
+    path(
+        "projects/<int:project_pk>/experiments/<int:experiment_pk>/"
+        "participants/<int:participant_pk>/detail/",
+        views.participant_detail_view,
+        name="participant_detail",
+    ),
     path("", include((module_registry.urls, "modules"))),
     path("", include((data_viewset_registry.urls, "data"))),
 ]
