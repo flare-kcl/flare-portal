@@ -1054,7 +1054,7 @@ contextlib2 = ">=0.5.5"
 
 [[package]]
 name = "scout-apm"
-version = "2.17.0"
+version = "2.18.0"
 description = "Scout Application Performance Monitoring Agent"
 category = "main"
 optional = false
@@ -1320,7 +1320,7 @@ gunicorn = ["gunicorn"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "3ef888581835312a49d2c74a642c45579b4acada4b7fba5707fd9f5cd9e35420"
+content-hash = "45e9115cf6bd1c5414e618dcd0f85eb14453c0e1344072c3889bea6a7ebd899d"
 
 [metadata.files]
 appdirs = [
@@ -1405,6 +1405,7 @@ cffi = [
     {file = "cffi-1.14.4-cp39-cp39-macosx_10_9_x86_64.whl", hash = "sha256:840793c68105fe031f34d6a086eaea153a0cd5c491cde82a74b420edd0a2b909"},
     {file = "cffi-1.14.4-cp39-cp39-manylinux1_i686.whl", hash = "sha256:b18e0a9ef57d2b41f5c68beefa32317d286c3d6ac0484efd10d6e07491bb95dd"},
     {file = "cffi-1.14.4-cp39-cp39-manylinux1_x86_64.whl", hash = "sha256:045d792900a75e8b1e1b0ab6787dd733a8190ffcf80e8c8ceb2fb10a29ff238a"},
+    {file = "cffi-1.14.4-cp39-cp39-manylinux2014_aarch64.whl", hash = "sha256:7ef7d4ced6b325e92eb4d3502946c78c5367bc416398d387b39591532536734e"},
     {file = "cffi-1.14.4-cp39-cp39-win32.whl", hash = "sha256:ba4e9e0ae13fc41c6b23299545e5ef73055213e466bd107953e4a013a5ddd7e3"},
     {file = "cffi-1.14.4-cp39-cp39-win_amd64.whl", hash = "sha256:f032b34669220030f905152045dfa27741ce1a6db3324a5bc0b96b6c7420c87b"},
     {file = "cffi-1.14.4.tar.gz", hash = "sha256:1a465cbe98a7fd391d47dce4b8f7e5b921e6cd805ef421d04f5f66ba8f06086c"},
@@ -1945,25 +1946,34 @@ schema = [
     {file = "schema-0.7.3.tar.gz", hash = "sha256:4cf529318cfd1e844ecbe02f41f7e5aa027463e7403666a52746f31f04f47a5e"},
 ]
 scout-apm = [
-    {file = "scout_apm-2.17.0-cp35-cp35m-manylinux1_i686.whl", hash = "sha256:23ecc92d852c4c7adc7340701f8787ed119b06ed072e610f0324ae904e032b77"},
-    {file = "scout_apm-2.17.0-cp35-cp35m-manylinux1_x86_64.whl", hash = "sha256:381c65e04b97581d70d9a5d405dd5cb95c3c3cc6908450f72ebde84b138ceffb"},
-    {file = "scout_apm-2.17.0-cp35-cp35m-manylinux2010_i686.whl", hash = "sha256:299967150693911105d1de067b3ff7c179437457aa565db81c3f9cb32026b7d7"},
-    {file = "scout_apm-2.17.0-cp35-cp35m-manylinux2010_x86_64.whl", hash = "sha256:2444802b43b1191666978787b435e804b66850046614419c835d242a97a909dd"},
-    {file = "scout_apm-2.17.0-cp36-cp36m-manylinux1_i686.whl", hash = "sha256:56fb2da6d070f06717870d8bd5cd0a97e47988fe9a960ceb7211602f3b233016"},
-    {file = "scout_apm-2.17.0-cp36-cp36m-manylinux1_x86_64.whl", hash = "sha256:64f1ee0633a7ac6c99e11afeaac4ebf950ceca5542780975960a7f1f535cd246"},
-    {file = "scout_apm-2.17.0-cp36-cp36m-manylinux2010_i686.whl", hash = "sha256:1b69c7a1355f8dc07fa32a2d93de00ec8a8bc1b4006d631838ea5030676f46fa"},
-    {file = "scout_apm-2.17.0-cp36-cp36m-manylinux2010_x86_64.whl", hash = "sha256:8966b16667c13466e246ab8ef0b2620464bd7707eb49d4d07609aaf943900fba"},
-    {file = "scout_apm-2.17.0-cp37-cp37m-manylinux1_i686.whl", hash = "sha256:46d5574b357aab2bf11ef0cc20481a2d4cc0df8a292ed2ee76304e4b90391033"},
-    {file = "scout_apm-2.17.0-cp37-cp37m-manylinux1_x86_64.whl", hash = "sha256:70e6438c868bf5e013ffacba066518cd678ed44ee4ff0aa5917358b7b8ba1bf1"},
-    {file = "scout_apm-2.17.0-cp37-cp37m-manylinux2010_i686.whl", hash = "sha256:b89b9e68710290db7d25dc00402fb1d3d28bb7fc0f1dbd3c8e21d61d7a2ff992"},
-    {file = "scout_apm-2.17.0-cp37-cp37m-manylinux2010_x86_64.whl", hash = "sha256:1247ac71ab797956ff3bb64af056168de76b9fc0b086bd492cb2b5cf8cd436e8"},
-    {file = "scout_apm-2.17.0-cp38-cp38-manylinux1_i686.whl", hash = "sha256:553e1897ce4d5e180a2257abf5d9964d7d7d62a6320e63dae4cc8bb12802bc6b"},
-    {file = "scout_apm-2.17.0-cp38-cp38-manylinux1_x86_64.whl", hash = "sha256:da3e1f3d991caf2a5e6a06a3e07099d62c4496613ae397420690adaa368597c2"},
-    {file = "scout_apm-2.17.0-cp38-cp38-manylinux2010_i686.whl", hash = "sha256:c246d9e751a91725a2fecc5e6bfa48c1c1fb17e3667d0668d124158525db0865"},
-    {file = "scout_apm-2.17.0-cp38-cp38-manylinux2010_x86_64.whl", hash = "sha256:9cbf8f207e057d6e5e857b03087e596d18aca927b080c8b2b4993cc62e343423"},
-    {file = "scout_apm-2.17.0-py2-none-any.whl", hash = "sha256:17627aa62065fa2ef92e66cb81d1bdfccaa695363b324ebeb63edd6be9dd500e"},
-    {file = "scout_apm-2.17.0-py3-none-any.whl", hash = "sha256:2679c61ce19f436fbf1d6baf805fec1cc185175dba06598a5d82b8e196bf5fe6"},
-    {file = "scout_apm-2.17.0.tar.gz", hash = "sha256:6b91c5649ba6e141666279abf225b0623ae31e44e52b079aed9e6790b09c4c33"},
+    {file = "scout_apm-2.18.0-cp35-cp35m-manylinux1_i686.whl", hash = "sha256:4dedab7baf1da21a2f4b5277b402763fe55908a12e82db2962ed881236d627d6"},
+    {file = "scout_apm-2.18.0-cp35-cp35m-manylinux1_x86_64.whl", hash = "sha256:6235a24d006ac7cbafe3c97a8ddeda980bcda76266266bbf736c24fb3a91c07e"},
+    {file = "scout_apm-2.18.0-cp35-cp35m-manylinux2010_i686.whl", hash = "sha256:6fac170cc9617010eeeaba7535112cc4aaf6494b6b7b0a087a08fa2af9ad1b26"},
+    {file = "scout_apm-2.18.0-cp35-cp35m-manylinux2010_x86_64.whl", hash = "sha256:e34d346822ae3dc137ed994adef15d4345c116fc9d838b32c024810acf9a6457"},
+    {file = "scout_apm-2.18.0-cp35-cp35m-manylinux2014_aarch64.whl", hash = "sha256:c778c75e34abcf738592101c1c6cc4206f3b69513fd29a29fb1ab562fdfc5fc4"},
+    {file = "scout_apm-2.18.0-cp36-cp36m-manylinux1_i686.whl", hash = "sha256:7f1d7177d9947b82e6c4d62446fba4dc3cbc5179c3dcfa1a9e725c9bd2f3d674"},
+    {file = "scout_apm-2.18.0-cp36-cp36m-manylinux1_x86_64.whl", hash = "sha256:91da83c936578ab2629635627a1c7de9ca865df24b434464566c77bf10b407b4"},
+    {file = "scout_apm-2.18.0-cp36-cp36m-manylinux2010_i686.whl", hash = "sha256:1a099647f0a226b8e7e11671930918235b58aaed0ce6da5f967880bd4284a16a"},
+    {file = "scout_apm-2.18.0-cp36-cp36m-manylinux2010_x86_64.whl", hash = "sha256:ba4eed58eeb5ab03f038d0cdc0e78ca010f6a3f063c1ac706cd64939052be160"},
+    {file = "scout_apm-2.18.0-cp36-cp36m-manylinux2014_aarch64.whl", hash = "sha256:1dcbbf083d24932ecbe9144d6ecde15ac084cfe9065e88f1ef67fa2b5abc6ee2"},
+    {file = "scout_apm-2.18.0-cp37-cp37m-manylinux1_i686.whl", hash = "sha256:311267d0c75e675bb0caf13c2489f6df237931774af00fc8e7dc7af031936f80"},
+    {file = "scout_apm-2.18.0-cp37-cp37m-manylinux1_x86_64.whl", hash = "sha256:55573bd96063e4775942906e4dd8676465c6b1ba4a94996276c20a85cc5b9e87"},
+    {file = "scout_apm-2.18.0-cp37-cp37m-manylinux2010_i686.whl", hash = "sha256:3aaf2e3efd63bee56e7366ac80f0b01519f7b69d77cf7b24cee01941fdd9afdf"},
+    {file = "scout_apm-2.18.0-cp37-cp37m-manylinux2010_x86_64.whl", hash = "sha256:f98b8d904cc27f679db999dfe0990674f8e778bae1b6014547ba8cc9e8cbc52a"},
+    {file = "scout_apm-2.18.0-cp37-cp37m-manylinux2014_aarch64.whl", hash = "sha256:aae358f6fc2dec938772c6c4b6d18991d4f42d354c1fa1c53c23012f3c86ad45"},
+    {file = "scout_apm-2.18.0-cp38-cp38-manylinux1_i686.whl", hash = "sha256:2f05253c4a7f06bf083fb54574eff4febd6b930a2fbb3f0c86875052864f5c79"},
+    {file = "scout_apm-2.18.0-cp38-cp38-manylinux1_x86_64.whl", hash = "sha256:c92040c6f41015809689de902cff9528d2b5ebb3f38809885edc7f360f7af338"},
+    {file = "scout_apm-2.18.0-cp38-cp38-manylinux2010_i686.whl", hash = "sha256:cf1f92b30c842bba342f00f536e0f0fadfa832ff041ded46879cae7d1ab82f3b"},
+    {file = "scout_apm-2.18.0-cp38-cp38-manylinux2010_x86_64.whl", hash = "sha256:c690a0d5ecb7ef25426b613613dd86f2f768de6156a90bb0e7fdb66ac98971cd"},
+    {file = "scout_apm-2.18.0-cp38-cp38-manylinux2014_aarch64.whl", hash = "sha256:08bcd8316e087cf22fe5092db841c79dd0f3c7f77811791ed34058e7e0b325a4"},
+    {file = "scout_apm-2.18.0-cp39-cp39-manylinux1_i686.whl", hash = "sha256:62ee7cb7e13d662d91be484db110800a405253bae24bdc93cfe98bfd2068aa18"},
+    {file = "scout_apm-2.18.0-cp39-cp39-manylinux1_x86_64.whl", hash = "sha256:0cb49bd28f7368374cf117e5584fbdfe9ee863fe7f489bf0e110bc46070fea64"},
+    {file = "scout_apm-2.18.0-cp39-cp39-manylinux2010_i686.whl", hash = "sha256:ceeb0c6ac44ffc7b2f70faf4f7a1178dc46df7832f60b158072ae42745f55de0"},
+    {file = "scout_apm-2.18.0-cp39-cp39-manylinux2010_x86_64.whl", hash = "sha256:590885feecea6fba53e6cbaf7a2783b6bc7b6e83b17dd7922d155b74a468e40a"},
+    {file = "scout_apm-2.18.0-cp39-cp39-manylinux2014_aarch64.whl", hash = "sha256:a8b273cf6368007250432a8bd250d2e509e8cde30f89cd5c314746a68ab792db"},
+    {file = "scout_apm-2.18.0-py2-none-any.whl", hash = "sha256:6ad0f1e33af74c76227dec0ff61c92d6e2106251e8f6b9c9e483fa32a29cb83e"},
+    {file = "scout_apm-2.18.0-py3-none-any.whl", hash = "sha256:fbe4558810836d0d1b55055029d6e5017c80359850bdbe822f79d4e5b1364dfc"},
+    {file = "scout_apm-2.18.0.tar.gz", hash = "sha256:6c605add81bfcfef6367432fd35417dc075f45e39374caee6aba8ada1a7c250f"},
 ]
 seed-isort-config = [
     {file = "seed_isort_config-1.9.4-py2.py3-none-any.whl", hash = "sha256:81f7adf8dd0bc24e03d0f5eef87561e170757fc7a36050c01e4c29d150757783"},
