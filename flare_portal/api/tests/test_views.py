@@ -651,3 +651,52 @@ class VoucherAPIViewTest(TestCase):
         resp = self.client.post(self.url, post_data)
 
         self.assertEqual(400, resp.status_code)
+
+
+class TrackingAPIViewTest(TestCase):
+    def test_post(self) -> None:
+        experiment: Experiment = get_example_experiment()
+        fc_module = FearConditioningModuleFactory(experiment=experiment)
+        participant = ParticipantFactory(
+            participant_id="Flare.ABCDEF", experiment=experiment
+        )
+
+        # Try to finish the experiment
+        resp = self.client.post(
+            reverse("api:tracking"),
+            {
+                "participant": participant.participant_id,
+                "module": fc_module.pk,
+                "trial_index": 1,
+            },
+            content_type="application/json",
+        )
+
+        # Test that current module has been updated
+        self.assertEqual(
+            resp.json(),
+            {
+                "participant": participant.participant_id,
+                "current_module": fc_module.pk,
+                "current_trial": 1,
+                "rejection_reason": None,
+            },
+        )
+
+        # Try to timeout the experiment
+        resp = self.client.post(
+            reverse("api:tracking"),
+            {"participant": participant.participant_id, "rejection_reason": "TIMEOUT"},
+            content_type="application/json",
+        )
+
+        # Test that current module has been reset
+        self.assertEqual(
+            resp.json(),
+            {
+                "participant": participant.participant_id,
+                "rejection_reason": "TIMEOUT",
+                "current_module": None,
+                "current_trial": None,
+            },
+        )
