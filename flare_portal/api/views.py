@@ -10,6 +10,7 @@ from flare_portal.site_config.models import SiteConfiguration
 from . import constants
 from .forms import (
     ConfigurationForm,
+    ParticipantTrackingForm,
     SubmissionForm,
     TermsAndConditionsForm,
     VoucherForm,
@@ -151,3 +152,23 @@ class VoucherAPIView(APIView):
 
 
 voucher_api_view = VoucherAPIView.as_view()
+
+
+class ParticipantTrackingAPIView(APIView):
+    def post(self, request: Request, format: str = None) -> Response:
+        form = ParticipantTrackingForm(request.data)
+
+        if form.is_valid():
+            participant = form.save()
+            return Response(
+                {
+                    "participant": participant.participant_id,
+                    "current_module": participant.current_module.pk,
+                    "current_trial": participant.current_trial_index,
+                }
+            )
+
+        return Response(form.errors, status=400)
+
+
+tracking_api_view = ParticipantTrackingAPIView.as_view()
