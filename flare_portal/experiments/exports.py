@@ -230,7 +230,7 @@ class PostExperimentQuestionsDataSerializer(DataSerializer):
 
 
 class PostExperimentQuestionsDataExporter(DataExporter):
-    serializer_class = BasicInfoDataSerializer
+    serializer_class = PostExperimentQuestionsDataSerializer
 
     def get_queryset(self) -> QuerySet[PostExperimentQuestionsData]:
         return (
