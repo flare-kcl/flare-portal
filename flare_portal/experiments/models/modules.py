@@ -686,6 +686,10 @@ class USUnpleasantnessModule(Module):
     def construct_question(self) -> str:
         return f"How unpleasent did you find the {self.audible_keyword}?"
 
+    @classmethod
+    def get_module_name(cls) -> str:
+        return "US unpleasantness"
+
     def get_module_description(self) -> str:
         return self.construct_question()
 
