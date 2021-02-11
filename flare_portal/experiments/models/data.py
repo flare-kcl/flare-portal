@@ -378,6 +378,10 @@ class USUnpleasantnessData(BaseData):
         "rating",
     ]
 
+    @classmethod
+    def get_module_name(cls) -> str:
+        return "US unpleasantness"
+
 
 class ContingencyAwarenessData(BaseData):
     awareness_answer = models.BooleanField()
