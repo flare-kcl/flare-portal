@@ -87,6 +87,7 @@ class ConfigurationAPIViewTest(TestCase):
                 "id": experiment.pk,
                 "name": experiment.name,
                 "description": experiment.description,
+                "contact_email": None,
                 "trial_length": experiment.trial_length,
                 "rating_delay": experiment.rating_delay,
                 "iti_min_delay": experiment.iti_min_delay,

@@ -8,6 +8,7 @@ ExperimentType = TypedDict(
         "id": int,
         "name": str,
         "description": str,
+        "contact_email": str,
         "trial_length": float,
         "rating_delay": float,
         "iti_min_delay": int,

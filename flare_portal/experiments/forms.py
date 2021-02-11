@@ -17,6 +17,7 @@ class ExperimentForm(forms.ModelForm):
         fields = [
             "name",
             "description",
+            "contact_email",
             "code",
             "owner",
             "trial_length",
