@@ -79,6 +79,7 @@ class BaseModule(models.Model):
     def __str__(self) -> str:
         return f"PK: {self.pk} - Sort order: {self.sortorder}"
 
+    @property
     def specific(self):
         return BaseModule.objects.get_subclass(pk=self.pk)
 

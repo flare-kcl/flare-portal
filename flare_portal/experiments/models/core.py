@@ -170,6 +170,17 @@ class Participant(models.Model):
     started_at = models.DateTimeField(null=True)
     finished_at = models.DateTimeField(null=True)
 
+    def get_voucher_status(self) -> str:
+        """Displays the voucher status"""
+        if self.finished_at and self.experiment.voucher_pool_id:
+            try:
+                if str(self.voucher) is not None:
+                    return "Dispersed"
+            except ObjectDoesNotExist:
+                return "Failed"
+
+        return ""
+
     def get_voucher_display(self) -> str:
         """Displays the voucher code
 
@@ -186,20 +197,25 @@ class Participant(models.Model):
 
         return ""
 
+    def has_been_rejected(self) -> bool:
+        """Has the participant been locked out by the app?"""
+        return self.rejection_reason is not None
+
     def get_data_values(self):
         """Returns data for the data detail view"""
         fields = [
             ("Experiment", self.experiment),
+            (
+                "Current Module",
+                self.current_module.specific.label if self.current_module else None,
+            ),
+            ("Current Trial Index", self.current_trial_index),
+            ("Agreed to T&C's", self.agreed_to_terms_and_conditions),
+            ("Voucher Code", self.get_voucher_display()),
+            ("Rejection Reason", self.rejection_reason),
             ("Last Updated", self.udpated_at),
             ("Started At", self.started_at),
             ("Finished At", self.finished_at),
-            ("Rejection Reason", self.rejection_reason),
-            ("Agreed to T&C's", self.agreed_to_terms_and_conditions),
-            (
-                "Current Module",
-                self.current_module.label if self.current_module else None,
-            ),
-            ("Current Trial Index", self.current_trial_index),
         ]
 
         return fields

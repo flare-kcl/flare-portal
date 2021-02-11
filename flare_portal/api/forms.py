@@ -9,7 +9,6 @@ from rest_framework.exceptions import APIException
 from flare_portal.experiments.models import (
     BaseModule,
     FearConditioningModule,
-    Module,
     Participant,
 )
 from flare_portal.reimbursement.models import Voucher, VoucherPool
@@ -190,8 +189,8 @@ class ParticipantTrackingForm(forms.Form):
                     )
 
                 # Check trial index is supplied
-                if type(module.specific()) == FearConditioningModule:
-                    if cleaned_data["trial_index"] == None:
+                if type(module.specific) == FearConditioningModule:
+                    if cleaned_data["trial_index"] is None:
                         self.add_error(
                             "trial_index",
                             "trial_index missing for Fear Conditioning module.",
