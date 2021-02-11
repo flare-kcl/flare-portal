@@ -174,12 +174,6 @@ class ParticipantTrackingForm(forms.Form):
     def clean(self) -> Dict[str, Any]:
         cleaned_data = super().clean()
         if participant := cleaned_data.get("participant"):
-            # Invalidate tracking if locked out
-            if cleaned_data["rejection_reason"]:
-                cleaned_data["module"] = None
-                cleaned_data["trial_index"] = None
-                return cleaned_data
-
             if module := cleaned_data.get("module"):
                 # Check module ID is valid for this participant
                 if module.experiment.pk != participant.experiment.pk:

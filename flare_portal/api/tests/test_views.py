@@ -696,7 +696,7 @@ class TrackingAPIViewTest(TestCase):
             {
                 "participant": participant.participant_id,
                 "rejection_reason": "TIMEOUT",
-                "current_module": None,
-                "current_trial": None,
+                "current_module": fc_module.pk,
+                "current_trial": 1,
             },
         )

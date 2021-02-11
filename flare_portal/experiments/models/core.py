@@ -199,7 +199,7 @@ class Participant(models.Model):
 
     def has_been_rejected(self) -> bool:
         """Has the participant been locked out by the app?"""
-        return self.rejection_reason is not None
+        return self.rejection_reason is not ""
 
     def get_data_values(self):
         """Returns data for the data detail view"""
