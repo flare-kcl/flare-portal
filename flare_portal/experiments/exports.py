@@ -217,16 +217,7 @@ class VolumeCalibrationDataExporter(DataExporter):
 class PostExperimentQuestionsDataSerializer(DataSerializer):
     class Meta:
         model = PostExperimentQuestionsData
-        fields = DataSerializer.Meta.fields + [
-            "experiment_unpleasant_rating",
-            "did_follow_instructions",
-            "did_remove_headphones",
-            "headphones_removal_reason",
-            "did_pay_attention",
-            "task_environment",
-            "was_alone",
-            "was_interrupted",
-        ]
+        fields = DataSerializer.Meta.fields + PostExperimentQuestionsData.fields
 
 
 class PostExperimentQuestionsDataExporter(DataExporter):

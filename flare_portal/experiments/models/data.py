@@ -326,9 +326,10 @@ class PostExperimentQuestionsData(BaseData):
     experiment_unpleasant_rating = models.PositiveIntegerField()
     did_follow_instructions = models.BooleanField(null=True)
     did_remove_headphones = models.BooleanField(null=True)
-    headphones_removal_reason = models.CharField(max_length=255, null=True)
+    headphones_removal_point = models.CharField(max_length=255, null=True)
     did_pay_attention = models.BooleanField(null=True)
     task_environment = models.CharField(max_length=255, null=True)
+    was_quiet = models.BooleanField(null=True)
     was_alone = models.BooleanField(null=True)
     was_interrupted = models.BooleanField(null=True)
     module = models.ForeignKey(  # type: ignore
@@ -345,8 +346,7 @@ class PostExperimentQuestionsData(BaseData):
         "experiment_unpleasant_rating",
         "did_follow_instructions",
         "did_remove_headphones",
-        "task_environment",
-        "was_alone",
+        "did_pay_attention",
         "was_interrupted",
     ]
 
@@ -354,8 +354,10 @@ class PostExperimentQuestionsData(BaseData):
         "experiment_unpleasant_rating",
         "did_follow_instructions",
         "did_remove_headphones",
-        "headphones_removal_reason",
+        "headphones_removal_point",
+        "did_pay_attention",
         "task_environment",
+        "was_quiet",
         "was_alone",
         "was_interrupted",
     ]
