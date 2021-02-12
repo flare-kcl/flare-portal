@@ -387,7 +387,7 @@ class USUnpleasantnessData(BaseData):
 
 class ContingencyAwarenessData(BaseData):
     awareness_answer = models.BooleanField()
-    confirmation_answer = models.CharField(max_length=3)
+    confirmation_answer = models.CharField(max_length=3, null=True)
     is_aware = models.BooleanField()
     module = models.ForeignKey(  # type: ignore
         "experiments.ContingencyAwarenessModule",
