@@ -40,7 +40,7 @@ class Migration(migrations.Migration):
                     "append_participant_id",
                     models.BooleanField(
                         blank=True,
-                        help_text="Optional: Enabling this feature will append theparticpant's id to the url. This is useful if you are using a survey service such as Qualtrics or Google Forms.",
+                        help_text="Optional: Enabling this feature will append the participant's id to the url. This is useful if you are using a survey service such as Qualtrics or Google Forms.",
                     ),
                 ),
             ],
