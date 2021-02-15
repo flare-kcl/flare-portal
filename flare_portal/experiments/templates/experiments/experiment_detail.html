@@ -23,7 +23,7 @@
                                     {% get_module_types as module_types %}
                                     {% for module_type in module_types %}
                                         <a class="dropdown-item" href="{% get_module_create_url module_type experiment %}">
-                                            {{ module_type.get_module_name|title }}
+                                            {{ module_type.get_module_name }}
                                         </a>
                                     {% endfor %}
                                 </div>

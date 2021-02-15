@@ -399,7 +399,7 @@ class InstructionsModule(Module):
 
     @classmethod
     def get_module_name(cls) -> str:
-        return "Setup instructions"
+        return "Setup Instructions"
 
     def get_module_description(self) -> str:
         screen_count = self.screens.count()
@@ -495,7 +495,7 @@ class BreakStartModule(Module):
 
     @classmethod
     def get_module_name(cls) -> str:
-        return "break"
+        return "Break"
 
     @classmethod
     def get_module_tag(cls) -> str:
@@ -701,7 +701,7 @@ class USUnpleasantnessModule(Module):
 
     @classmethod
     def get_module_name(cls) -> str:
-        return "US unpleasantness"
+        return "US Unpleasantness"
 
     def get_module_description(self) -> str:
         return self.construct_question()

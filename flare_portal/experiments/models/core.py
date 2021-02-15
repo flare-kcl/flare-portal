@@ -1,3 +1,4 @@
+import string
 from typing import Any, List, Tuple
 
 from django.contrib.auth import get_user_model
@@ -233,7 +234,7 @@ class Nameable:
 
     @classmethod
     def get_module_name(cls) -> str:
-        return camel_case_to_spaces(cls.get_module_camel_case())
+        return string.capwords(camel_case_to_spaces(cls.get_module_camel_case()))
 
     @classmethod
     def get_module_snake_case(cls) -> str:
