@@ -92,7 +92,7 @@
     "prettier": "^2.2.1",
     "sass": "^1.32.7",
     "sass-loader": "^10.1.1",
-    "stylelint": "^13.7.2",
+    "stylelint": "^13.10.0",
     "stylelint-config-torchbox": "^1.0.0",
     "url-loader": "^4.1.1",
     "webpack": "^5.19.0",
