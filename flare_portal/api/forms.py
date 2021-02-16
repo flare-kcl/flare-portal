@@ -194,7 +194,7 @@ class ParticipantTrackingForm(forms.Form):
 
         return cleaned_data
 
-    def save(self):
+    def save(self) -> Participant:
         if not self.is_valid():
             raise ValueError("Form should be valid before calling .save()")
 

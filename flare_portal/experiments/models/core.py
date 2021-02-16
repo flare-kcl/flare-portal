@@ -1,3 +1,5 @@
+from typing import Any, List, Tuple
+
 from django.contrib.auth import get_user_model
 from django.core import validators
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
@@ -175,7 +177,7 @@ class Participant(models.Model):
         if self.finished_at and self.experiment.voucher_pool_id:
             try:
                 if str(self.voucher) is not None:
-                    return "Dispersed"
+                    return "Disbursed"
             except ObjectDoesNotExist:
                 return "Failed"
 
@@ -199,9 +201,9 @@ class Participant(models.Model):
 
     def has_been_rejected(self) -> bool:
         """Has the participant been locked out by the app?"""
-        return self.rejection_reason is not ""
+        return self.rejection_reason != ""
 
-    def get_data_values(self):
+    def get_data_values(self) -> List[Tuple[str, Any]]:
         """Returns data for the data detail view"""
         fields = [
             ("Experiment", self.experiment),
