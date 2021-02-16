@@ -3,6 +3,7 @@ from typing import Any, Dict
 
 from django import forms
 from django.contrib import messages
+from django.contrib.auth import get_user_model
 from django.db.models import QuerySet
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404
@@ -24,6 +25,8 @@ from .forms import (
     ParticipantDeleteForm,
     ParticipantFormSet,
     ParticipantUploadForm,
+    ProjectResearcherAddForm,
+    ProjectResearcherDeleteForm,
 )
 from .models import BreakEndModule, Experiment, Participant, Project
 
@@ -31,6 +34,16 @@ from .models import BreakEndModule, Experiment, Participant, Project
 class ProjectListView(ListView):
     context_object_name = "projects"
     model = Project
+
+    def get_queryset(self):
+        user = self.request.user
+
+        # Return all if an admin
+        if user.is_admin:
+            return Project.objects.all()
+
+        # Only get Projects the user has access to
+        return user.get_projects()
 
 
 project_list_view = ProjectListView.as_view()
@@ -184,6 +197,93 @@ class ExperimentDetailView(DetailView):
 
 
 experiment_detail_view = ExperimentDetailView.as_view()
+
+
+class ProjectResearcherAddView(FormView):
+    form_class = ProjectResearcherAddForm  # type: ignore
+    template_name = "experiments/researcher_list.html"
+
+    def dispatch(self, *args: Any, **kwargs: Any) -> HttpResponse:
+        self.project = get_object_or_404(Project, pk=kwargs["project_pk"])
+        return super().dispatch(*args, **kwargs)
+
+    def get_form_kwargs(self) -> dict:
+        return {
+            **super().get_form_kwargs(),
+            "instance": self.project,
+        }
+
+    def get_success_url(self) -> str:
+        return reverse(
+            "experiments:researcher_list",
+            kwargs={
+                "project_pk": self.kwargs["project_pk"],
+            },
+        )
+
+    def get_context_data(self, **kwargs: Any) -> dict:
+        context = super().get_context_data(**kwargs)
+        context["project"] = self.project
+        context["researchers"] = self.project.researchers.all()
+
+        return context
+
+    def form_valid(self, form: ProjectResearcherAddForm) -> HttpResponse:
+        changed_count = form.save()
+        if changed_count:
+            messages.success(
+                self.request,
+                f"Added {changed_count} Researcher{pluralize(changed_count)}.",
+            )
+
+        return super().form_valid(form)
+
+
+researcher_add_view = ProjectResearcherAddView.as_view()
+
+
+class ProjectResearcherDeleteView(FormView):
+    form_class = ProjectResearcherDeleteForm  # type: ignore
+    template_name = "experiments/researcher_delete_form.html"
+
+    def dispatch(self, *args: Any, **kwargs: Any) -> HttpResponse:
+        self.project = get_object_or_404(Project, pk=kwargs["project_pk"])
+        self.researcher = get_object_or_404(
+            get_user_model(), pk=kwargs["researcher_pk"]
+        )
+        return super().dispatch(*args, **kwargs)
+
+    def get_form_kwargs(self) -> dict:
+        return {
+            **super().get_form_kwargs(),
+            "project": self.project,
+            "researcher": self.researcher,
+        }
+
+    def get_success_url(self) -> str:
+        return reverse(
+            "experiments:researcher_list",
+            kwargs={
+                "project_pk": self.kwargs["project_pk"],
+            },
+        )
+
+    def get_context_data(self, **kwargs: Any) -> dict:
+        context = super().get_context_data(**kwargs)
+        context["project"] = self.project
+        context["researcher"] = self.researcher
+
+        return context
+
+    def form_valid(self, form: ProjectResearcherDeleteForm) -> HttpResponse:
+        form.save()
+        messages.success(
+            self.request, f"Removed Researcher: {self.researcher.username}"
+        )
+        return super().form_valid(form)
+
+
+researcher_delete_view = ProjectResearcherDeleteView.as_view()
 
 
 class ParticipantCreateBatchView(FormView):

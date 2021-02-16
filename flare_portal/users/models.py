@@ -75,5 +75,19 @@ class User(AbstractUser):
         roles = sorted([role_dict[role] for role in self.roles])
         return ", ".join(roles)
 
+    @property
+    def is_admin(self):
+        return "ADMIN" in self.roles
+
+    def get_projects(self, owner_only=False):
+        from flare_portal.experiments.models import Project
+
+        if owner_only:
+            return Project.objects.filter(owner_id=self.pk)
+
+        return Project.objects.filter(
+            models.Q(researchers__id=self.pk) | models.Q(owner_id=self.pk)
+        )
+
     def __str__(self) -> str:
         return self.name or self.username
