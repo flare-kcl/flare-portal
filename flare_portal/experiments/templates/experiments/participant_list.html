@@ -43,7 +43,8 @@
                                         <th>Login ID</th>
                                         <th>Started</th>
                                         <th>Finished</th>
-                                        <th>Agreed to T&amp;Cs</th>
+                                        <th>Current Module</th>
+                                        <th>Rejected</th>
                                         <th>Voucher</th>
                                         <th></th>
                                         <th></th>
@@ -52,7 +53,7 @@
                                 <tbody>
                                     {% for form in formset %}
                                         <tr>
-                                            <td><span class="text-muted">{{ forloop.counter }}</span></td>
+                                            <td><a href="{% url "experiments:participant_detail" project_pk=view.kwargs.project_pk experiment_pk=view.kwargs.experiment_pk participant_pk=form.instance.pk %}"><span class="text-muted">{{ forloop.counter }}</span></a></td>
                                             <td>
                                                 {% if form.non_field_errors %}
                                                     {% for error in form.non_field_errors %}
@@ -74,10 +75,14 @@
                                             <td>{{ form.instance.finished_at|default:"" }}</td>
 
                                             <td>
-                                                <span class="status-icon {% if form.instance.agreed_to_terms_and_conditions %}bg-success{% else %}bg-danger{% endif %}"></span> {{ form.instance.agreed_to_terms_and_conditions|yesno|title }}
+                                                {{ form.instance.current_module.specific.label }}
                                             </td>
 
-                                            <td>{{ form.instance.get_voucher_display }}</td>
+                                            <td>
+                                                <span class="status-icon {% if not form.instance.has_been_rejected %}bg-success{% else %}bg-danger{% endif %}"></span> {{ form.instance.has_been_rejected|yesno|title }}
+                                            </td>
+
+                                            <td>{{ form.instance.get_voucher_status }}</td>
 
                                             <td>
                                                 {{ form.id }}

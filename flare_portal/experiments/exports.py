@@ -267,6 +267,9 @@ class ParticipantSerializer(serializers.ModelSerializer):
             "finished_at",
             "agreed_to_terms_and_conditions",
             "voucher",
+            "rejection_reason",
+            "current_module",
+            "current_trial_index",
         ]
 
 

@@ -1,5 +1,5 @@
 import re
-from typing import List
+from typing import Any, List
 
 from django import forms
 from django.core.exceptions import ValidationError
@@ -78,6 +78,10 @@ class BaseModule(models.Model):
 
     def __str__(self) -> str:
         return f"PK: {self.pk} - Sort order: {self.sortorder}"
+
+    @property
+    def specific(self) -> Any:
+        return BaseModule.objects.get_subclass(pk=self.pk)
 
 
 class Module(Manageable, BaseModule):

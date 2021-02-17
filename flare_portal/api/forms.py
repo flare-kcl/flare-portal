@@ -6,7 +6,11 @@ from django.utils import timezone
 from rest_framework import serializers
 from rest_framework.exceptions import APIException
 
-from flare_portal.experiments.models import Participant
+from flare_portal.experiments.models import (
+    BaseModule,
+    FearConditioningModule,
+    Participant,
+)
 from flare_portal.reimbursement.models import Voucher, VoucherPool
 
 
@@ -153,3 +157,58 @@ class VoucherForm(forms.Form):
             raise VoucherPoolEmpty(detail=pool.empty_pool_message)
 
         return voucher
+
+
+class ParticipantTrackingForm(forms.Form):
+    participant = forms.ModelChoiceField(
+        queryset=Participant.objects.all(),
+        to_field_name="participant_id",
+    )
+    module = forms.ModelChoiceField(
+        queryset=BaseModule.objects.all(), to_field_name="pk", required=False
+    )
+
+    trial_index = forms.IntegerField(required=False)
+    rejection_reason = forms.CharField(max_length=255, required=False)
+
+    def clean(self) -> Dict[str, Any]:
+        cleaned_data = super().clean()
+        if participant := cleaned_data.get("participant"):
+            if module := cleaned_data.get("module"):
+                # Check module ID is valid for this participant
+                if module.experiment.pk != participant.experiment.pk:
+                    self.add_error(
+                        "module",
+                        "This module is not part of the assigned experiment.",
+                    )
+
+                # Check trial index is supplied
+                if type(module.specific) == FearConditioningModule:
+                    if cleaned_data["trial_index"] is None:
+                        self.add_error(
+                            "trial_index",
+                            "trial_index missing for Fear Conditioning module.",
+                        )
+                else:
+                    cleaned_data["trial_index"] = None
+
+        return cleaned_data
+
+    def save(self) -> Participant:
+        if not self.is_valid():
+            raise ValueError("Form should be valid before calling .save()")
+
+        # Update fields on participant
+        participant: Participant = self.cleaned_data["participant"]
+        participant.current_module = (
+            self.cleaned_data["module"] or participant.current_module
+        )
+        participant.current_trial_index = (
+            self.cleaned_data["trial_index"] or participant.current_trial_index
+        )
+        participant.rejection_reason = (
+            self.cleaned_data["rejection_reason"] or participant.rejection_reason
+        )
+        participant.save()
+
+        return participant
