@@ -7,23 +7,87 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('experiments', '0040_break_modules'),
+        ("experiments", "0040_break_modules"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='TaskInstructionsModule',
+            name="TaskInstructionsModule",
             fields=[
-                ('basemodule_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='experiments.basemodule')),
-                ('intro_heading', models.CharField(default='Practice time', help_text='Title on the task instructions intro screen', max_length=255)),
-                ('intro_body', models.TextField(blank=True, default='Before you begin the experiment, we need to to practice using the rating interface.', help_text='Text on the task instructions intro screen')),
-                ('rating_explanation_heading', models.CharField(default='A few seconds after each circle appears, this scale will appear at the bottom of the screen.', help_text='Title on the rating scale explanation screen', max_length=255)),
-                ('rating_explanation_body', models.TextField(blank=True, default='Each time the scale appears, press the corresponding number on the screen to rate how much you expect to hear a scream.', help_text='Text on the rating scale explanation screen')),
-                ('rating_practice_heading', models.TextField(default='Press any number to practice making a rating with the scaling below.', help_text='Text on the rating scale practice screen')),
-                ('interval_explanation_body', models.TextField(default='Before each circle is presented, you will see a white screen with a cross in the middle like the one shown above. It is important that you keep looking at the cross and wait for the next circle to appear.', help_text='Text on the ITI explanation screen')),
-                ('outro_heading', models.CharField(default='Instructions complete', help_text='Title on the task instructions outro screen', max_length=255)),
-                ('outro_body', models.TextField(blank=True, default='The experiment will now begin.\n\n You may occasionaly hear a scream.\n\n Remember to rate how much you expect to hear a scream by pressing a number every time the scale appears.', help_text='Text on the task instructions outro screen')),
+                (
+                    "basemodule_ptr",
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to="experiments.basemodule",
+                    ),
+                ),
+                (
+                    "intro_heading",
+                    models.CharField(
+                        default="Practice time",
+                        help_text="Title on the task instructions intro screen",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "intro_body",
+                    models.TextField(
+                        blank=True,
+                        default="Before you begin the experiment, we need to  practice using the rating interface.",
+                        help_text="Text on the task instructions intro screen",
+                    ),
+                ),
+                (
+                    "rating_explanation_heading",
+                    models.CharField(
+                        default="A few seconds after each circle appears, this scale will appear at the bottom of the screen.",
+                        help_text="Title on the rating scale explanation screen",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "rating_explanation_body",
+                    models.TextField(
+                        blank=True,
+                        default="Each time the scale appears, press the corresponding number on the screen to rate how much you expect to hear a scream.",
+                        help_text="Text on the rating scale explanation screen",
+                    ),
+                ),
+                (
+                    "rating_practice_heading",
+                    models.TextField(
+                        default="Press any number to practice making a rating with the scale below.",
+                        help_text="Text on the rating scale practice screen",
+                    ),
+                ),
+                (
+                    "interval_explanation_body",
+                    models.TextField(
+                        default="Before each circle is presented, you will see a white screen with a cross in the middle like the one shown above. It is important that you keep looking at the cross and wait for the next circle to appear.",
+                        help_text="Text on the ITI explanation screen",
+                    ),
+                ),
+                (
+                    "outro_heading",
+                    models.CharField(
+                        default="Instructions complete",
+                        help_text="Title on the task instructions outro screen",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "outro_body",
+                    models.TextField(
+                        blank=True,
+                        default="The experiment will now begin.\n\n You may occasionally hear a scream. \n\n Remember to rate how much you expect to hear a scream by pressing a number every time the scale appears.",
+                        help_text="Text on the task instructions outro screen",
+                    ),
+                ),
             ],
-            bases=('experiments.basemodule',),
+            bases=("experiments.basemodule",),
         ),
     ]

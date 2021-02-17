@@ -38,7 +38,7 @@ class Migration(migrations.Migration):
                 (
                     "duration",
                     models.PositiveIntegerField(
-                        help_text="How long the break should last in seconds. (e.g. 300 is 5 minutes)"
+                        help_text="How long the break should last in seconds (e.g. 300 is 5 minutes)."
                     ),
                 ),
                 (

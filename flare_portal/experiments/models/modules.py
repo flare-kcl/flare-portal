@@ -313,8 +313,8 @@ class WebModule(Module):
     )
     append_participant_id = models.BooleanField(
         blank=True,
-        help_text="Optional: Enabling this feature will append the"
-        "particpant's id to the url. This is useful if you are using a "
+        help_text="Optional: Enabling this feature will append the "
+        "participant's id to the url. This is useful if you are using a "
         "survey service such as Qualtrics or Google Forms.",
     )
 
@@ -397,6 +397,10 @@ class InstructionsModule(Module):
             },
         )
 
+    @classmethod
+    def get_module_name(cls) -> str:
+        return "Setup Instructions"
+
     def get_module_description(self) -> str:
         screen_count = self.screens.count()
         return f"{screen_count} screen{pluralize(screen_count)}"
@@ -470,7 +474,7 @@ class TextModule(Module):
 
 class BreakStartModule(Module):
     duration = models.PositiveIntegerField(
-        help_text="How long the break should last in seconds. (e.g. 300 is 5 minutes)",
+        help_text="How long the break should last in seconds (e.g. 300 is 5 minutes).",
     )
     start_title = models.CharField(
         max_length=255,
@@ -491,7 +495,7 @@ class BreakStartModule(Module):
 
     @classmethod
     def get_module_name(cls) -> str:
-        return "break"
+        return "Break"
 
     @classmethod
     def get_module_tag(cls) -> str:
@@ -558,8 +562,8 @@ class TaskInstructionsModule(Module):
     )
     intro_body = models.TextField(
         blank=True,
-        default="Before you begin the experiment, we need to to practice using "
-        "the rating interface.",
+        default="Before you begin the experiment, we need to "
+        "practice using the rating interface.",
         help_text="Text on the task instructions intro screen",
     )
     rating_explanation_heading = models.CharField(
@@ -575,7 +579,7 @@ class TaskInstructionsModule(Module):
         help_text="Text on the rating scale explanation screen",
     )
     rating_practice_heading = models.TextField(
-        default="Press any number to practice making a rating with the scaling below.",
+        default="Press any number to practice making a rating with the scale below.",
         help_text="Text on the rating scale practice screen",
     )
     interval_explanation_body = models.TextField(
@@ -697,7 +701,7 @@ class USUnpleasantnessModule(Module):
 
     @classmethod
     def get_module_name(cls) -> str:
-        return "US unpleasantness"
+        return "US Unpleasantness"
 
     def get_module_description(self) -> str:
         return self.construct_question()
