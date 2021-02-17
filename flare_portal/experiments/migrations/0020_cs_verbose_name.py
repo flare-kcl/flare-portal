@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="fearconditioningdata",
             name="conditional_stimulus",
-            field=models.CharField(max_length=24, verbose_name="CS/GS"),
+            field=models.CharField(max_length=24, verbose_name="stimulus"),
         ),
     ]

@@ -130,13 +130,15 @@ class FearConditioningData(BaseData):
     )
     trial = models.PositiveIntegerField()
     rating = models.PositiveIntegerField(blank=True, null=True)
-    conditional_stimulus = models.CharField(max_length=24, verbose_name="CS/GS")
+    conditional_stimulus = models.CharField(max_length=24, verbose_name="stimulus")
     unconditional_stimulus = models.BooleanField(verbose_name="US")
     trial_started_at = models.DateTimeField()
     response_recorded_at = models.DateTimeField(blank=True, null=True)
-    volume_level = models.DecimalField(max_digits=3, decimal_places=2)
+    volume_level = models.DecimalField(
+        max_digits=3, decimal_places=2, verbose_name="device volume level"
+    )
     calibrated_volume_level = models.DecimalField(max_digits=3, decimal_places=2)
-    headphones = models.BooleanField()
+    headphones = models.BooleanField(verbose_name="headphones connected")
 
     fields = [
         "module__phase",
@@ -382,7 +384,7 @@ class USUnpleasantnessData(BaseData):
 
     @classmethod
     def get_module_name(cls) -> str:
-        return "US unpleasantness"
+        return "US unpleasantness data"
 
 
 class ContingencyAwarenessData(BaseData):
