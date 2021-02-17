@@ -299,6 +299,26 @@ class ParticipantUploadView(FormView):
 participant_upload_view = ParticipantUploadView.as_view()
 
 
+class ParticipantDetailView(DetailView):
+    context_object_name = "participant"
+    pk_url_kwarg = "experiment_pk"
+    queryset = Participant.objects
+
+    def dispatch(self, *args: Any, **kwargs: Any) -> HttpResponse:
+        self.participant = get_object_or_404(Participant, pk=kwargs["participant_pk"])
+        self.experiment = get_object_or_404(Experiment, pk=kwargs["experiment_pk"])
+        return super().dispatch(*args, **kwargs)
+
+    def get_context_data(self, **kwargs: Any) -> dict:
+        context = super().get_context_data(**kwargs)
+        context["participant"] = self.participant
+        context["experiment"] = self.experiment
+        return context
+
+
+participant_detail_view = ParticipantDetailView.as_view()
+
+
 class ParticipantFormSetView(FormView):
     form_class = ParticipantFormSet  # type: ignore
     template_name = "experiments/participant_list.html"

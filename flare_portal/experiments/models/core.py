@@ -1,3 +1,5 @@
+from typing import Any, List, Tuple
+
 from django.contrib.auth import get_user_model
 from django.core import validators
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
@@ -157,12 +159,29 @@ class Participant(models.Model):
     experiment = models.ForeignKey(
         "experiments.Experiment", on_delete=models.CASCADE, related_name="participants"
     )
+
+    current_module = models.ForeignKey(
+        "experiments.BaseModule", on_delete=models.CASCADE, null=True
+    )
+    current_trial_index = models.PositiveIntegerField(null=True)
     agreed_to_terms_and_conditions = models.BooleanField(default=False)
+    rejection_reason = models.CharField(max_length=255, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     udpated_at = models.DateTimeField(auto_now=True)
     started_at = models.DateTimeField(null=True)
     finished_at = models.DateTimeField(null=True)
+
+    def get_voucher_status(self) -> str:
+        """Displays the voucher status"""
+        if self.finished_at and self.experiment.voucher_pool_id:
+            try:
+                if str(self.voucher) is not None:
+                    return "Disbursed"
+            except ObjectDoesNotExist:
+                return "Failed"
+
+        return ""
 
     def get_voucher_display(self) -> str:
         """Displays the voucher code
@@ -179,6 +198,29 @@ class Participant(models.Model):
                 return "Unable to disburse voucher."
 
         return ""
+
+    def has_been_rejected(self) -> bool:
+        """Has the participant been locked out by the app?"""
+        return self.rejection_reason != ""
+
+    def get_data_values(self) -> List[Tuple[str, Any]]:
+        """Returns data for the data detail view"""
+        fields = [
+            ("Experiment", self.experiment),
+            (
+                "Current Module",
+                self.current_module.specific.label if self.current_module else None,
+            ),
+            ("Current Trial Index", self.current_trial_index),
+            ("Agreed to T&C's", self.agreed_to_terms_and_conditions),
+            ("Voucher Code", self.get_voucher_display()),
+            ("Rejection Reason", self.rejection_reason),
+            ("Last Updated", self.udpated_at),
+            ("Started At", self.started_at),
+            ("Finished At", self.finished_at),
+        ]
+
+        return fields
 
     def __str__(self) -> str:
         return self.participant_id
