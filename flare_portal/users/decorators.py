@@ -7,6 +7,7 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect
 
 from . import constants
+from flare_portal.users.models import User
 
 
 def role_required(
@@ -44,14 +45,15 @@ def has_researcher_access(
         def _wrapped_view(
             request: HttpRequest, *args: Any, **kwargs: Any
         ) -> HttpResponse:
-            if project_pk := kwargs.get("project_pk"):
-                # Get all the projects that the user can access.
-                user_projects = request.user.get_projects(
-                    owner_only=owner_only
-                ).values_list("id", flat=True)
+            if isinstance(request.user, User):
+                if project_pk := kwargs.get("project_pk"):
+                    # Get all the projects that the user can access.
+                    user_projects = request.user.get_projects(
+                        owner_only=owner_only
+                    ).values_list("id", flat=True)
 
-                if project_pk in user_projects or request.user.is_admin:
-                    return view_func(request, *args, **kwargs)
+                    if project_pk in user_projects or request.user.is_admin:
+                        return view_func(request, *args, **kwargs)
 
             messages.warning(
                 request, "You don't have permission to access that project."

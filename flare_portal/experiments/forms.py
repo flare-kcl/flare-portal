@@ -9,7 +9,6 @@ from django.core.validators import FileExtensionValidator
 from django.forms import inlineformset_factory
 
 from flare_portal.users.models import User
-
 from .models import BreakEndModule, BreakStartModule, Experiment, Participant, Project
 
 
@@ -209,13 +208,18 @@ class BreakStartModuleForm(forms.ModelForm):
 
 
 class ProjectResearcherAddForm(forms.ModelForm):
-    researchers = forms.ModelMultipleChoiceField(queryset=User.objects, required=True)
+    def __init__(self, *args: Any, **kwargs: Any):
+        super(ProjectResearcherAddForm, self).__init__(*args, **kwargs)
+        project = kwargs.get("instance")
+        self.fields["researchers"] = forms.ModelMultipleChoiceField(
+            queryset=User.objects.exclude(pk=project.owner.pk), required=True
+        )
 
     class Meta:
         model = Project
         fields = ("researchers",)
 
-    def save(self) -> None:
+    def save(self, commit: bool = True) -> int:
         researchers = self.cleaned_data.get("researchers")
         for resercher in researchers:
             self.instance.researchers.add(resercher.pk)
@@ -228,7 +232,7 @@ class ProjectResearcherDeleteForm(forms.Form):
         max_length=24, required=True, label="Confirm User ID"
     )
 
-    def __init__(self, *args, project, researcher, **kwargs):
+    def __init__(self, *args: Any, project: Project, researcher: User, **kwargs: Any):
         super(ProjectResearcherDeleteForm, self).__init__(*args, **kwargs)
         self.project = project
         self.researcher = researcher

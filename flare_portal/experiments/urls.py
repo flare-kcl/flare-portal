@@ -92,6 +92,11 @@ project_urlpatterns = [
         views.participant_detail_view,
         name="participant_detail",
     ),
+    path(
+        "projects/<int:project_pk>/leave/",
+        views.researcher_leave_view,
+        name="researcher_leave",
+    ),
     path("", include((module_registry.urls, "modules"))),
     path("", include((data_viewset_registry.urls, "data"))),
 ]

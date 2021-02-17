@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}Leave Project - {{ project.name }}{% endblock title %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4">
+                {% include "experiments/includes/project_sidebar.html" %}
+            </div>
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title text-danger">Leave Project - {{ project.name }}</h3>
+                    </div>
+
+                    <form action="" method="POST">
+                        {% csrf_token %}
+
+                        <div class="card-body">
+                            <p class="mb-6">Leaving a project means you will lose access to all enclosed experiments. Please enter your User ID to confirm the action: <span class="text-danger"><strong>{{ researcher.username }}</strong></span></p>
+
+                            {% if form.non_field_errors %}
+                                <div class="card-alert alert alert-danger my-3">
+                                    {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+
+                            {% for field in form %}
+                                {% include "includes/form-group.html" %}
+                            {% endfor %}
+                        </div>
+
+                        <div class="card-footer">
+                            <div class="d-flex">
+                                <a href="{% url "experiments:researcher_list" project_pk=view.kwargs.project_pk %}" class="btn btn-link">Cancel</a>
+                                <div class="btn-list ml-auto">
+                                    <button type="submit" class="btn btn-primary btn-danger ml-auto">Leave</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

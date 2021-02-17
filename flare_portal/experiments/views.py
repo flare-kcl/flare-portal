@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.db.models import QuerySet
 from django.http import HttpRequest, HttpResponse
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.template.defaultfilters import pluralize
 from django.urls import reverse, reverse_lazy
 from django.views.generic import DetailView, ListView, View
@@ -29,14 +29,18 @@ from .forms import (
     ProjectResearcherDeleteForm,
 )
 from .models import BreakEndModule, Experiment, Participant, Project
+from flare_portal.users.models import User
 
 
 class ProjectListView(ListView):
     context_object_name = "projects"
     model = Project
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet[Project]:
         user = self.request.user
+
+        if not isinstance(user, User):
+            return Project.objects.none()
 
         # Return all if an admin
         if user.is_admin:
@@ -228,7 +232,7 @@ class ProjectResearcherAddView(FormView):
 
         return context
 
-    def form_valid(self, form: ProjectResearcherAddForm) -> HttpResponse:
+    def form_valid(self, form: Any) -> HttpResponse:
         changed_count = form.save()
         if changed_count:
             messages.success(
@@ -275,7 +279,7 @@ class ProjectResearcherDeleteView(FormView):
 
         return context
 
-    def form_valid(self, form: ProjectResearcherDeleteForm) -> HttpResponse:
+    def form_valid(self, form: Any) -> HttpResponse:
         form.save()
         messages.success(
             self.request, f"Removed Researcher: {self.researcher.username}"
@@ -284,6 +288,54 @@ class ProjectResearcherDeleteView(FormView):
 
 
 researcher_delete_view = ProjectResearcherDeleteView.as_view()
+
+
+class ProjectResearcherLeaveView(FormView):
+    form_class = ProjectResearcherDeleteForm  # type: ignore
+    template_name = "experiments/researcher_leave_form.html"
+
+    def dispatch(self, *args: Any, **kwargs: Any) -> HttpResponse:
+        self.project = get_object_or_404(Project, pk=kwargs["project_pk"])
+        self.researcher = self.request.user
+
+        # Check researcher isn't owner
+        if self.researcher.pk == self.project.owner.pk:
+            messages.warning(self.request, "You cannot leave a project you own.")
+            return redirect(
+                reverse(
+                    "experiments:experiment_list",
+                    kwargs={
+                        "project_pk": self.kwargs["project_pk"],
+                    },
+                )
+            )
+
+        return super().dispatch(*args, **kwargs)
+
+    def get_form_kwargs(self) -> dict:
+        return {
+            **super().get_form_kwargs(),
+            "project": self.project,
+            "researcher": self.researcher,
+        }
+
+    def get_success_url(self) -> str:
+        return reverse("experiments:project_list")
+
+    def get_context_data(self, **kwargs: Any) -> dict:
+        context = super().get_context_data(**kwargs)
+        context["project"] = self.project
+        context["researcher"] = self.researcher
+
+        return context
+
+    def form_valid(self, form: Any) -> HttpResponse:
+        form.save()
+        messages.success(self.request, f"Left Project: {self.project.name}")
+        return super().form_valid(form)
+
+
+researcher_leave_view = ProjectResearcherLeaveView.as_view()
 
 
 class ParticipantCreateBatchView(FormView):
