@@ -102,7 +102,7 @@ class FearConditioningModuleTest(TestCase):
     def test_display_names(self) -> None:
         module: FearConditioningModule = FearConditioningModuleFactory()
 
-        self.assertEqual("fear conditioning", module.get_module_name())
+        self.assertEqual("Fear Conditioning", module.get_module_name())
         self.assertEqual("FEAR_CONDITIONING", module.get_module_tag())
         self.assertEqual("fear-conditioning", module.get_module_slug())
         self.assertEqual("fear_conditioning", module.get_module_snake_case())
@@ -172,13 +172,13 @@ class FearConditioningDataTest(TestCase):
                 ("phase", module.get_phase_display()),
                 ("trial", data.trial),
                 ("rating", data.rating),
-                ("Stimulus", data.conditional_stimulus),
+                ("stimulus", data.conditional_stimulus),
                 ("US", data.unconditional_stimulus),
                 ("trial started at", data.trial_started_at),
                 ("response recorded at", data.response_recorded_at),
-                ("volume level", data.volume_level),
+                ("device volume level", data.volume_level),
                 ("calibrated volume level", data.calibrated_volume_level),
-                ("headphones", data.headphones),
+                ("headphones connected", data.headphones),
             ],
         )
 
@@ -186,7 +186,7 @@ class FearConditioningDataTest(TestCase):
         columns = FearConditioningData.get_list_display_columns()
 
         self.assertEqual(
-            columns, ["participant", "phase", "trial", "Stimulus", "US", "rating"]
+            columns, ["participant", "phase", "trial", "stimulus", "US", "rating"]
         )
 
     def test_list_display_values(self) -> None:
@@ -213,7 +213,7 @@ class FearConditioningDataTest(TestCase):
                 ("participant", data.participant),
                 ("phase", module.get_phase_display()),
                 ("trial", data.trial),
-                ("Stimulus", data.conditional_stimulus),
+                ("stimulus", data.conditional_stimulus),
                 ("US", data.unconditional_stimulus),
                 ("rating", data.rating),
             ],

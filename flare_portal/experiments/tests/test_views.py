@@ -756,7 +756,7 @@ class ModuleCreateViewTest(TestCase):
 
         self.assertEqual(
             str(list(resp.context["messages"])[0]),
-            "Added fear conditioning module",
+            "Added Fear Conditioning module",
         )
 
     def test_create_criterion_module(self) -> None:
@@ -840,14 +840,14 @@ class ModuleCreateViewTest(TestCase):
 
         self.assertEqual(
             str(list(resp.context["messages"])[0]),
-            "Added criterion module",
+            "Added Criterion module",
         )
 
     def test_create_break_module(self) -> None:
         existing_module = FearConditioningModuleFactory(experiment=self.experiment)
 
         url = reverse(
-            "experiments:modules:break_create",
+            "experiments:modules:break_start_create",
             kwargs={"project_pk": self.project.pk, "experiment_pk": self.experiment.pk},
         )
 
@@ -901,7 +901,7 @@ class ModuleCreateViewTest(TestCase):
 
         self.assertEqual(
             str(list(resp.context["messages"])[0]),
-            "Added break module",
+            "Added Break module",
         )
 
     def test_update_ordering(self) -> None:
@@ -1006,7 +1006,7 @@ class ModuleUpdateViewTest(TestCase):
 
         self.assertEqual(
             str(list(resp.context["messages"])[0]),
-            "Updated fear conditioning module",
+            "Updated Fear Conditioning module",
         )
 
 
@@ -1049,7 +1049,7 @@ class ModuleDeleteViewTest(TestCase):
 
         self.assertEqual(
             str(list(resp.context["messages"])[0]),
-            "Deleted fear conditioning module",
+            "Deleted Fear Conditioning module",
         )
 
 

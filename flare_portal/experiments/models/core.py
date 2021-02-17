@@ -233,12 +233,16 @@ class Nameable:
         return cls.__name__
 
     @classmethod
+    def get_base_name(cls) -> str:
+        return camel_case_to_spaces(cls.get_module_camel_case())
+
+    @classmethod
     def get_module_name(cls) -> str:
-        return string.capwords(camel_case_to_spaces(cls.get_module_camel_case()))
+        return string.capwords(cls.get_base_name())
 
     @classmethod
     def get_module_snake_case(cls) -> str:
-        return cls.get_module_name().replace(" ", "_")
+        return cls.get_base_name().replace(" ", "_")
 
     @classmethod
     def get_module_tag(cls) -> str:
@@ -246,4 +250,4 @@ class Nameable:
 
     @classmethod
     def get_module_slug(cls) -> str:
-        return slugify(cls.get_module_name())
+        return slugify(cls.get_base_name())
