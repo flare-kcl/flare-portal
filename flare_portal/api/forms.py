@@ -200,9 +200,15 @@ class ParticipantTrackingForm(forms.Form):
 
         # Update fields on participant
         participant: Participant = self.cleaned_data["participant"]
-        participant.current_module = self.cleaned_data["module"]
-        participant.current_trial_index = self.cleaned_data["trial_index"]
-        participant.rejection_reason = self.cleaned_data["rejection_reason"]
+        participant.current_module = (
+            self.cleaned_data["module"] or participant.current_module
+        )
+        participant.current_trial_index = (
+            self.cleaned_data["trial_index"] or participant.current_trial_index
+        )
+        participant.rejection_reason = (
+            self.cleaned_data["rejection_reason"] or participant.rejection_reason
+        )
         participant.save()
 
         return participant

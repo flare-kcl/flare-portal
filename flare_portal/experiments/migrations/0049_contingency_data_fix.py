@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('experiments', '0048_peqm_additonal_fields'),
+        ("experiments", "0048_peqm_additonal_fields"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='contingencyawarenessdata',
-            name='confirmation_answer',
+            model_name="contingencyawarenessdata",
+            name="confirmation_answer",
             field=models.CharField(max_length=3, null=True),
         ),
     ]
