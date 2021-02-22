@@ -29,7 +29,6 @@ from .forms import (
     ProjectResearcherDeleteForm,
 )
 from .models import BreakEndModule, Experiment, Participant, Project
-from flare_portal.users.models import User
 
 
 class ProjectListView(ListView):
@@ -39,7 +38,7 @@ class ProjectListView(ListView):
     def get_queryset(self) -> QuerySet[Project]:
         user = self.request.user
 
-        if not isinstance(user, User):
+        if not user.is_authenticated:
             return Project.objects.none()
 
         # Return all if an admin
@@ -233,13 +232,8 @@ class ProjectResearcherAddView(FormView):
         return context
 
     def form_valid(self, form: Any) -> HttpResponse:
-        changed_count = form.save()
-        if changed_count:
-            messages.success(
-                self.request,
-                f"Added {changed_count} Researcher{pluralize(changed_count)}.",
-            )
-
+        form.save()
+        messages.success(self.request, "Researchers updated")
         return super().form_valid(form)
 
 

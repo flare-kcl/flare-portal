@@ -34,30 +34,29 @@ def role_required(
     return decorator(function)
 
 
-def has_researcher_access(
-    function: Callable,
-    owner_only: bool = False,
-    login_url: str = None,
-    redirect_field_name: str = REDIRECT_FIELD_NAME,
-) -> Callable:
+def can_user_view_project(
+    project_pk: int, user: User, owner_only: bool = False
+) -> bool:
+    return user.get_projects(owner_only=owner_only).filter(pk=project_pk).exists()
+
+
+def has_researcher_access(function: Callable, owner_only: bool = False) -> Callable:
     def decorator(view_func: Callable) -> Callable:
         @wraps(view_func)
         def _wrapped_view(
             request: HttpRequest, *args: Any, **kwargs: Any
         ) -> HttpResponse:
-            if isinstance(request.user, User):
+            if request.user.is_authenticated:
                 if project_pk := kwargs.get("project_pk"):
-                    # Get all the projects that the user can access.
-                    user_projects = request.user.get_projects(
-                        owner_only=owner_only
-                    ).values_list("id", flat=True)
-
-                    if project_pk in user_projects or request.user.is_admin:
+                    if request.user.is_admin or can_user_view_project(
+                        project_pk, request.user, owner_only
+                    ):
                         return view_func(request, *args, **kwargs)
 
             messages.warning(
                 request, "You don't have permission to access that project."
             )
+
             return redirect("experiments:project_list")
 
         return _wrapped_view

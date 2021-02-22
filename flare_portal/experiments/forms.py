@@ -219,12 +219,15 @@ class ProjectResearcherAddForm(forms.ModelForm):
         model = Project
         fields = ("researchers",)
 
-    def save(self, commit: bool = True) -> int:
-        researchers = self.cleaned_data.get("researchers")
+    def save(self, commit: bool = True) -> Project:
+        researchers = self.cleaned_data.get("researchers", [])
         for resercher in researchers:
             self.instance.researchers.add(resercher.pk)
 
-        return len(researchers)
+        if commit:
+            self.instance.save()
+
+        return self.instance
 
 
 class ProjectResearcherDeleteForm(forms.Form):
@@ -247,10 +250,8 @@ class ProjectResearcherDeleteForm(forms.Form):
 
         return cleaned_data
 
-    def save(self) -> None:
-        if not self.is_valid():
-            raise ValueError("Form should be valid before calling .save()")
-
+    def save(self) -> Project:
         # Remove user as researcher
         self.project.researchers.remove(self.researcher.pk)
         self.project.save()
+        return self.project

@@ -18,17 +18,20 @@
                         <p class="card-subtitle m-0 ml-2">{{ researchers|length }} researcher{{ researchers|length|pluralize }}</p>
                     </div>
                     <div class="card-options">
-                        <button class="btn btn-sm btn-primary ml-4" form="add-researcher-form" type="submit">Save changes</button>
+                        <template x-if="showPicker == true">
+                            <button class="btn btn-sm btn-primary ml-4" form="add-researcher-form" type="submit">Save changes</button>
+                        </template>
                     </div>
                 </div>
 
                 <div class="table-responsive">
                     <table class="table card-table table-vcenter">
+                        <caption hidden="true">Users that have access to this Project and it's enclosed Experiments.</caption>
                         <thead>
                             <tr>
-                                <th></th>
-                                <th>User ID</th>
-                                <th>Delete</th>
+                                <th scope="col"></th>
+                                <th scope="col">User ID</th>
+                                <th scope="col">Delete</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -43,16 +46,9 @@
                                         {% endfor %}
                                     </td>
                                     <td>
-                                        <a class="text-danger" href="{% url 'experiments:researcher_delete' project_pk=view.kwargs.project_pk researcher_pk=researcher.pk %}">
+                                        <a class="text-danger" href="{% url 'experiments:researcher_delete' project_pk=view.kwargs.project_pk researcher_pk=researcher.pk %}" aria-label="Delete {{ researcher.username }}">
                                             <i class="fe fe-trash-2"></i>
                                         </a>
-                                        <!-- <form action="{% url 'experiments:researcher_delete' project_pk=view.kwargs.project_pk researcher_pk=researcher.pk %}" method="POST">
-                                            {% csrf_token %}
-                                            <input type="hidden" name="researcher_pk" value="{{ researcher.pk }}">
-                                            <button class="text-danger" style="-webkit-appearance: button;" type="submit">
-                                                <i class="fe fe-trash-2"></i>
-                                            </button>
-                                        </form> -->
                                     </td>
 
                                 </tr>
@@ -79,9 +75,11 @@
 
                 <div class="card-footer d-flex">
                     <button class="btn btn-sm btn-secondary" @click.prevent="showPicker = true">Add Researcher</button>
-                    <button class="btn btn-sm btn-primary ml-auto" form="add-researcher-form" type="submit">
-                        Save changes
-                    </button>
+                    <template x-if="showPicker == true">
+                        <button class="btn btn-sm btn-primary ml-auto" form="add-researcher-form" type="submit">
+                            Save changes
+                        </button>
+                    </template>
                 </div>
             </div>
         </div>
