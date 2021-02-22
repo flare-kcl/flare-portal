@@ -6,8 +6,9 @@ from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect
 
-from . import constants
 from flare_portal.users.models import User
+
+from . import constants
 
 
 def role_required(
