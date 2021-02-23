@@ -1,6 +1,9 @@
+from typing import Any
+
 from django.contrib.auth.models import AbstractUser
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
+from django.db.models import QuerySet
 
 from . import constants
 
@@ -74,6 +77,20 @@ class User(AbstractUser):
         role_dict = dict(constants.ROLE_CHOICES)
         roles = sorted([role_dict[role] for role in self.roles])
         return ", ".join(roles)
+
+    @property
+    def is_admin(self) -> bool:
+        return "ADMIN" in self.roles
+
+    def get_projects(self, owner_only: bool = False) -> QuerySet[Any]:
+        from flare_portal.experiments.models import Project
+
+        if owner_only:
+            return Project.objects.filter(owner_id=self.pk)
+
+        return Project.objects.filter(
+            models.Q(researchers__id=self.pk) | models.Q(owner_id=self.pk)
+        )
 
     def __str__(self) -> str:
         return self.name or self.username

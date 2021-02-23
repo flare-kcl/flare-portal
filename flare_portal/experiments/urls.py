@@ -1,6 +1,6 @@
 from django.urls import include, path
 
-from flare_portal.users.decorators import role_required
+from flare_portal.users.decorators import has_researcher_access, role_required
 from flare_portal.utils.urls import decorate_urlpatterns
 
 from . import views
@@ -12,6 +12,9 @@ app_name = "experiments"
 urlpatterns = [
     path("projects/", views.project_list_view, name="project_list"),
     path("projects/add/", views.project_create_view, name="project_create"),
+]
+
+project_urlpatterns = [
     path(
         "projects/<int:project_pk>/edit/",
         views.project_update_view,
@@ -89,8 +92,35 @@ urlpatterns = [
         views.participant_detail_view,
         name="participant_detail",
     ),
+    path(
+        "projects/<int:project_pk>/leave/",
+        views.researcher_leave_view,
+        name="researcher_leave",
+    ),
     path("", include((module_registry.urls, "modules"))),
     path("", include((data_viewset_registry.urls, "data"))),
 ]
 
-urlpatterns = decorate_urlpatterns(urlpatterns, role_required, "RESEARCHER")
+project_owner_urlpatterns = [
+    path(
+        "projects/<int:project_pk>/researchers/",
+        views.researcher_add_view,
+        name="researcher_list",
+    ),
+    path(
+        "projects/<int:project_pk>/researchers/<int:researcher_pk>/delete/",
+        views.researcher_delete_view,
+        name="researcher_delete",
+    ),
+]
+
+project_urlpatterns = decorate_urlpatterns(project_urlpatterns, has_researcher_access)
+project_owner_urlpatterns = decorate_urlpatterns(
+    project_owner_urlpatterns, has_researcher_access, True
+)
+
+urlpatterns = decorate_urlpatterns(
+    urlpatterns + project_urlpatterns + project_owner_urlpatterns,
+    role_required,
+    "RESEARCHER",
+)

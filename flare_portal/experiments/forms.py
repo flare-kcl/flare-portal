@@ -8,7 +8,9 @@ from django import forms
 from django.core.validators import FileExtensionValidator
 from django.forms import inlineformset_factory
 
-from .models import BreakEndModule, BreakStartModule, Experiment, Participant
+from flare_portal.users.models import User
+
+from .models import BreakEndModule, BreakStartModule, Experiment, Participant, Project
 
 
 class ExperimentForm(forms.ModelForm):
@@ -204,3 +206,53 @@ class BreakStartModuleForm(forms.ModelForm):
             )
 
         return module
+
+
+class ProjectResearcherAddForm(forms.ModelForm):
+    def __init__(self, *args: Any, **kwargs: Any):
+        super(ProjectResearcherAddForm, self).__init__(*args, **kwargs)
+        project = kwargs.get("instance")
+        self.fields["researchers"] = forms.ModelMultipleChoiceField(
+            queryset=User.objects.exclude(pk=project.owner.pk), required=True
+        )
+
+    class Meta:
+        model = Project
+        fields = ("researchers",)
+
+    def save(self, commit: bool = True) -> Project:
+        researchers = self.cleaned_data.get("researchers", [])
+        for resercher in researchers:
+            self.instance.researchers.add(resercher.pk)
+
+        if commit:
+            self.instance.save()
+
+        return self.instance
+
+
+class ProjectResearcherDeleteForm(forms.Form):
+    researcher_confirm = forms.CharField(
+        max_length=24, required=True, label="Confirm User ID"
+    )
+
+    def __init__(self, *args: Any, project: Project, researcher: User, **kwargs: Any):
+        super(ProjectResearcherDeleteForm, self).__init__(*args, **kwargs)
+        self.project = project
+        self.researcher = researcher
+
+    def clean(self) -> Dict[str, Any]:
+        cleaned_data = super().clean()
+
+        # Check the input matches
+        researcher_confirm = self.cleaned_data.get("researcher_confirm")
+        if researcher_confirm != self.researcher.username:
+            self.add_error("researcher_confirm", "Input does not match User ID")
+
+        return cleaned_data
+
+    def save(self) -> Project:
+        # Remove user as researcher
+        self.project.researchers.remove(self.researcher.pk)
+        self.project.save()
+        return self.project

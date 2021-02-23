@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% load experiments_tags widget_tweaks %}
+
+{% block title %}Researchers - {{ project.name }}{% endblock title %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-lg-4">
+            {% include "experiments/includes/project_sidebar.html" %}
+        </div>
+        <div class="col-lg-8">
+            <div class="card" x-data="{ forms: [], showPicker: false, startIndex: {{ researchers.count }} }">
+                <div class="card-header">
+                    <div class="d-flex align-items-baseline">
+                        <h3 class="card-title">Researchers</h3>
+                        <p class="card-subtitle m-0 ml-2">{{ researchers|length }} researcher{{ researchers|length|pluralize }}</p>
+                    </div>
+                    <div class="card-options">
+                        <template x-if="showPicker == true">
+                            <button class="btn btn-sm btn-primary ml-4" form="add-researcher-form" type="submit">Save changes</button>
+                        </template>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table card-table table-vcenter">
+                        <caption hidden="true">Users that have access to this Project and it's enclosed Experiments.</caption>
+                        <thead>
+                            <tr>
+                                <th scope="col"></th>
+                                <th scope="col">User ID</th>
+                                <th scope="col">Delete</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for researcher in researchers %}
+                                <tr>
+                                    <td><span class="text-muted">{{ forloop.counter }}</span></td>
+                                    <td>
+                                        <input type="text" name="userame" value="{{ researcher.username }}" maxlength="24" class="form-control" readonly>
+
+                                        {% for error in form.participant_id.errors %}
+                                            <div class="invalid-feedback">{{ error }}</div>
+                                        {% endfor %}
+                                    </td>
+                                    <td>
+                                        <a class="text-danger" href="{% url 'experiments:researcher_delete' project_pk=view.kwargs.project_pk researcher_pk=researcher.pk %}" aria-label="Delete {{ researcher.username }}">
+                                            <i class="fe fe-trash-2"></i>
+                                        </a>
+                                    </td>
+
+                                </tr>
+                            {% endfor %}
+
+                            <template x-if="showPicker == true">
+                                <tr>
+                                    <td><span class="text-muted" x-text="startIndex + 1"></span></td>
+                                    <td>
+                                        <form id="add-researcher-form" method="POST" action="">
+                                            {% csrf_token %}
+                                            {{ form.researchers|add_class:"form-control"|add_error_class:"is-invalid" }}
+                                        </form>
+                                    </td>
+
+                                    <td>
+                                        <a class="icon" href="#" @click.prevent="showPicker = false"><i class="fe fe-trash text-danger"></i></a>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="card-footer d-flex">
+                    <button class="btn btn-sm btn-secondary" @click.prevent="showPicker = true">Add Researcher</button>
+                    <template x-if="showPicker == true">
+                        <button class="btn btn-sm btn-primary ml-auto" form="add-researcher-form" type="submit">
+                            Save changes
+                        </button>
+                    </template>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

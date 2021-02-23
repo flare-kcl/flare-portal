@@ -14,6 +14,7 @@ class Project(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     owner = models.ForeignKey(get_user_model(), on_delete=models.PROTECT)
+    researchers = models.ManyToManyField(get_user_model(), related_name="projects")
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
