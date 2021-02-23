@@ -679,14 +679,14 @@ class TrackingAPIViewTest(TestCase):
                 "participant": participant.participant_id,
                 "current_module": fc_module.pk,
                 "current_trial": 1,
-                "rejection_reason": None,
+                "lock_reason": None,
             },
         )
 
         # Try to timeout the experiment
         resp = self.client.post(
             reverse("api:tracking"),
-            {"participant": participant.participant_id, "rejection_reason": "TIMEOUT"},
+            {"participant": participant.participant_id, "lock_reason": "TIMEOUT"},
             content_type="application/json",
         )
 
@@ -695,7 +695,7 @@ class TrackingAPIViewTest(TestCase):
             resp.json(),
             {
                 "participant": participant.participant_id,
-                "rejection_reason": "TIMEOUT",
+                "lock_reason": "TIMEOUT",
                 "current_module": fc_module.pk,
                 "current_trial": 1,
             },
