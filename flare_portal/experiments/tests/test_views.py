@@ -40,7 +40,7 @@ class ProjectAuthorizationTest(TestCase):
         user: User = UserFactory()
         self.client.force_login(user)
 
-        project: Project = ProjectFactory()
+        project: Project = ProjectFactory(owner=user)
 
         self.assertEqual(
             302, self.client.get(reverse("experiments:project_list")).status_code
@@ -99,7 +99,10 @@ class ProjectListViewTest(TestCase):
 
         self.assertEqual(200, resp.status_code)
 
-        self.assertEqual(projects, list(resp.context["projects"]))
+        # print(len(projects))
+        # print(len(resp.context["projects"]))
+
+        self.assertCountEqual(projects, list(resp.context["projects"]))
 
 
 class ProjectCreateViewTest(TestCase):
@@ -149,7 +152,7 @@ class ProjectUpdateViewTest(TestCase):
         self.client.force_login(self.user)
 
     def test_update_project(self) -> None:
-        project: Project = ProjectFactory()
+        project: Project = ProjectFactory(owner=self.user)
 
         url = reverse("experiments:project_update", kwargs={"project_pk": project.pk})
 
@@ -188,7 +191,7 @@ class ProjectDeleteViewTest(TestCase):
         self.client.force_login(self.user)
 
     def test_delete_project(self) -> None:
-        project: Project = ProjectFactory()
+        project: Project = ProjectFactory(owner=self.user)
 
         url = reverse("experiments:project_delete", kwargs={"project_pk": project.pk})
         resp = self.client.get(url)
@@ -210,7 +213,7 @@ class ExperimentAuthorizationTest(TestCase):
         user: User = UserFactory()
         self.client.force_login(user)
 
-        project: Project = ProjectFactory()
+        project: Project = ProjectFactory(owner=user)
         experiment: Experiment = ExperimentFactory(project=project)
 
         self.assertEqual(
@@ -314,7 +317,7 @@ class ExperimentListViewTest(TestCase):
         self.client.force_login(self.user)
 
     def test_get(self) -> None:
-        project = ProjectFactory()
+        project = ProjectFactory(owner=self.user)
         experiments = ExperimentFactory.create_batch(5, project=project)
 
         resp = self.client.get(
@@ -327,9 +330,9 @@ class ExperimentListViewTest(TestCase):
         self.assertEqual(experiments, list(resp.context["experiments"]))
 
     def test_get_experiments_only_for_the_current_project(self) -> None:
-        project_1 = ProjectFactory()
+        project_1 = ProjectFactory(owner=self.user)
         experiments_1 = ExperimentFactory.create_batch(5, project=project_1)
-        project_2 = ProjectFactory()
+        project_2 = ProjectFactory(owner=self.user)
         ExperimentFactory.create_batch(5, project=project_2)
 
         resp = self.client.get(
@@ -349,7 +352,7 @@ class ExperimentCreateViewTest(TestCase):
         self.user.save()
         self.client.force_login(self.user)
 
-        self.project = ProjectFactory()
+        self.project = ProjectFactory(owner=self.user)
 
     def test_create_experiment(self) -> None:
         url = reverse(
@@ -502,7 +505,8 @@ class ExperimentUpdateViewTest(TestCase):
         self.client.force_login(self.user)
 
     def test_update_experiment(self) -> None:
-        experiment: Experiment = ExperimentFactory()
+        project = ProjectFactory(owner=self.user)
+        experiment: Experiment = ExperimentFactory(project=project)
 
         url = reverse(
             "experiments:experiment_update",
@@ -620,7 +624,7 @@ class ExperimentDeleteViewTest(TestCase):
         self.client.force_login(self.user)
 
     def test_delete_experiment(self) -> None:
-        project: Project = ProjectFactory()
+        project: Project = ProjectFactory(owner=self.user)
         experiment: Experiment = ExperimentFactory(project=project)
 
         url = reverse(
@@ -652,7 +656,7 @@ class ExperimentDetailViewTest(TestCase):
         self.client.force_login(self.user)
 
     def test_get(self) -> None:
-        project: Project = ProjectFactory()
+        project: Project = ProjectFactory(owner=self.user)
         experiment: Experiment = ExperimentFactory(project=project)
         FearConditioningModuleFactory.create_batch(5, experiment=experiment)
         resp = self.client.get(
@@ -669,7 +673,7 @@ class ExperimentDetailViewTest(TestCase):
         )
 
     def test_get_modules_only_for_current_experiment(self) -> None:
-        project: Project = ProjectFactory()
+        project: Project = ProjectFactory(owner=self.user)
         experiment_1: Experiment = ExperimentFactory(project=project)
         modules_1 = FearConditioningModuleFactory.create_batch(
             5, experiment=experiment_1
@@ -705,8 +709,10 @@ class ModuleCreateViewTest(TestCase):
             content_type="image/png",
         )
 
-        self.experiment: Experiment = ExperimentFactory(context_a=context_a_file)
-        self.project = self.experiment.project
+        self.project = ProjectFactory(owner=self.user)
+        self.experiment: Experiment = ExperimentFactory(
+            project=self.project, context_a=context_a_file
+        )
 
     def test_create_fear_conditioning_module(self) -> None:
         url = reverse(
@@ -952,8 +958,8 @@ class ModuleUpdateViewTest(TestCase):
 
         self.client.force_login(self.user)
 
-        self.experiment: Experiment = ExperimentFactory()
-        self.project = self.experiment.project
+        self.project = ProjectFactory(owner=self.user)
+        self.experiment: Experiment = ExperimentFactory(project=self.project)
 
     def test_update_fear_conditioning_module(self) -> None:
         module: FearConditioningModule = FearConditioningModuleFactory(
@@ -1018,7 +1024,7 @@ class ModuleDeleteViewTest(TestCase):
         self.client.force_login(self.user)
 
     def test_delete_fear_conditioning_module(self) -> None:
-        project: Project = ProjectFactory()
+        project: Project = ProjectFactory(owner=self.user)
         experiment: Experiment = ExperimentFactory(project=project)
         module: FearConditioningModule = FearConditioningModuleFactory(
             experiment=experiment
@@ -1061,7 +1067,7 @@ class ParticipantCreateBatchViewTest(TestCase):
         self.client.force_login(self.user)
 
     def test_create_batch(self) -> None:
-        project: Project = ProjectFactory()
+        project: Project = ProjectFactory(owner=self.user)
         experiment: Experiment = ExperimentFactory(project=project)
         url = reverse(
             "experiments:participant_create_batch",
@@ -1108,7 +1114,7 @@ class ParticipantUploadViewTest(TestCase):
         self.client.force_login(self.user)
 
     def test_upload(self) -> None:
-        project: Project = ProjectFactory()
+        project: Project = ProjectFactory(owner=self.user)
         experiment: Experiment = ExperimentFactory(project=project)
         url = reverse(
             "experiments:participant_upload",
@@ -1154,7 +1160,7 @@ class ParticipantFormSetViewTest(TestCase):
         self.client.force_login(self.user)
 
     def test_update_participants(self) -> None:
-        project: Project = ProjectFactory()
+        project: Project = ProjectFactory(owner=self.user)
         experiment: Experiment = ExperimentFactory(project=project)
         participants: List[Participant] = ParticipantFactory.create_batch(
             3, experiment=experiment
@@ -1226,7 +1232,7 @@ class DataListViewTest(TestCase):
         self.client.force_login(self.user)
 
     def test_get(self) -> None:
-        project: Project = ProjectFactory()
+        project: Project = ProjectFactory(owner=self.user)
         experiment: Experiment = ExperimentFactory(project=project)
         module: FearConditioningModule = FearConditioningModuleFactory(
             experiment=experiment
@@ -1248,7 +1254,7 @@ class DataListViewTest(TestCase):
 
     def test_filter(self) -> None:
         # Can filter by participant
-        project: Project = ProjectFactory()
+        project: Project = ProjectFactory(owner=self.user)
         experiment: Experiment = ExperimentFactory(project=project)
         module: FearConditioningModule = FearConditioningModuleFactory(
             experiment=experiment
@@ -1275,7 +1281,7 @@ class DataListViewTest(TestCase):
 
     def test_data_list_view_override(self) -> None:
         # Should be able to override the pregenerated DataListView
-        project: Project = ProjectFactory()
+        project: Project = ProjectFactory(owner=self.user)
         experiment: Experiment = ExperimentFactory(project=project)
         module_1: FearConditioningModule = FearConditioningModuleFactory(
             experiment=experiment,
@@ -1349,7 +1355,7 @@ class DataDetailViewTest(TestCase):
         self.client.force_login(self.user)
 
     def test_get(self) -> None:
-        project: Project = ProjectFactory()
+        project: Project = ProjectFactory(owner=self.user)
         experiment: Experiment = ExperimentFactory(project=project)
         module: FearConditioningModule = FearConditioningModuleFactory(
             experiment=experiment
@@ -1366,7 +1372,6 @@ class DataDetailViewTest(TestCase):
         )
 
         resp = self.client.get(url)
-
         self.assertEqual(resp.status_code, 200)
 
         self.assertEqual(resp.context["data_type"], FearConditioningData)
@@ -1381,7 +1386,7 @@ class ModuleSortViewTest(APITestCase):
         self.client.force_login(self.user)
 
     def test_sort_modules(self) -> None:
-        project: Project = ProjectFactory()
+        project: Project = ProjectFactory(owner=self.user)
         experiment: Experiment = ExperimentFactory(project=project)
         modules = FearConditioningModuleFactory.create_batch(5, experiment=experiment)
 
@@ -1415,7 +1420,7 @@ class ModuleSortViewTest(APITestCase):
 
     def test_sorting_validation_break_end_validation(self) -> None:
         # Break end cannot be before break start
-        project: Project = ProjectFactory()
+        project: Project = ProjectFactory(owner=self.user)
         experiment: Experiment = ExperimentFactory(project=project)
         modules = FearConditioningModuleFactory.create_batch(5, experiment=experiment)
 
@@ -1457,7 +1462,7 @@ class ModuleSortViewTest(APITestCase):
 
     def test_sorting_validation_break_overlap_validation(self) -> None:
         # Breaks cannot overlap
-        project: Project = ProjectFactory()
+        project: Project = ProjectFactory(owner=self.user)
         experiment: Experiment = ExperimentFactory(project=project)
         modules = FearConditioningModuleFactory.create_batch(5, experiment=experiment)
 
@@ -1520,8 +1525,10 @@ class ExportViewTest(TestCase):
 
         self.client.force_login(self.user)
 
-        self.experiment: Experiment = ExperimentFactory(code="DEMO1")
-        self.project = self.experiment.project
+        self.project = ProjectFactory(owner=self.user)
+        self.experiment: Experiment = ExperimentFactory(
+            project=self.project, code="DEMO1"
+        )
 
     def test_get(self) -> None:
         url = reverse(
