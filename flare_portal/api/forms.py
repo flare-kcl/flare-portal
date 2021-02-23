@@ -87,6 +87,7 @@ class SubmissionForm(forms.Form):
 
 
 class TermsAndConditionsForm(forms.Form):
+    agreed = forms.BooleanField(required=False)
     participant = forms.ModelChoiceField(
         queryset=Participant.objects.all(),
         to_field_name="participant_id",
@@ -95,7 +96,7 @@ class TermsAndConditionsForm(forms.Form):
 
     def save(self) -> Participant:
         participant = self.cleaned_data["participant"]
-        participant.agreed_to_terms_and_conditions = True
+        participant.agreed_to_terms_and_conditions = self.cleaned_data["agreed"]
         participant.save()
         return participant
 
