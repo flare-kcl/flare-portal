@@ -6,6 +6,8 @@ from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect
 
+from flare_portal.users.models import User
+
 from . import constants
 
 
@@ -27,6 +29,41 @@ def role_required(
 
             messages.warning(request, "You don't have permission to access that page.")
             return redirect("home")
+
+        return _wrapped_view
+
+    return decorator(function)
+
+
+def can_user_view_project(
+    project_pk: int, user: User, owner_only: bool = False
+) -> bool:
+    return user.get_projects(owner_only=owner_only).filter(pk=project_pk).exists()
+
+
+def has_researcher_access(function: Callable, owner_only: bool = False) -> Callable:
+    def decorator(view_func: Callable) -> Callable:
+        @wraps(view_func)
+        def _wrapped_view(
+            request: HttpRequest, *args: Any, **kwargs: Any
+        ) -> HttpResponse:
+            if request.user.is_authenticated:
+                if project_pk := kwargs.get("project_pk"):
+                    if request.user.is_admin or can_user_view_project(
+                        project_pk, request.user, owner_only
+                    ):
+                        return view_func(request, *args, **kwargs)
+                    else:
+                        print("CAN't ACCESS")
+            else:
+                print("NOT AUTH")
+
+            messages.warning(
+                request, "You don't have permission to access that project."
+            )
+
+            print("WOMP")
+            return redirect("experiments:project_list")
 
         return _wrapped_view
 

@@ -30,8 +30,17 @@
         <a href="{% url "experiments:experiment_list" project_pk=project.pk %}" class="list-group-item list-group-item-action d-flex align-items-center{% if request.resolver_match.url_name == 'experiment_list' %} active{% endif %}">
             <span class="icon mr-3"><i class="fe fe-zap"></i></span>Experiments
         </a>
-        <a href="{% url "experiments:project_update" project_pk=project.pk %}" class="list-group-item list-group-item-action d-flex align-items-center{% if request.resolver_match.url_name == 'project_update' %} active{% endif %}">
-            <span class="icon mr-3"><i class="fe fe-sliders"></i></span>Project settings
-        </a>
+        {% if project.owner_id == request.user.id or request.user.is_admin %}
+            <a href="{% url "experiments:researcher_list" project_pk=project.pk %}" class="list-group-item list-group-item-action d-flex align-items-center{% if request.resolver_match.url_name == 'researcher_list' %} active{% endif %}">
+                <span class="icon mr-3"><i class="fe fe-user"></i></span>Researchers
+            </a>
+            <a href="{% url "experiments:project_update" project_pk=project.pk %}" class="list-group-item list-group-item-action d-flex align-items-center{% if request.resolver_match.url_name == 'project_update' %} active{% endif %}">
+                <span class="icon mr-3"><i class="fe fe-sliders"></i></span>Project Settings
+            </a>
+        {% else %}
+            <a href="{% url "experiments:researcher_leave" project_pk=project.pk %}" class="list-group-item list-group-item-action d-flex align-items-center{% if request.resolver_match.url_name == 'researcher_leave' %} active{% endif %}">
+                <span class="icon mr-3"><i class="fe fe-log-out"></i></span>Leave Project
+            </a>
+        {% endif %}
     </div>
 </div>
