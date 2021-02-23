@@ -8,13 +8,15 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('experiments', '0049_contingency_data_fix'),
+        ("experiments", "0051_copy_edits"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='project',
-            name='researchers',
-            field=models.ManyToManyField(related_name='projects', to=settings.AUTH_USER_MODEL),
+            model_name="project",
+            name="researchers",
+            field=models.ManyToManyField(
+                related_name="projects", to=settings.AUTH_USER_MODEL
+            ),
         ),
     ]
