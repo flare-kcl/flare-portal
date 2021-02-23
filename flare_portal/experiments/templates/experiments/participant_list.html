@@ -44,7 +44,7 @@
                                         <th>Started</th>
                                         <th>Finished</th>
                                         <th>Current Module</th>
-                                        <th>Rejected</th>
+                                        <th>ID Locked</th>
                                         <th>Voucher</th>
                                         <th></th>
                                         <th></th>
@@ -79,7 +79,7 @@
                                             </td>
 
                                             <td>
-                                                <span class="status-icon {% if not form.instance.has_been_rejected %}bg-success{% else %}bg-danger{% endif %}"></span> {{ form.instance.has_been_rejected|yesno|title }}
+                                                <span class="status-icon {% if form.instance.has_been_rejected %}bg-success{% else %}bg-danger{% endif %}"></span> {{ form.instance.has_been_rejected|yesno|title }}
                                             </td>
 
                                             <td>{{ form.instance.get_voucher_status }}</td>

@@ -166,7 +166,7 @@ class Participant(models.Model):
     )
     current_trial_index = models.PositiveIntegerField(null=True)
     agreed_to_terms_and_conditions = models.BooleanField(null=True)
-    rejection_reason = models.CharField(max_length=255, blank=True)
+    lock_reason = models.CharField(max_length=255, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     udpated_at = models.DateTimeField(auto_now=True)
@@ -202,7 +202,7 @@ class Participant(models.Model):
 
     def has_been_rejected(self) -> bool:
         """Has the participant been locked out by the app?"""
-        return self.rejection_reason != ""
+        return self.lock_reason != ""
 
     def get_data_values(self) -> List[Tuple[str, Any]]:
         """Returns data for the data detail view"""
@@ -215,7 +215,7 @@ class Participant(models.Model):
             ("Current Trial Index", self.current_trial_index),
             ("Agreed to T&C's", self.agreed_to_terms_and_conditions),
             ("Voucher Code", self.get_voucher_display()),
-            ("Rejection Reason", self.rejection_reason),
+            ("Lock Reason", self.lock_reason),
             ("Last Updated", self.udpated_at),
             ("Started At", self.started_at),
             ("Finished At", self.finished_at),
