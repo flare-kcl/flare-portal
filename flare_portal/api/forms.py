@@ -170,7 +170,7 @@ class ParticipantTrackingForm(forms.Form):
     )
 
     trial_index = forms.IntegerField(required=False)
-    rejection_reason = forms.CharField(max_length=255, required=False)
+    lock_reason = forms.CharField(max_length=255, required=False)
 
     def clean(self) -> Dict[str, Any]:
         cleaned_data = super().clean()
@@ -207,8 +207,8 @@ class ParticipantTrackingForm(forms.Form):
         participant.current_trial_index = (
             self.cleaned_data["trial_index"] or participant.current_trial_index
         )
-        participant.rejection_reason = (
-            self.cleaned_data["rejection_reason"] or participant.rejection_reason
+        participant.lock_reason = (
+            self.cleaned_data["lock_reason"] or participant.lock_reason
         )
         participant.save()
 
