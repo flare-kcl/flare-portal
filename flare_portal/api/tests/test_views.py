@@ -226,7 +226,7 @@ class TermsAndConditionsAPIViewTest(TestCase):
 
         resp = self.client.post(
             reverse("api:terms_and_conditions"),
-            {"participant": "Flare.ABCDEF", "did_agree": True},
+            {"participant": "Flare.ABCDEF", "agreed": True},
             content_type="application/json",
         )
 
