@@ -165,7 +165,7 @@ class Participant(models.Model):
         "experiments.BaseModule", on_delete=models.CASCADE, null=True
     )
     current_trial_index = models.PositiveIntegerField(null=True)
-    agreed_to_terms_and_conditions = models.BooleanField(default=False)
+    agreed_to_terms_and_conditions = models.BooleanField(null=True)
     rejection_reason = models.CharField(max_length=255, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
