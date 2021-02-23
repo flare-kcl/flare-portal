@@ -172,6 +172,59 @@ class ParticipantDeleteForm(forms.Form):
         self.participant.delete()
 
 
+class ParticipantBulkDeleteForm(forms.Form):
+    experiment: Experiment
+    participants: List[Participant]
+
+    def __init__(
+        self, experiment: Experiment, participants: Any, *args: Any, **kwargs: Any
+    ) -> None:
+        super(ParticipantBulkDeleteForm, self).__init__(*args, **kwargs)
+        self.experiment = experiment
+        self.participants = participants
+
+    def clean(self) -> Dict[str, Any]:
+        cleaned_data = super().clean()
+
+        for participant in self.participants:
+            # Check all the participants are part of the same experiment
+            if participant.experiment != self.experiment:
+                self.add_error(
+                    None,
+                    f"Participant {participant.participant_id} does not belong "
+                    "to experiment {self.experiment.name}",
+                )
+
+                return cleaned_data
+
+            # Check participant hasn't been allocated voucher
+            if getattr(participant, "voucher", None) is not None:
+                self.add_error(
+                    None,
+                    f"Participant {participant.participant_id} can't be "
+                    "deleted because they have a voucher dispersed.",
+                )
+
+                return cleaned_data
+
+            # Check participant hasn't started experiment
+            if participant.started_at is not None:
+                self.add_error(
+                    None,
+                    f"Participant {participant.participant_id} can't be "
+                    "deleted because they have already started the experiment.",
+                )
+
+                return cleaned_data
+
+        return cleaned_data
+
+    def save(self) -> None:
+        # Delete all the selected participants
+        for participant in self.participants:
+            participant.delete()
+
+
 class BreakStartModuleForm(forms.ModelForm):
     class Meta:
         model = BreakStartModule
