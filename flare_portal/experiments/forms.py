@@ -5,6 +5,7 @@ import string
 from typing import Any, Dict, List, Tuple
 
 from django import forms
+from django.db.models import QuerySet
 from django.core.validators import FileExtensionValidator
 from django.forms import inlineformset_factory
 
@@ -174,7 +175,7 @@ class ParticipantDeleteForm(forms.Form):
 
 class ParticipantBulkDeleteForm(forms.Form):
     experiment: Experiment
-    participants: List[Participant]
+    participants: QuerySet[Participant]
 
     def __init__(
         self, experiment: Experiment, participants: Any, *args: Any, **kwargs: Any
