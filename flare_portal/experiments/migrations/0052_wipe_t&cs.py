@@ -17,7 +17,7 @@ def wipe_blank_terms(apps: Any, schema_editor: Any) -> None:
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("experiments", "0052_project_researchers"),
+        ("experiments", "0051_copy_edits"),
     ]
 
     operations = [
