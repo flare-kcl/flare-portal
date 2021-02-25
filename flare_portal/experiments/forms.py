@@ -5,8 +5,8 @@ import string
 from typing import Any, Dict, List, Tuple
 
 from django import forms
-from django.db.models import QuerySet
 from django.core.validators import FileExtensionValidator
+from django.db.models import QuerySet
 from django.forms import inlineformset_factory
 
 from flare_portal.users.models import User
