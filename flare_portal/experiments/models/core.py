@@ -6,6 +6,7 @@ from django.core import validators
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.core.validators import FileExtensionValidator
 from django.db import models
+from django.db.models import QuerySet
 from django.urls import reverse
 from django.utils.text import camel_case_to_spaces, slugify
 
@@ -24,6 +25,11 @@ class Project(models.Model):
 
     def __str__(self) -> str:
         return self.name
+
+    def get_researchers(self) -> QuerySet[Any]:
+        return (
+            get_user_model().objects.filter(pk=self.owner.pk) | self.researchers.all()
+        )
 
 
 def experiment_assets_path(instance: "Experiment", filename: str) -> str:
@@ -211,7 +217,9 @@ class Participant(models.Model):
             ("Experiment", self.experiment),
             (
                 "Current Module",
-                self.current_module.specific.label if self.current_module else None,
+                self.current_module.specific.get_module_title()
+                if self.current_module
+                else None,
             ),
             ("Current Trial Index", self.current_trial_index),
             ("Agreed to T&C's", self.agreed_to_terms_and_conditions),

@@ -43,6 +43,10 @@ class ExperimentForm(forms.ModelForm):
             "gsd",
         ]
 
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super(ExperimentForm, self).__init__(*args, **kwargs)
+        self.fields["owner"].queryset = kwargs.get("instance").project.get_researchers()
+
 
 class ExperimentCreateForm(forms.ModelForm):
     class Meta:
@@ -266,7 +270,8 @@ class ProjectResearcherAddForm(forms.ModelForm):
         super(ProjectResearcherAddForm, self).__init__(*args, **kwargs)
         project = kwargs.get("instance")
         self.fields["researchers"] = forms.ModelMultipleChoiceField(
-            queryset=User.objects.exclude(pk=project.owner.pk), required=True
+            queryset=User.objects.exclude(pk=project.owner.pk).order_by("first_name"),
+            required=True,
         )
 
     class Meta:
