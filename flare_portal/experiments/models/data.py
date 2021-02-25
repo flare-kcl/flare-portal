@@ -129,8 +129,11 @@ class FearConditioningData(BaseData):
         related_name="data",
     )
     trial = models.PositiveIntegerField()
+    trial_by_stimulus = models.PositiveIntegerField()
     rating = models.PositiveIntegerField(blank=True, null=True)
-    conditional_stimulus = models.CharField(max_length=24, verbose_name="stimulus")
+    stimulus = models.CharField(max_length=24)
+    normalised_stimulus = models.CharField(max_length=3, blank=True)
+    reinforced_stimulus = models.CharField(max_length=3, blank=True)
     unconditional_stimulus = models.BooleanField(verbose_name="US")
     trial_started_at = models.DateTimeField()
     response_recorded_at = models.DateTimeField(blank=True, null=True)
@@ -144,7 +147,10 @@ class FearConditioningData(BaseData):
         "module__phase",
         "trial",
         "rating",
-        "conditional_stimulus",
+        "trial_by_stimulus",
+        "stimulus",
+        "reinforced_stimulus",
+        "normalised_stimulus",
         "unconditional_stimulus",
         "trial_started_at",
         "response_recorded_at",
@@ -156,7 +162,7 @@ class FearConditioningData(BaseData):
         "participant",
         "module__phase",
         "trial",
-        "conditional_stimulus",
+        "stimulus",
         "unconditional_stimulus",
         "rating",
     ]
@@ -302,6 +308,7 @@ class VolumeCalibrationData(BaseData):
 
 class AffectiveRatingData(BaseData):
     stimulus = models.CharField(max_length=3)
+    normalised_stimulus = models.CharField(max_length=3, blank=True)
     rating = models.PositiveIntegerField()
     module = models.ForeignKey(  # type: ignore
         "experiments.AffectiveRatingModule",
@@ -312,6 +319,7 @@ class AffectiveRatingData(BaseData):
     list_display = [
         "participant",
         "stimulus",
+        "normalised_stimulus",
         "rating",
     ]
 

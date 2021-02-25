@@ -180,6 +180,17 @@ class Participant(models.Model):
     started_at = models.DateTimeField(null=True)
     finished_at = models.DateTimeField(null=True)
 
+    @property
+    def reinforced_stimulus(self) -> str:
+        from flare_portal.experiments.models import FearConditioningData
+
+        # Get the first trial response
+        trial = FearConditioningData.objects.filter(participant_id=self.pk).first()
+        if trial:
+            return trial.reinforced_stimulus
+
+        return ""
+
     def get_voucher_status(self) -> str:
         """Displays the voucher status"""
         if self.finished_at and self.experiment.voucher_pool_id:
@@ -222,6 +233,7 @@ class Participant(models.Model):
                 else None,
             ),
             ("Current Trial Index", self.current_trial_index),
+            ("Reinforced Stimulus", self.reinforced_stimulus),
             ("Agreed to T&C's", self.agreed_to_terms_and_conditions),
             ("Voucher Code", self.get_voucher_display()),
             ("Lock Reason", self.lock_reason),
