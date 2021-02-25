@@ -8,7 +8,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ("experiments", "0051_copy_edits"),
+        ("experiments", "0052_wipe_t&cs"),
     ]
 
     operations = [
