@@ -39,7 +39,7 @@
                                     type="button"
                                     @click="
                                         window.location = `{% url 'experiments:participant_delete_batch' project_pk=view.kwargs.project_pk experiment_pk=view.kwargs.experiment_pk participant_pks='PKS-PLACEHOLDER' %}`
-                                            .replace('PKS-PLACEHOLDER', selectedRows.join())
+                                        .replace('PKS-PLACEHOLDER', encodeURIComponent(selectedRows.join()))
                                     "
                                 ></button>
                             </div>
@@ -71,7 +71,7 @@
                                                         type="checkbox"
                                                         aria-label="Press to select this participant row for deletion."
                                                         {% if form.instance.started_at %} disabled {% endif %}
-                                                        @click="
+                                                        @change="
                                                             const id = {{ form.instance.pk }}
                                                             if (selectedRows.includes(id)) {
                                                                 selectedRows = selectedRows.filter(selectedId => selectedId != id)
@@ -169,7 +169,7 @@
                                 type="button"
                                 @click="
                                     window.location = `{% url 'experiments:participant_delete_batch' project_pk=view.kwargs.project_pk experiment_pk=view.kwargs.experiment_pk participant_pks='PKS-PLACEHOLDER' %}`
-                                        .replace('PKS-PLACEHOLDER', selectedRows.join())
+                                        .replace('PKS-PLACEHOLDER', encodeURIComponent(selectedRows.join()))
                                 "
                             ></button>
                         </div>

@@ -221,8 +221,7 @@ class ParticipantBulkDeleteForm(forms.Form):
 
     def save(self) -> None:
         # Delete all the selected participants
-        for participant in self.participants:
-            participant.delete()
+        self.participants.delete()
 
 
 class BreakStartModuleForm(forms.ModelForm):

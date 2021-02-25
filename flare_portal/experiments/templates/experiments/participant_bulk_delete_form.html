@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Delete Participant - {{ experiment.name }}{% endblock title %}
+{% block title %}Delete {{ participants|length }} Participant{{ participants|length|pluralize }} - {{ experiment.name }}{% endblock title %}
 
 {% block content %}
     <div class="container">
@@ -18,12 +18,12 @@
                         {% csrf_token %}
 
                         <div class="card-body">
-                            <p class="mb-6">Deleting the following participants that have not submitted any data:</p>
+                            <p class="mb-6">Delete the following participants that have not submitted any data:</p>
 
                             <ul>
-                            {% for participant in participants %}
-                                <li>{{ participant.participant_id }}</li>
-                            {% endfor %}
+                                {% for participant in participants %}
+                                    <li>{{ participant.participant_id }}</li>
+                                {% endfor %}
                             </ul>
 
                             {% if form.non_field_errors %}
@@ -39,7 +39,7 @@
 
                         <div class="card-footer">
                             <div class="d-flex">
-                                <a href="{% url "experiments:participant_list" project_pk=view.kwargs.project_pk experiment_pk=view.kwargs.experiment_pk %}" class="btn btn-link">Cancel</a>
+                                <a href='{% url "experiments:participant_list" project_pk=view.kwargs.project_pk experiment_pk=view.kwargs.experiment_pk %}' class="btn btn-link">Cancel</a>
                                 <div class="btn-list ml-auto">
                                     <button type="submit" class="btn btn-primary btn-danger ml-auto">Delete {{ participants|length }} participant{{ participants|length|pluralize }}</button>
                                 </div>
