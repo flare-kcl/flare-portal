@@ -18,9 +18,7 @@
                         <p class="card-subtitle m-0 ml-2">{{ researchers|length }} researcher{{ researchers|length|pluralize }}</p>
                     </div>
                     <div class="card-options">
-                        <template x-if="showPicker == true">
-                            <button class="btn btn-sm btn-primary ml-4" form="add-researcher-form" type="submit">Save changes</button>
-                        </template>
+                        <button x-show="showPicker == true" class="btn btn-sm btn-primary ml-4" form="add-researcher-form" type="submit">Save changes</button>
                     </div>
                 </div>
 
@@ -74,12 +72,10 @@
                 </div>
 
                 <div class="card-footer d-flex">
-                    <button class="btn btn-sm btn-secondary" @click.prevent="showPicker = true">Add Researcher</button>
-                    <template x-if="showPicker == true">
-                        <button class="btn btn-sm btn-primary ml-auto" form="add-researcher-form" type="submit">
-                            Save changes
-                        </button>
-                    </template>
+                    <button x-show="showPicker == false" class="btn btn-sm btn-secondary" @click.prevent="showPicker = true">Add Researcher</button>
+                    <button x-show="showPicker == true" class="btn btn-sm btn-primary ml-auto" form="add-researcher-form" type="submit">
+                        Save changes
+                    </button>
                 </div>
             </div>
         </div>
