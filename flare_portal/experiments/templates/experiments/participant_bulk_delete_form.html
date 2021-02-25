@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Delete {{ participants|length }} Participant{{ participants|length|pluralize }} - {{ experiment.name }}{% endblock title %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4">
+                {% include "experiments/includes/experiment_sidebar.html" %}
+            </div>
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title text-danger">Delete {{ participants|length }} Participant{{ participants|length|pluralize }}</h3>
+                    </div>
+
+                    <form action="" method="POST">
+                        {% csrf_token %}
+
+                        <div class="card-body">
+                            <p class="mb-6">Delete the following participants that have not submitted any data:</p>
+
+                            <ul>
+                                {% for participant in participants %}
+                                    <li>{{ participant.participant_id }}</li>
+                                {% endfor %}
+                            </ul>
+
+                            {% if form.non_field_errors %}
+                                <div class="card-alert alert alert-danger my-3">
+                                    {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+
+                            {% for field in form %}
+                                {% include "includes/form-group.html" %}
+                            {% endfor %}
+                        </div>
+
+                        <div class="card-footer">
+                            <div class="d-flex">
+                                <a href='{% url "experiments:participant_list" project_pk=view.kwargs.project_pk experiment_pk=view.kwargs.experiment_pk %}' class="btn btn-link">Cancel</a>
+                                <div class="btn-list ml-auto">
+                                    <button type="submit" class="btn btn-primary btn-danger ml-auto">Delete {{ participants|length }} participant{{ participants|length|pluralize }}</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

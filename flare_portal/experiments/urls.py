@@ -88,6 +88,12 @@ project_urlpatterns = [
     ),
     path(
         "projects/<int:project_pk>/experiments/<int:experiment_pk>/"
+        "participants/<str:participant_pks>/delete-bulk/",
+        views.participant_bulk_delete_view,
+        name="participant_delete_batch",
+    ),
+    path(
+        "projects/<int:project_pk>/experiments/<int:experiment_pk>/"
         "participants/<int:participant_pk>/detail/",
         views.participant_detail_view,
         name="participant_detail",

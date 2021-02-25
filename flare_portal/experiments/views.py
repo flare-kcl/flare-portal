@@ -22,6 +22,7 @@ from .forms import (
     ExperimentCreateForm,
     ExperimentForm,
     ParticipantBatchForm,
+    ParticipantBulkDeleteForm,
     ParticipantDeleteForm,
     ParticipantFormSet,
     ParticipantUploadForm,
@@ -406,6 +407,57 @@ class ParticipantDeleteView(FormView):
 
 
 participant_delete_view = ParticipantDeleteView.as_view()
+
+
+class ParticipantBulkDeleteView(FormView):
+    form_class = ParticipantBulkDeleteForm
+    template_name = "experiments/participant_bulk_delete_form.html"
+
+    def get_success_url(self) -> str:
+        return reverse(
+            "experiments:participant_list",
+            kwargs={
+                "project_pk": self.kwargs["project_pk"],
+                "experiment_pk": self.kwargs["experiment_pk"],
+            },
+        )
+
+    def get_form_kwargs(self) -> Dict[str, Any]:
+        kwargs = super(ParticipantBulkDeleteView, self).get_form_kwargs()
+        kwargs["experiment"] = self.experiment
+        kwargs["participants"] = self.participants
+        return kwargs
+
+    def dispatch(self, *args: Any, **kwargs: Any) -> HttpResponse:
+        self.experiment = get_object_or_404(Experiment, pk=kwargs["experiment_pk"])
+        self.participants = Participant.objects.filter(
+            pk__in=[int(pk) for pk in kwargs["participant_pks"].split(",")]
+        )
+
+        return super().dispatch(*args, **kwargs)
+
+    def get_context_data(self, **kwargs: Any) -> dict:
+        context = super().get_context_data(**kwargs)
+        context["experiment"] = self.experiment
+        context["participants"] = self.participants
+        return context
+
+    def form_valid(self, form: ParticipantDeleteForm) -> HttpResponse:  # type: ignore
+        # Attempt Delete
+        form.save()
+
+        # Add message
+        deleted_count = len(self.participants)
+        messages.success(
+            self.request,
+            f"Deleted {deleted_count} participant{pluralize(deleted_count)}.",
+        )
+
+        # Return redirect
+        return super().form_valid(form)
+
+
+participant_bulk_delete_view = ParticipantBulkDeleteView.as_view()
 
 
 class ParticipantUploadView(FormView):
