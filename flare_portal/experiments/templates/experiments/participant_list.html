@@ -12,7 +12,7 @@
                     {% include "experiments/includes/experiment_sidebar.html" %}
                 </div>
                 <div class="col-lg-9">
-                    <form class="card" method="POST" action="" x-data="{ forms: [], startIndex: {{ formset.management_form.TOTAL_FORMS.value }} }">
+                    <form id="participants-form" class="card" method="POST" action="" x-data="{ forms: [], selectedRows: [], startIndex: {{ formset.management_form.TOTAL_FORMS.value }} }">
                         {% csrf_token %}
                         {{ formset.management_form.TOTAL_FORMS|attr:"x-bind::value:startIndex + forms.length" }}
                         {{ formset.management_form.INITIAL_FORMS }}
@@ -25,13 +25,23 @@
                                 <p class="card-subtitle m-0 ml-2">{{ participants|length }} participant{{ participants|length|pluralize }}</p>
                             </div>
                             <div class="card-options">
-                                <a href="{% url "experiments:participant_upload" project_pk=view.kwargs.project_pk experiment_pk=view.kwargs.experiment_pk %}" class="btn btn-sm btn-secondary">
+                                <a href="{% url "experiments:participant_upload" project_pk=view.kwargs.project_pk experiment_pk=view.kwargs.experiment_pk %}" class="btn btn-sm btn-secondary ml-4"">
                                     Upload
                                 </a>
                                 <a href="{% url "experiments:participant_create_batch" project_pk=view.kwargs.project_pk experiment_pk=view.kwargs.experiment_pk %}" class="btn btn-sm btn-secondary ml-4">
                                     Generate batch
                                 </a>
-                                <button class="btn btn-sm btn-primary ml-4" type="submit">Save changes</button>
+                                <button x-show="selectedRows.length == 0" class="btn btn-sm btn-primary ml-4" type="submit">Save changes</button>
+                                <button
+                                    x-show="selectedRows.length > 0"
+                                    x-text="selectedRows.length > 1 ? `Delete ${selectedRows.length} participants` : `Delete participant`"
+                                    class="btn btn-sm btn-danger ml-4"
+                                    type="button"
+                                    @click="
+                                        window.location = `{% url 'experiments:participant_delete_batch' project_pk=view.kwargs.project_pk experiment_pk=view.kwargs.experiment_pk participant_pks='PKS-PLACEHOLDER' %}`
+                                        .replace('PKS-PLACEHOLDER', encodeURIComponent(selectedRows.join()))
+                                    "
+                                ></button>
                             </div>
                         </div>
 
@@ -39,6 +49,7 @@
                             <table class="table card-table table-vcenter">
                                 <thead>
                                     <tr>
+                                        <th></th>
                                         <th></th>
                                         <th>Login ID</th>
                                         <th>Started</th>
@@ -53,6 +64,23 @@
                                 <tbody>
                                     {% for form in formset %}
                                         <tr>
+                                            <td>
+                                                <label class="form-label mt-2">
+                                                    <input
+                                                        class="form-check"
+                                                        type="checkbox"
+                                                        aria-label="Press to select this participant row for deletion."
+                                                        {% if form.instance.started_at %} disabled {% endif %}
+                                                        @change="
+                                                            const id = {{ form.instance.pk }}
+                                                            if (selectedRows.includes(id)) {
+                                                                selectedRows = selectedRows.filter(selectedId => selectedId != id)
+                                                            } else {
+                                                                selectedRows.push(id)
+                                                            }
+                                                        ">
+                                                </label>
+                                            </td>
                                             <td><a href="{% url "experiments:participant_detail" project_pk=view.kwargs.project_pk experiment_pk=view.kwargs.experiment_pk participant_pk=form.instance.pk %}"><span class="text-muted">{{ forloop.counter }}</span></a></td>
                                             <td>
                                                 {% if form.non_field_errors %}
@@ -109,10 +137,12 @@
                                     {% endfor %}
                                     <template x-for="(form, index) in forms" :key="index">
                                         <tr>
+                                            <td></td>
                                             <td><span class="text-muted" x-text="index + startIndex + 1"></span></td>
                                             <td>
                                                 <input type="text" :name="`participants-${index + startIndex}-participant_id`" maxlength="24" placeholder="New participant" class="form-control" :id="`id_participants-${index + startIndex}-participant_id`" x-model="forms[index]">
                                             </td>
+                                            <td></td>
                                             <td></td>
                                             <td></td>
                                             <td></td>
@@ -131,7 +161,17 @@
 
                         <div class="card-footer d-flex">
                             <button class="btn btn-sm btn-secondary" @click.prevent="forms.push('')">Add participants</button>
-                            <button class="btn btn-sm btn-primary ml-auto" type="submit">Save changes</button>
+                            <button x-show="selectedRows.length == 0" class="btn btn-sm btn-primary ml-auto" type="submit">Save changes</button>
+                            <button
+                                x-show="selectedRows.length > 0"
+                                x-text="selectedRows.length > 1 ? `Delete ${selectedRows.length} participants` : `Delete participant`"
+                                class="btn btn-sm btn-danger ml-auto"
+                                type="button"
+                                @click="
+                                    window.location = `{% url 'experiments:participant_delete_batch' project_pk=view.kwargs.project_pk experiment_pk=view.kwargs.experiment_pk participant_pks='PKS-PLACEHOLDER' %}`
+                                        .replace('PKS-PLACEHOLDER', encodeURIComponent(selectedRows.join()))
+                                "
+                            ></button>
                         </div>
                     </form>
                 </div>

@@ -6,6 +6,7 @@ from typing import Any, Dict, List, Tuple
 
 from django import forms
 from django.core.validators import FileExtensionValidator
+from django.db.models import QuerySet
 from django.forms import inlineformset_factory
 
 from flare_portal.users.models import User
@@ -170,6 +171,58 @@ class ParticipantDeleteForm(forms.Form):
 
         # Validation passes so delete Participant
         self.participant.delete()
+
+
+class ParticipantBulkDeleteForm(forms.Form):
+    experiment: Experiment
+    participants: QuerySet[Participant]
+
+    def __init__(
+        self, experiment: Experiment, participants: Any, *args: Any, **kwargs: Any
+    ) -> None:
+        super(ParticipantBulkDeleteForm, self).__init__(*args, **kwargs)
+        self.experiment = experiment
+        self.participants = participants
+
+    def clean(self) -> Dict[str, Any]:
+        cleaned_data = super().clean()
+
+        for participant in self.participants:
+            # Check all the participants are part of the same experiment
+            if participant.experiment != self.experiment:
+                self.add_error(
+                    None,
+                    f"Participant {participant.participant_id} does not belong "
+                    "to experiment {self.experiment.name}",
+                )
+
+                return cleaned_data
+
+            # Check participant hasn't been allocated voucher
+            if getattr(participant, "voucher", None) is not None:
+                self.add_error(
+                    None,
+                    f"Participant {participant.participant_id} can't be "
+                    "deleted because they have a voucher dispersed.",
+                )
+
+                return cleaned_data
+
+            # Check participant hasn't started experiment
+            if participant.started_at is not None:
+                self.add_error(
+                    None,
+                    f"Participant {participant.participant_id} can't be "
+                    "deleted because they have already started the experiment.",
+                )
+
+                return cleaned_data
+
+        return cleaned_data
+
+    def save(self) -> None:
+        # Delete all the selected participants
+        self.participants.delete()
 
 
 class BreakStartModuleForm(forms.ModelForm):
