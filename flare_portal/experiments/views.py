@@ -499,7 +499,7 @@ participant_upload_view = ParticipantUploadView.as_view()
 
 class ParticipantDetailView(DetailView):
     context_object_name = "participant"
-    pk_url_kwarg = "experiment_pk"
+    pk_url_kwarg = "participant_pk"
     queryset = Participant.objects
 
     def dispatch(self, *args: Any, **kwargs: Any) -> HttpResponse:
