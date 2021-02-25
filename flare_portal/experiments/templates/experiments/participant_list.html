@@ -56,7 +56,10 @@
                                         <th>Finished</th>
                                         <th>Current Module</th>
                                         <th>ID Locked</th>
-                                        <th>Voucher</th>
+
+                                        <!-- Only show voucher column if the experiment has a 'Voucher Pool' -->
+                                        {% if experiment.voucher_pool %} <th>Voucher</th> {% endif %}
+
                                         <th></th>
                                         <th></th>
                                     </tr>
@@ -110,7 +113,7 @@
                                                 <span class="status-icon {% if form.instance.has_been_rejected %}bg-success{% else %}bg-danger{% endif %}"></span> {{ form.instance.has_been_rejected|yesno|title }}
                                             </td>
 
-                                            <td>{{ form.instance.get_voucher_status }}</td>
+                                            {% if experiment.voucher_pool %} <td>{{ form.instance.get_voucher_status }}</td> {% endif %}
 
                                             <td>
                                                 {{ form.id }}

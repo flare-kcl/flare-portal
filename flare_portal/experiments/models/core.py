@@ -185,7 +185,7 @@ class Participant(models.Model):
         if self.finished_at and self.experiment.voucher_pool_id:
             try:
                 if str(self.voucher) is not None:
-                    return "Disbursed"
+                    return "Allocated"
             except ObjectDoesNotExist:
                 return "Failed"
 
@@ -203,7 +203,7 @@ class Participant(models.Model):
             try:
                 return str(self.voucher)
             except ObjectDoesNotExist:
-                return "Unable to disburse voucher."
+                return "Unable to allocate voucher."
 
         return ""
 
