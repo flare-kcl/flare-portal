@@ -443,14 +443,16 @@ class ParticipantBulkDeleteView(FormView):
         return context
 
     def form_valid(self, form: ParticipantDeleteForm) -> HttpResponse:  # type: ignore
+        # Get number of selected participants
+        participants_count = self.participants.count()
+
         # Attempt Delete
         form.save()
 
         # Add message
-        deleted_count = len(self.participants)
         messages.success(
             self.request,
-            f"Deleted {deleted_count} participant{pluralize(deleted_count)}.",
+            f"Deleted {participants_count} participant{pluralize(participants_count)}.",
         )
 
         # Return redirect
