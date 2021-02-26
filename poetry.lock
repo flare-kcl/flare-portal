@@ -204,7 +204,7 @@ python-versions = ">=2.6, !=3.0.*, !=3.1.*"
 
 [[package]]
 name = "detect-secrets"
-version = "0.14.3"
+version = "1.0.2"
 description = "Tool for detecting secrets in the codebase"
 category = "dev"
 optional = false
@@ -1320,7 +1320,7 @@ gunicorn = ["gunicorn"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "45e9115cf6bd1c5414e618dcd0f85eb14453c0e1344072c3889bea6a7ebd899d"
+content-hash = "91ecd10053e1ad01c36608fc131bbce4a17fb9a0571b1b13a13da5e1aac8592c"
 
 [metadata.files]
 appdirs = [
@@ -1451,8 +1451,8 @@ decorator = [
     {file = "decorator-4.4.2.tar.gz", hash = "sha256:e3a62f0520172440ca0dcc823749319382e377f37f140a0b99ef45fecb84bfe7"},
 ]
 detect-secrets = [
-    {file = "detect_secrets-0.14.3-py2.py3-none-any.whl", hash = "sha256:dc56fb75ddc221eed4e998127230b59154024910121778bf38100a29da04c5cd"},
-    {file = "detect_secrets-0.14.3.tar.gz", hash = "sha256:953466e6e4a698cd6ee5bce060173889d7383a7ebf7a2cf3774ab7718bf826a3"},
+    {file = "detect_secrets-1.0.2-py2.py3-none-any.whl", hash = "sha256:88d29d89fef634bc1ba7ced9574f99f1b1b45196cd92c43c4d2f3a1ae0e51feb"},
+    {file = "detect_secrets-1.0.2.tar.gz", hash = "sha256:1e9c4a2676a6865eb7dd9aa4a896bd109fe2289807b5567f985b45e94dc07d69"},
 ]
 distlib = [
     {file = "distlib-0.3.1-py2.py3-none-any.whl", hash = "sha256:8c09de2c67b3e7deef7184574fc060ab8a793e7adbb183d942c389c8b13c52fb"},
