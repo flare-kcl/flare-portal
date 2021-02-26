@@ -1,6 +1,7 @@
 import csv
 import io
 import zipfile
+from collections import OrderedDict
 from datetime import datetime
 from typing import IO, List, Type
 
@@ -62,7 +63,18 @@ class Exporter:
 
         writer = csv.DictWriter(file, self.serializer_class.Meta.fields)
         writer.writeheader()
-        writer.writerows(serializer.data)
+
+        # Write serializer data and replace None/'' with 'NA'
+        writer.writerows(
+            OrderedDict(
+                (
+                    field_name,
+                    "NA" if (field_value is None or field_value == "") else field_value,
+                )
+                for field_name, field_value in row.items()
+            )
+            for row in serializer.data
+        )
 
         file.seek(0)
 
@@ -84,8 +96,10 @@ class FearConditioningDataSerializer(DataSerializer):
         fields = DataSerializer.Meta.fields + [
             "phase",
             "trial",
+            "trial_by_stimulus",
             "rating",
-            "conditional_stimulus",
+            "stimulus",
+            "normalised_stimulus",
             "unconditional_stimulus",
             "trial_started_at",
             "response_recorded_at",
@@ -109,7 +123,11 @@ class FearConditioningDataExporter(DataExporter):
 class AffectiveRatingDataSerializer(DataSerializer):
     class Meta:
         model = AffectiveRatingData
-        fields = DataSerializer.Meta.fields + ["stimulus", "rating"]
+        fields = DataSerializer.Meta.fields + [
+            "stimulus",
+            "rating",
+            "normalised_stimulus",
+        ]
 
 
 class AffectiveRatingDataExporter(DataExporter):
@@ -181,6 +199,7 @@ class CriterionDataSerializer(DataSerializer):
             "question_id",
             "question",
             "required_answer",
+            "passed",
             "required",
             "answer",
         ]
@@ -270,6 +289,7 @@ class ParticipantSerializer(serializers.ModelSerializer):
             "lock_reason",
             "current_module",
             "current_trial_index",
+            "reinforced_stimulus",
         ]
 
 

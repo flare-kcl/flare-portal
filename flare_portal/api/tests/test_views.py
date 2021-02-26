@@ -259,8 +259,11 @@ class ModuleDataAPIViewTest(TestCase):
             "participant": participant.participant_id,
             "module": module.pk,
             "trial": 1,
+            "trial_by_stimulus": 1,
             "rating": 5,
-            "conditional_stimulus": "CSA",
+            "stimulus": "CSA",
+            "normalised_stimulus": "CS+",
+            "reinforced_stimulus": "CSA",
             "unconditional_stimulus": True,
             "trial_started_at": parse_datetime("2020-01-01T00:00Z"),
             "response_recorded_at": parse_datetime("2020-01-01T00:00Z"),
@@ -287,8 +290,11 @@ class ModuleDataAPIViewTest(TestCase):
         self.assertEqual(data.participant.participant_id, json_data["participant"])
         self.assertEqual(data.module_id, json_data["module"])
         self.assertEqual(data.trial, json_data["trial"])
+        self.assertEqual(data.trial_by_stimulus, json_data["trial_by_stimulus"])
         self.assertEqual(data.rating, json_data["rating"])
-        self.assertEqual(data.conditional_stimulus, json_data["conditional_stimulus"])
+        self.assertEqual(data.stimulus, json_data["stimulus"])
+        self.assertEqual(data.normalised_stimulus, json_data["normalised_stimulus"])
+        self.assertEqual(data.reinforced_stimulus, json_data["reinforced_stimulus"])
         self.assertEqual(
             data.unconditional_stimulus, json_data["unconditional_stimulus"]
         )
@@ -312,8 +318,11 @@ class ModuleDataAPIViewTest(TestCase):
             "participant": participant.participant_id,
             "module": module.pk,
             "trial": 1,
+            "trial_by_stimulus": 1,
             "rating": 5,
-            "conditional_stimulus": "CSA",
+            "stimulus": "CSA",
+            "normalised_stimulus": "CS+",
+            "reinforced_stimulus": "CSA",
             "unconditional_stimulus": True,
             "trial_started_at": parse_datetime("2020-01-01T00:00Z"),
             "response_recorded_at": parse_datetime("2020-01-01T00:00Z"),
@@ -350,8 +359,11 @@ class FearConditioningDataAPIViewTest(TestCase):
             "participant": participant.participant_id,
             "module": module.pk,
             "trial": 1,
+            "trial_by_stimulus": 1,
             "rating": 5,
-            "conditional_stimulus": "CSA",
+            "stimulus": "CSA",
+            "normalised_stimulus": "CS+",
+            "reinforced_stimulus": "CSA",
             "unconditional_stimulus": True,
             "trial_started_at": parse_datetime("2020-01-01T00:00Z"),
             "response_recorded_at": parse_datetime("2020-01-01T00:00Z"),

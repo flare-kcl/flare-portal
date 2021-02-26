@@ -77,7 +77,7 @@ slugified name of the data Django model.
   "module": 7,
   "trial": 2,
   "rating": 5,
-  "conditional_stimulus": "CSA",
+  "stimulus": "CSA",
   "unconditional_stimulus": true,
   "trial_started_at": "2020-12-07T14:00:00Z",
   "response_recorded_at": "2020-12-07T14:00:10Z",
