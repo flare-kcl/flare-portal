@@ -53,16 +53,11 @@ def has_researcher_access(function: Callable, owner_only: bool = False) -> Calla
                         project_pk, request.user, owner_only
                     ):
                         return view_func(request, *args, **kwargs)
-                    else:
-                        print("CAN't ACCESS")
-            else:
-                print("NOT AUTH")
 
             messages.warning(
                 request, "You don't have permission to access that project."
             )
 
-            print("WOMP")
             return redirect("experiments:project_list")
 
         return _wrapped_view
