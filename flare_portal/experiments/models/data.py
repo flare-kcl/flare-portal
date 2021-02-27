@@ -142,6 +142,8 @@ class FearConditioningData(BaseData):
     )
     calibrated_volume_level = models.DecimalField(max_digits=3, decimal_places=2)
     headphones = models.BooleanField(verbose_name="headphones connected")
+    did_leave_iti = models.BooleanField(verbose_name="did leave ITI", default=False)
+    did_leave_task = models.BooleanField(default=False)
 
     fields = [
         "module__phase",
@@ -157,6 +159,8 @@ class FearConditioningData(BaseData):
         "volume_level",
         "calibrated_volume_level",
         "headphones",
+        "did_leave_iti",
+        "did_leave_task",
     ]
     list_display = [
         "participant",
