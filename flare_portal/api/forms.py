@@ -204,9 +204,7 @@ class ParticipantTrackingForm(forms.Form):
         participant.current_module = (
             self.cleaned_data["module"] or participant.current_module
         )
-        participant.current_trial_index = (
-            self.cleaned_data["trial_index"] or participant.current_trial_index
-        )
+        participant.current_trial_index = self.cleaned_data["trial_index"]
         participant.lock_reason = (
             self.cleaned_data["lock_reason"] or participant.lock_reason
         )
