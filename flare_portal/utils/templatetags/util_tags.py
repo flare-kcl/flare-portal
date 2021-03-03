@@ -1,12 +1,13 @@
 import json
 import os
 import re
-import markdown
 from typing import Any, Dict
 
 from django import forms, template
 from django.db.models.fields.files import FieldFile
 from django.utils.safestring import mark_safe
+
+import markdown
 
 register = template.Library()
 
