@@ -276,6 +276,7 @@ class USUnpleasantnessDataExporter(DataExporter):
 class ParticipantSerializer(serializers.ModelSerializer):
     experiment_code = serializers.CharField(source="experiment.code")
     voucher = serializers.CharField(source="get_voucher_display")
+    current_module = serializers.SerializerMethodField()
 
     class Meta:
         model = Participant
@@ -293,6 +294,12 @@ class ParticipantSerializer(serializers.ModelSerializer):
             "current_trial_index",
             "reinforced_stimulus",
         ]
+
+    def get_current_module(self, obj: Participant) -> str:
+        if obj.current_module:
+            return obj.current_module.specific.get_module_title()
+
+        return ""
 
 
 class ParticipantExporter(Exporter):
