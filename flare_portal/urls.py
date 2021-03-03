@@ -12,7 +12,12 @@ from flare_portal.api import urls as api_urls
 from flare_portal.experiments import urls as experiment_urls
 from flare_portal.reimbursement import urls as reimbursement_urls
 from flare_portal.site_config import urls as site_config_urls
-from flare_portal.site_config.views import privacy_policy
+from flare_portal.site_config.views import (
+    participant_privacy_policy_view,
+    participant_terms_view,
+    researcher_privacy_policy_view,
+    researcher_terms_view,
+)
 from flare_portal.users import urls as users_urls
 from flare_portal.utils.cache import get_default_cache_control_decorator
 from flare_portal.utils.urls import decorate_urlpatterns
@@ -32,7 +37,26 @@ private_urlpatterns = decorate_urlpatterns(private_urlpatterns, login_required)
 urlpatterns: List[Union[URLPattern, URLResolver]] = [
     path("accounts/", include(users_urls.public_urlpatterns)),
     path("api/v1/", include(api_urls)),
-    path("privacy-policy/", privacy_policy, name="privacy-policy"),
+    path(
+        "privacy-policy/",
+        participant_privacy_policy_view,
+        name="participant_privacy_policy",
+    ),
+    path(
+        "terms-and-conditions/",
+        participant_terms_view,
+        name="participant_terms_and_conditions",
+    ),
+    path(
+        "researcher-privacy-policy/",
+        researcher_privacy_policy_view,
+        name="researcher_privacy_policy",
+    ),
+    path(
+        "researcher-terms-and-conditions/",
+        researcher_terms_view,
+        name="researcher_terms_and_conditions",
+    ),
 ]
 
 

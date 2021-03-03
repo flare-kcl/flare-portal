@@ -1,14 +1,14 @@
 {% extends "base.html" %}
+{% load util_tags %}
 
-{% block title %}FLARe Privacy Policy{% endblock title %}
+{% block title %}{{ title }}{% endblock title %}
 
 {% block base_content %}
 
   <div class="container">
     <div class="card mt-6 mt-lg-9 pb-4">
       <div class="card-body">
-        <h1 class="mt-4 mb-5">FLARe App - Privacy Policy</h1>
-        <p>{{ privacy_policy|safe }}</p>
+        {{ content|render_markdown }}
       </div>
     </div>
 </div>

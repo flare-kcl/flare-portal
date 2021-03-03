@@ -1,36 +1,73 @@
-from django import forms
+from typing import Any
+
 from django.contrib import messages
-from django.db.models import QuerySet
 from django.http import HttpRequest, HttpResponse
 from django.template.response import TemplateResponse
-from django.urls import reverse_lazy
-from django.views.generic.edit import UpdateView
+from django.urls import reverse
+from django.views.generic.edit import FormView
 
+from .forms import SiteConfigurationUpdateForm
 from .models import SiteConfiguration
 
 
-class SiteConfigurationUpdateView(UpdateView):
-    fields = "__all__"
-    model = SiteConfiguration
-    success_url = reverse_lazy("site_config:update")
+class SiteConfigurationUpdateFormView(FormView):
+    form_class = SiteConfigurationUpdateForm  # type: ignore
+    template_name = "site_config/siteconfiguration_form.html"
 
-    def get_object(
-        self, queryset: QuerySet[SiteConfiguration] = None
-    ) -> SiteConfiguration:
-        return SiteConfiguration.get_solo()
+    def get_form_kwargs(self) -> dict:
+        return {**super().get_form_kwargs(), "instance": SiteConfiguration.get_solo()}
 
-    def form_valid(self, form: forms.BaseModelForm) -> HttpResponse:
-        response = super().form_valid(form)
+    def get_success_url(self) -> str:
+        return reverse("site_config:update")
+
+    def form_valid(self, form: Any) -> HttpResponse:
+        form.save()
         messages.success(self.request, "Updated site configuration.")
-        return response
+        return super().form_valid(form)
 
 
-site_configuration_update_view = SiteConfigurationUpdateView.as_view()
+site_configuration_update_view = SiteConfigurationUpdateFormView.as_view()
 
 
-def privacy_policy(request: HttpRequest) -> HttpResponse:
+def participant_privacy_policy_view(request: HttpRequest) -> HttpResponse:
     return TemplateResponse(
         request,
-        "site_config/privacy-policy.html",
-        {"privacy_policy": SiteConfiguration.get_solo().privacy_policy},
+        "site_config/markdown-article.html",
+        {
+            "title": "FLARe App - Participant Privacy Policy",
+            "content": SiteConfiguration.get_solo().participant_privacy_policy,
+        },
+    )
+
+
+def researcher_privacy_policy_view(request: HttpRequest) -> HttpResponse:
+    return TemplateResponse(
+        request,
+        "site_config/markdown-article.html",
+        {
+            "title": "FLARe App - Researcher Privacy Policy",
+            "content": SiteConfiguration.get_solo().researcher_privacy_policy,
+        },
+    )
+
+
+def participant_terms_view(request: HttpRequest) -> HttpResponse:
+    return TemplateResponse(
+        request,
+        "site_config/markdown-article.html",
+        {
+            "title": "FLARe App - Participant Terms & Conditions",
+            "content": SiteConfiguration.get_solo().participant_terms_and_conditions,
+        },
+    )
+
+
+def researcher_terms_view(request: HttpRequest) -> HttpResponse:
+    return TemplateResponse(
+        request,
+        "site_config/markdown-article.html",
+        {
+            "title": "FLARe App - Researcher Terms & Conditions",
+            "content": SiteConfiguration.get_solo().researcher_terms_and_conditions,
+        },
     )
