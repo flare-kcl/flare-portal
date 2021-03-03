@@ -168,7 +168,7 @@ class ParticipantTrackingAPIView(APIView):
                     if participant.current_module
                     else None,
                     "current_trial": participant.current_trial_index
-                    if participant.current_trial_index
+                    if participant.current_trial_index is not None
                     else None,
                 }
             )
