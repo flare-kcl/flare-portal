@@ -17,7 +17,8 @@ window.require(['jquery', 'selectize'], ($, selectize) => {
 // Initialise any markdown editors
 document.querySelectorAll('[data-markdown-editor]').forEach((element) => {
     // Attach editor instance to TextArea element
-    const editor = new SimpleMDE({
+    // eslint-disable-next-line no-new
+    new SimpleMDE({
         element,
         forceSync: true,
         allowAtxHeaderWithoutSpace: true,
