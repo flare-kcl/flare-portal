@@ -17,8 +17,10 @@ from flare_portal.site_config.views import (
     participant_terms_view,
     researcher_privacy_policy_view,
     researcher_terms_view,
+    terms_accept_view,
 )
 from flare_portal.users import urls as users_urls
+from flare_portal.users.decorators import must_accept_terms
 from flare_portal.utils.cache import get_default_cache_control_decorator
 from flare_portal.utils.urls import decorate_urlpatterns
 
@@ -26,13 +28,20 @@ from flare_portal.utils.urls import decorate_urlpatterns
 private_urlpatterns = [
     path("django-admin/", admin.site.urls),
     path("configuration/", include(site_config_urls)),
+]
+
+# Private URL's that are protected by Terms & Conditions
+protected_urlpatterns = [
     path("", include(reimbursement_urls)),
     path("", include(experiment_urls)),
     path("", include(users_urls)),
     path("", TemplateView.as_view(template_name="home.html"), name="home"),
 ]
 
-private_urlpatterns = decorate_urlpatterns(private_urlpatterns, login_required)
+protected_urlpatterns = decorate_urlpatterns(protected_urlpatterns, must_accept_terms)
+private_urlpatterns = decorate_urlpatterns(
+    protected_urlpatterns + private_urlpatterns, login_required
+)
 
 urlpatterns: List[Union[URLPattern, URLResolver]] = [
     path("accounts/", include(users_urls.public_urlpatterns)),
@@ -57,6 +66,7 @@ urlpatterns: List[Union[URLPattern, URLResolver]] = [
         researcher_terms_view,
         name="researcher_terms_and_conditions",
     ),
+    path("accept-terms", terms_accept_view, name="researcher_terms_form"),
 ]
 
 

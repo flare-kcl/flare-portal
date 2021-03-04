@@ -30,4 +30,34 @@ class Migration(migrations.Migration):
             name="researcher_terms_and_conditions",
             field=models.TextField(blank=True),
         ),
+        migrations.AddField(
+            model_name="siteconfiguration",
+            name="researcher_terms_updated_at",
+            field=models.DateTimeField(null=True),
+        ),
+        migrations.AlterField(
+            model_name="siteconfiguration",
+            name="participant_privacy_policy",
+            field=models.TextField(blank=True, default="# Privacy Policy"),
+        ),
+        migrations.AlterField(
+            model_name="siteconfiguration",
+            name="participant_terms_and_conditions",
+            field=models.TextField(blank=True, default="# Terms and Conditions"),
+        ),
+        migrations.AlterField(
+            model_name="siteconfiguration",
+            name="researcher_privacy_policy",
+            field=models.TextField(blank=True, default="# Privacy Policy"),
+        ),
+        migrations.AlterField(
+            model_name="siteconfiguration",
+            name="researcher_terms_and_conditions",
+            field=models.TextField(blank=True, default="# Terms and Conditions"),
+        ),
+        migrations.AddField(
+            model_name="siteconfiguration",
+            name="admin_contact_email",
+            field=models.EmailField(default="flare@kcl.ac.uk", max_length=254),
+        ),
     ]

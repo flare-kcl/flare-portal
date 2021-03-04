@@ -6,7 +6,7 @@ from django.template.response import TemplateResponse
 from django.urls import reverse
 from django.views.generic.edit import FormView
 
-from .forms import SiteConfigurationUpdateForm
+from .forms import SiteConfigurationUpdateForm, ResearcherTermsAgreeForm
 from .models import SiteConfiguration
 
 
@@ -27,6 +27,29 @@ class SiteConfigurationUpdateFormView(FormView):
 
 
 site_configuration_update_view = SiteConfigurationUpdateFormView.as_view()
+
+
+class ResearcherTermsAcceptFormView(FormView):
+    form_class = ResearcherTermsAgreeForm  # type: ignore
+    template_name = "site_config/terms_accept_form.html"
+
+    def get_form_kwargs(self) -> dict:
+        return {**super().get_form_kwargs(), "user": self.request.user}
+
+    def get_success_url(self) -> str:
+        return reverse("experiments:project_list")
+
+    def get_context_data(self, **kwargs: Any) -> dict:
+        context = super().get_context_data(**kwargs)
+        context["config"] = SiteConfiguration.get_solo()
+        return context
+
+    def form_valid(self, form: Any) -> HttpResponse:
+        form.save()
+        return super().form_valid(form)
+
+
+terms_accept_view = ResearcherTermsAcceptFormView.as_view()
 
 
 def participant_privacy_policy_view(request: HttpRequest) -> HttpResponse:

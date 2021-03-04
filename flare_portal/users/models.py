@@ -12,6 +12,7 @@ class User(AbstractUser):
     job_title = models.CharField(max_length=255, blank=True)
     affiliation = models.CharField(max_length=255, blank=True)
     roles = ArrayField(models.CharField(max_length=10, blank=False), default=list)
+    agreed_terms_at = models.DateTimeField(null=True)
 
     @property
     def name(self) -> str:

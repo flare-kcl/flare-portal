@@ -1,6 +1,9 @@
 from django.urls import include, path
 
-from flare_portal.users.decorators import has_researcher_access, role_required
+from flare_portal.users.decorators import (
+    has_researcher_access,
+    role_required,
+)
 from flare_portal.utils.urls import decorate_urlpatterns
 
 from . import views
