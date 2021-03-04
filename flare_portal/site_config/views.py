@@ -6,7 +6,7 @@ from django.template.response import TemplateResponse
 from django.urls import reverse
 from django.views.generic.edit import FormView
 
-from .forms import SiteConfigurationUpdateForm, ResearcherTermsAgreeForm
+from .forms import ResearcherTermsAgreeForm, SiteConfigurationUpdateForm
 from .models import SiteConfiguration
 
 

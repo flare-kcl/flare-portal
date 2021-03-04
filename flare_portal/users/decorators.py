@@ -6,8 +6,8 @@ from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect
 
-from flare_portal.users.models import User
 from flare_portal.site_config.models import SiteConfiguration
+from flare_portal.users.models import User
 
 from . import constants
 
