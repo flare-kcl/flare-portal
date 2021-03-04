@@ -1,3 +1,4 @@
+import sys
 from functools import wraps
 from typing import Any, Callable
 
@@ -66,6 +67,9 @@ def has_researcher_access(function: Callable, owner_only: bool = False) -> Calla
     return decorator(function)
 
 
+IGNORE_RESEARCHER_TERMS = "test" in sys.argv
+
+
 def must_accept_terms(function: Callable) -> Callable:
     def decorator(view_func: Callable) -> Callable:
         @wraps(view_func)
@@ -74,12 +78,16 @@ def must_accept_terms(function: Callable) -> Callable:
         ) -> HttpResponse:
             if request.user.is_authenticated:
                 config = SiteConfiguration.get_solo()
-                if request.user.agreed_terms_at is None or (
-                    request.user.agreed_terms_at < config.researcher_terms_updated_at
-                ):
-                    return redirect("researcher_terms_form")
+                if (
+                    request.user.agreed_terms_at is not None
+                    and (
+                        request.user.agreed_terms_at
+                        > config.researcher_terms_updated_at
+                    )
+                ) or IGNORE_RESEARCHER_TERMS:
+                    return view_func(request, *args, **kwargs)
 
-            return view_func(request, *args, **kwargs)
+            return redirect("researcher_terms_form")
 
         return _wrapped_view
 

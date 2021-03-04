@@ -11,8 +11,6 @@ class SiteSettingsTest(TestCase):
         # Load global settings
         config = SiteConfiguration.get_solo()
 
-        self.assertEqual(config.participant_terms_and_conditions, "")
-
         config.participant_terms_and_conditions = "T&Cs"
 
         config.save()
