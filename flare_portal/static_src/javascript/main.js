@@ -1,5 +1,7 @@
 import 'alpinejs';
+import SimpleMDE from 'simplemde';
 import '../sass/main.scss';
+import 'simplemde/dist/simplemde.min.css';
 
 import fileInput from './alpine_components/fileInput';
 import moduleList from './alpine_components/moduleList';
@@ -9,6 +11,18 @@ import moduleList from './alpine_components/moduleList';
 window.require(['jquery', 'selectize'], ($, selectize) => {
     $(document).ready(() => {
         $('[data-selectize]').selectize({ allowEmptyOption: true });
+    });
+});
+
+// Initialise any markdown editors
+document.querySelectorAll('[data-markdown-editor]').forEach((element) => {
+    // Attach editor instance to TextArea element
+    // eslint-disable-next-line no-new
+    new SimpleMDE({
+        element,
+        forceSync: true,
+        allowAtxHeaderWithoutSpace: true,
+        spellChecker: true,
     });
 });
 

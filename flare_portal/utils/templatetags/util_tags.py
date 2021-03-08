@@ -7,6 +7,8 @@ from django import forms, template
 from django.db.models.fields.files import FieldFile
 from django.utils.safestring import mark_safe
 
+import markdown
+
 register = template.Library()
 
 
@@ -48,3 +50,9 @@ def alpine_field(field: forms.BoundField, index: str) -> dict:
 @register.filter
 def filename(value: FieldFile) -> str:
     return os.path.basename(value.file.name)
+
+
+@register.filter
+def render_markdown(content: str) -> str:
+    md = markdown.markdown(content)
+    return mark_safe(md)

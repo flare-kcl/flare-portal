@@ -67,7 +67,7 @@ class ConfigurationAPIView(APIView):
                         reimbursements=bool(experiment.voucher_pool),
                     ),
                     config=constants.SiteConfigurationType(
-                        terms_and_conditions=config.terms_and_conditions,
+                        terms_and_conditions=config.participant_terms_and_conditions,
                     ),
                     modules=[
                         module.get_module_config()
