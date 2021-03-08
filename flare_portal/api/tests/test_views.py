@@ -57,7 +57,7 @@ def get_example_experiment() -> Experiment:
 class ConfigurationAPIViewTest(TestCase):
     def test_post(self) -> None:
         config = SiteConfiguration.get_solo()
-        config.terms_and_conditions = "Some T&Cs"
+        config.participant_terms_and_conditions = "Some T&Cs"
         config.save()
 
         experiment: Experiment = get_example_experiment()

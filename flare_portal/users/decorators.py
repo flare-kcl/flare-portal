@@ -1,3 +1,4 @@
+import sys
 from functools import wraps
 from typing import Any, Callable
 
@@ -6,6 +7,7 @@ from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect
 
+from flare_portal.site_config.models import SiteConfiguration
 from flare_portal.users.models import User
 
 from . import constants
@@ -59,6 +61,33 @@ def has_researcher_access(function: Callable, owner_only: bool = False) -> Calla
             )
 
             return redirect("experiments:project_list")
+
+        return _wrapped_view
+
+    return decorator(function)
+
+
+IGNORE_RESEARCHER_TERMS = "test" in sys.argv
+
+
+def must_accept_terms(function: Callable) -> Callable:
+    def decorator(view_func: Callable) -> Callable:
+        @wraps(view_func)
+        def _wrapped_view(
+            request: HttpRequest, *args: Any, **kwargs: Any
+        ) -> HttpResponse:
+            if request.user.is_authenticated:
+                config = SiteConfiguration.get_solo()
+                if (
+                    request.user.agreed_terms_at is not None
+                    and (
+                        request.user.agreed_terms_at
+                        > config.researcher_terms_updated_at
+                    )
+                ) or IGNORE_RESEARCHER_TERMS:
+                    return view_func(request, *args, **kwargs)
+
+            return redirect("researcher_terms_form")
 
         return _wrapped_view
 
