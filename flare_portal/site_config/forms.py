@@ -36,7 +36,7 @@ class SiteConfigurationUpdateForm(forms.ModelForm):
 
         # If researcher terms changed then update timestamp
         if (
-            config.researcher_privacy_policy
+            config.researcher_terms_and_conditions
             != self.cleaned_data["researcher_terms_and_conditions"]
         ):
             config.researcher_terms_updated_at = datetime.now()

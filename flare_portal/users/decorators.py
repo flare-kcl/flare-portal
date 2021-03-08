@@ -80,6 +80,7 @@ def must_accept_terms(function: Callable) -> Callable:
                 config = SiteConfiguration.get_solo()
                 if (
                     request.user.agreed_terms_at is not None
+                    and config.researcher_terms_updated_at is not None
                     and (
                         request.user.agreed_terms_at
                         > config.researcher_terms_updated_at
