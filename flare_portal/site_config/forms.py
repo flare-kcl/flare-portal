@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any
+from typing import Any, Dict
 
 from django import forms
 
@@ -31,7 +31,8 @@ class SiteConfigurationUpdateForm(forms.ModelForm):
         model = SiteConfiguration
         exclude = ["researcher_terms_updated_at", "admin_contact_email"]
 
-    def save(self, commit: bool = True) -> SiteConfiguration:
+    def clean(self) -> Dict[str, Any]:
+        cleaned_data = super().clean()
         config = self.instance
 
         # If researcher terms changed then update timestamp
@@ -39,7 +40,16 @@ class SiteConfigurationUpdateForm(forms.ModelForm):
             config.researcher_terms_and_conditions
             != self.cleaned_data["researcher_terms_and_conditions"]
         ):
-            config.researcher_terms_updated_at = datetime.now()
+            cleaned_data["researcher_terms_updated_at"] = datetime.now()
+        else:
+            cleaned_data[
+                "researcher_terms_updated_at"
+            ] = config.researcher_terms_updated_at
+
+        return cleaned_data
+
+    def save(self, commit: bool = True) -> SiteConfiguration:
+        config = self.instance
 
         # Update fields
         config.participant_terms_and_conditions = self.cleaned_data[
@@ -53,6 +63,9 @@ class SiteConfigurationUpdateForm(forms.ModelForm):
         ]
         config.researcher_privacy_policy = self.cleaned_data[
             "researcher_privacy_policy"
+        ]
+        config.researcher_terms_updated_at = self.cleaned_data[
+            "researcher_terms_updated_at"
         ]
 
         if commit:
