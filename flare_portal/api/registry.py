@@ -1,8 +1,7 @@
 from typing import Callable, Dict, List, Type
 
-from django.urls import URLPattern, path
 from django.db import transaction
-
+from django.urls import URLPattern, path
 
 from rest_framework import serializers
 from rest_framework.generics import CreateAPIView
