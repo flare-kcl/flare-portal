@@ -52,7 +52,7 @@ mkdocs-material = "~4.6"
 pymdown-extensions = "~6.2"
 mypy = "^0.800"
 django-stubs = "^1.7.0"
-ipdb = "^0.13.4"
+ipdb = "^0.13.6"
 freezegun = "^1.1.0"
 
 [build-system]
