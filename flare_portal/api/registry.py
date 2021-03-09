@@ -1,5 +1,6 @@
 from typing import Callable, Dict, List, Type
 
+from django.db import transaction
 from django.urls import URLPattern, path
 
 from rest_framework import serializers
@@ -81,7 +82,8 @@ class DataAPIRegistry:
             (CreateAPIView,),
             {"serializer_class": serializer_class},
         )
-        self.views[api_view_name] = api_view_class.as_view()
+
+        self.views[api_view_name] = transaction.atomic(api_view_class.as_view())
         self.urls.append(path(api_path, self.views[api_view_name], name=api_view_name))
 
 
