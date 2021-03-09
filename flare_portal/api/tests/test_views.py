@@ -164,7 +164,7 @@ class ConfigurationAPIViewTest(TestCase):
             {
                 "participant": [
                     "This participant identifier is not correct, please contact "
-                    "your research assistant."
+                    "your study administrator."
                 ]
             },
         )

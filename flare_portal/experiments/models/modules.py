@@ -238,7 +238,7 @@ class BasicInfoModule(Module):
 class CriterionQuestion(models.Model):
     question_text = models.CharField(max_length=255)
     help_text = models.TextField(blank=True)
-    required_answer = models.BooleanField(
+    correct_answer = models.BooleanField(
         default=None,
         null=True,
         blank=True,
@@ -265,7 +265,7 @@ class CriterionQuestion(models.Model):
 
 class CriterionQuestionInline(InlineFormSetFactory):
     model = CriterionQuestion
-    fields = ["question_text", "help_text", "required_answer", "required", "sortorder"]
+    fields = ["question_text", "help_text", "correct_answer", "required", "sortorder"]
     factory_kwargs = {"widgets": {"sortorder": forms.HiddenInput}, "extra": 0}
 
 
@@ -285,7 +285,7 @@ class CriterionModule(Module):
                         "id": question.pk,
                         "help_text": question.help_text,
                         "question_text": question.question_text,
-                        "required_answer": question.required_answer,
+                        "correct_answer": question.correct_answer,
                         "required": question.required,
                     }
                     for question in self.questions.all()
@@ -595,8 +595,8 @@ class TaskInstructionsModule(Module):
     )
     outro_body = models.TextField(
         blank=True,
-        default="The experiment will now begin.\n\n You may occasionaly hear a "
-        "scream.\n\n Remember to rate how much you expect to hear a scream by "
+        default="The experiment will now begin.\n\nYou may occasionally hear a "
+        "scream.\n\nRemember to rate how much you expect to hear a scream by "
         "pressing a number every time the scale appears.",
         help_text="Text on the task instructions outro screen",
     )
@@ -686,7 +686,7 @@ class PostExperimentQuestionsModule(Module):
 
 class USUnpleasantnessModule(Module):
     audible_keyword = models.CharField(
-        max_length=255, help_text="How unpleasent did you find the ......?"
+        max_length=255, help_text="How unpleasant did you find the ......?"
     )
 
     def get_module_config(self) -> constants.ModuleConfigType:
@@ -697,7 +697,7 @@ class USUnpleasantnessModule(Module):
         )
 
     def construct_question(self) -> str:
-        return f"How unpleasent did you find the {self.audible_keyword}?"
+        return f"How unpleasant did you find the {self.audible_keyword}?"
 
     @classmethod
     def get_module_name(cls) -> str:
