@@ -280,11 +280,11 @@ class CriterionData(BaseData):
             (self.answer is None and not self.question.required)
             # Correct answer
             or (
-                self.question.required_answer is not None
-                and self.question.required_answer == self.answer
+                self.question.correct_answer is not None
+                and self.question.correct_answer == self.answer
             )
             # Either answer is correct as long as there is one
-            or (self.question.required_answer is None and self.answer is not None)
+            or (self.question.correct_answer is None and self.answer is not None)
             or False
         )
 
@@ -396,7 +396,7 @@ class USUnpleasantnessData(BaseData):
 
     @classmethod
     def get_module_name(cls) -> str:
-        return "US unpleasantness data"
+        return "US unpleasantness Data"
 
 
 class ContingencyAwarenessData(BaseData):

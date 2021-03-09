@@ -789,19 +789,19 @@ class ModuleCreateViewTest(TestCase):
             "questions-0-id": "",
             "questions-0-question_text": "This is question 1",
             "questions-0-help_text": "This is help text 1",
-            "questions-0-required_answer": True,
+            "questions-0-correct_answer": True,
             "questions-0-sortorder": "1",
             "questions-0-DELETE": "",
             "questions-1-id": "",
             "questions-1-question_text": "This is question 2",
             "questions-1-help_text": "This is help text 2",
-            "questions-1-required_answer": False,
+            "questions-1-correct_answer": False,
             "questions-1-sortorder": "2",
             "questions-1-DELETE": "",
             "questions-2-id": "",
             "questions-2-question_text": "This is question 3",
             "questions-2-help_text": "This is help text 3",
-            "questions-2-required_answer": False,
+            "questions-2-correct_answer": False,
             "questions-2-sortorder": "3",
             "questions-2-DELETE": "",
         }
@@ -831,17 +831,17 @@ class ModuleCreateViewTest(TestCase):
 
         self.assertEqual(questions[0].question_text, "This is question 1")
         self.assertEqual(questions[0].help_text, "This is help text 1")
-        self.assertEqual(questions[0].required_answer, True)
+        self.assertEqual(questions[0].correct_answer, True)
         self.assertEqual(questions[0].sortorder, 1)
 
         self.assertEqual(questions[1].question_text, "This is question 2")
         self.assertEqual(questions[1].help_text, "This is help text 2")
-        self.assertEqual(questions[1].required_answer, False)
+        self.assertEqual(questions[1].correct_answer, False)
         self.assertEqual(questions[1].sortorder, 2)
 
         self.assertEqual(questions[2].question_text, "This is question 3")
         self.assertEqual(questions[2].help_text, "This is help text 3")
-        self.assertEqual(questions[2].required_answer, False)
+        self.assertEqual(questions[2].correct_answer, False)
         self.assertEqual(questions[2].sortorder, 3)
 
         self.assertEqual(

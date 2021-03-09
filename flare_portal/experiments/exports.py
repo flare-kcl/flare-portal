@@ -192,7 +192,7 @@ class ContingencyAwarenessDataExporter(DataExporter):
 class CriterionDataSerializer(DataSerializer):
     question_id = serializers.CharField(source="question.pk")
     question = serializers.CharField(source="question.question_text")
-    required_answer = serializers.CharField(source="question.required_answer")
+    correct_answer = serializers.CharField(source="question.correct_answer")
     required = serializers.CharField(source="question.required")
 
     class Meta:
@@ -200,7 +200,7 @@ class CriterionDataSerializer(DataSerializer):
         fields = DataSerializer.Meta.fields + [
             "question_id",
             "question",
-            "required_answer",
+            "correct_answer",
             "passed",
             "required",
             "answer",

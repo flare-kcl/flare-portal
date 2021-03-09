@@ -239,13 +239,13 @@ class CriterionDataTest(TestCase):
         participant: Participant = ParticipantFactory()
         module = CriterionModuleFactory()
         required_question_yes = CriterionQuestionFactory(
-            module=module, required_answer=True
+            module=module, correct_answer=True
         )
         required_question_no = CriterionQuestionFactory(
-            module=module, required_answer=False
+            module=module, correct_answer=False
         )
         required_question_either = CriterionQuestionFactory(
-            module=module, required_answer=None
+            module=module, correct_answer=None
         )
         non_required_question = CriterionQuestionFactory(module=module, required=False)
 
