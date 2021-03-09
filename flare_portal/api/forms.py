@@ -20,7 +20,7 @@ class ConfigurationForm(forms.Form):
         to_field_name="participant_id",
         error_messages={
             "invalid_choice": "This participant identifier is "
-            "not correct, please contact your research assistant."
+            "not correct, please contact your study administrator."
         },
     )
 

@@ -98,7 +98,7 @@ class CriterionQuestionFactory(factory.django.DjangoModelFactory):
 
     question_text = factory.Faker("sentence")
     help_text = factory.Faker("paragraph")
-    required_answer = factory.Faker("random_element", elements=[True, False])
+    correct_answer = factory.Faker("random_element", elements=[True, False])
 
     module = factory.SubFactory(CriterionModuleFactory)
 
