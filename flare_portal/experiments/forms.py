@@ -45,7 +45,12 @@ class ExperimentForm(forms.ModelForm):
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super(ExperimentForm, self).__init__(*args, **kwargs)
-        self.fields["owner"].queryset = kwargs.get("instance").project.get_researchers()
+        experiment = kwargs.get("instance")
+        self.fields["owner"].queryset = experiment.project.get_researchers()
+        self.fields["owner"].help_text = (
+            f"Only researchers that are members of the '{experiment.project.name}'"
+            " project can be an owner of this experiment."
+        )
 
 
 class ExperimentCreateForm(forms.ModelForm):
