@@ -4,7 +4,11 @@ from typing import Any, List, Tuple
 from django.contrib.auth import get_user_model
 from django.core import validators
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
-from django.core.validators import FileExtensionValidator
+from django.core.validators import (
+    FileExtensionValidator,
+    MaxValueValidator,
+    MinValueValidator,
+)
 from django.db import models
 from django.db.models import QuerySet
 from django.urls import reverse
@@ -53,6 +57,10 @@ class Experiment(models.Model):
     project = models.ForeignKey("experiments.Project", on_delete=models.CASCADE)
     trial_length = models.FloatField()
     rating_delay = models.FloatField(default=1)
+    minimum_volume = models.FloatField(
+        default=1,
+        validators=[MinValueValidator(0), MaxValueValidator(1)],
+    )
     iti_min_delay = models.PositiveIntegerField(default=1, verbose_name="ITI min delay")
     iti_max_delay = models.PositiveIntegerField(default=3, verbose_name="ITI max delay")
 

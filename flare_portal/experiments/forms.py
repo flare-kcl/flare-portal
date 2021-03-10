@@ -15,6 +15,15 @@ from .models import BreakEndModule, BreakStartModule, Experiment, Participant, P
 
 
 class ExperimentForm(forms.ModelForm):
+    minimum_volume = forms.FloatField(
+        required=True,
+        max_value=1,
+        min_value=0,
+        widget=forms.NumberInput(attrs={"step": "0.01"}),
+        help_text="The minimum volume that you would like the participant to "
+        "abide by. Must be a value between 0 - 1, e.g. 0.5 equates to 50% volume.",
+    )
+
     class Meta:
         model = Experiment
         fields = [
@@ -27,6 +36,7 @@ class ExperimentForm(forms.ModelForm):
             "rating_delay",
             "iti_min_delay",
             "iti_max_delay",
+            "minimum_volume",
             "rating_scale_anchor_label_left",
             "rating_scale_anchor_label_center",
             "rating_scale_anchor_label_right",
@@ -46,6 +56,8 @@ class ExperimentForm(forms.ModelForm):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super(ExperimentForm, self).__init__(*args, **kwargs)
         experiment = kwargs.get("instance")
+
+        # Dynamically filter the owner dropdown
         self.fields["owner"].queryset = experiment.project.get_researchers()
         self.fields["owner"].help_text = (
             f"Only researchers that are members of the '{experiment.project.name}'"

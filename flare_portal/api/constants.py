@@ -13,6 +13,7 @@ ExperimentType = TypedDict(
         "rating_delay": float,
         "iti_min_delay": int,
         "iti_max_delay": int,
+        "minimum_volume": float,
         "rating_scale_anchor_label_left": str,
         "rating_scale_anchor_label_center": str,
         "rating_scale_anchor_label_right": str,
