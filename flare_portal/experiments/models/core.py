@@ -29,7 +29,7 @@ class Project(models.Model):
     def get_researchers(self) -> QuerySet[Any]:
         return (
             get_user_model().objects.filter(pk=self.owner.pk) | self.researchers.all()
-        )
+        ).distinct()
 
 
 def experiment_assets_path(instance: "Experiment", filename: str) -> str:
