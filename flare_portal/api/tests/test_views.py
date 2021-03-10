@@ -92,6 +92,7 @@ class ConfigurationAPIViewTest(TestCase):
                 "rating_delay": experiment.rating_delay,
                 "iti_min_delay": experiment.iti_min_delay,
                 "iti_max_delay": experiment.iti_max_delay,
+                "minimum_volume": experiment.minimum_volume,
                 "rating_scale_anchor_label_left": (
                     experiment.rating_scale_anchor_label_left
                 ),
