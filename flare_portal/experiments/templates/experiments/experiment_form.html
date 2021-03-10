@@ -88,6 +88,11 @@
 
                     <div class="card-body">
                         {% include "includes/form-group.html" with field=form.us accept="audio/wav,audio/mp3" %}
+                        <div class="row gutter-xs mt-6">
+                            <div class="col-8">
+                                {% include "includes/form-group.html" with field=form.minimum_volume %}
+                            </div>
+                        </div>
                     </div>
 
                     <div class="card-alert alert alert-info my-3">CS, GS, and context images should be in PNG format and their dimensions should be 800x800px.</div>

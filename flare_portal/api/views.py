@@ -37,6 +37,7 @@ class ConfigurationAPIView(APIView):
                         contact_email=experiment.contact_email or None,
                         trial_length=experiment.trial_length,
                         rating_delay=experiment.rating_delay,
+                        minimum_volume=experiment.minimum_volume,
                         iti_min_delay=experiment.iti_min_delay,
                         iti_max_delay=experiment.iti_max_delay,
                         rating_scale_anchor_label_left=(
