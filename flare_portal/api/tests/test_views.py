@@ -164,7 +164,7 @@ class ConfigurationAPIViewTest(TestCase):
             resp.json(),
             {
                 "participant": [
-                    "This participant identifier is not correct, please contact "
+                    "This participant ID is not correct, please contact "
                     "your study administrator."
                 ]
             },
