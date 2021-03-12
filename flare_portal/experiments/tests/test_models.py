@@ -189,7 +189,7 @@ class FearConditioningDataTest(TestCase):
                 ("calibrated volume level", data.calibrated_volume_level),
                 ("headphones connected", data.headphones),
                 ("did leave ITI", False),
-                ("did leave task", False),
+                ("did leave trial", False),
             ],
         )
 

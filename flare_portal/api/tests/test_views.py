@@ -272,7 +272,7 @@ class ModuleDataAPIViewTest(TestCase):
             "calibrated_volume_level": "0.85",
             "headphones": True,
             "did_leave_iti": False,
-            "did_leave_task": False,
+            "did_leave_trial": False,
         }
 
         resp = self.client.post(url, json_data, content_type="application/json")
@@ -333,7 +333,7 @@ class ModuleDataAPIViewTest(TestCase):
             "calibrated_volume_level": 0.85,
             "headphones": True,
             "did_leave_iti": False,
-            "did_leave_task": False,
+            "did_leave_trial": False,
         }
 
         resp = self.client.post(url, json_data, content_type="application/json")
@@ -376,7 +376,7 @@ class FearConditioningDataAPIViewTest(TestCase):
             "calibrated_volume_level": "0.85",
             "headphones": True,
             "did_leave_iti": False,
-            "did_leave_task": False,
+            "did_leave_trial": False,
         }
 
         resp = self.client.post(url, json_data, content_type="application/json")
