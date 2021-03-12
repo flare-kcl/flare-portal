@@ -143,7 +143,7 @@ class FearConditioningData(BaseData):
     calibrated_volume_level = models.DecimalField(max_digits=3, decimal_places=2)
     headphones = models.BooleanField(verbose_name="headphones connected")
     did_leave_iti = models.BooleanField(verbose_name="did leave ITI", default=False)
-    did_leave_task = models.BooleanField(default=False)
+    did_leave_trial = models.BooleanField(default=False)
 
     fields = [
         "module__phase",
@@ -160,7 +160,7 @@ class FearConditioningData(BaseData):
         "calibrated_volume_level",
         "headphones",
         "did_leave_iti",
-        "did_leave_task",
+        "did_leave_trial",
     ]
     list_display = [
         "participant",
@@ -396,7 +396,7 @@ class USUnpleasantnessData(BaseData):
 
     @classmethod
     def get_module_name(cls) -> str:
-        return "US unpleasantness Data"
+        return "US Unpleasantness Data"
 
 
 class ContingencyAwarenessData(BaseData):

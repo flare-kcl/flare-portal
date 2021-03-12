@@ -59,6 +59,8 @@ class SubmissionForm(forms.Form):
         participant = self.cleaned_data.get("participant")
         if participant.finished_at is None:
             participant.finished_at = timezone.now()
+            participant.current_module = None
+            participant.current_trial_index = None
             participant.save()
 
         return participant

@@ -107,7 +107,7 @@ class FearConditioningDataSerializer(DataSerializer):
             "calibrated_volume_level",
             "headphones",
             "did_leave_iti",
-            "did_leave_task",
+            "did_leave_trial",
         ]
 
 
