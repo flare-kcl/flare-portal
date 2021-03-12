@@ -242,7 +242,7 @@ class Participant(models.Model):
             ),
             ("Current Trial Index", self.current_trial_index),
             ("Reinforced Stimulus", self.reinforced_stimulus),
-            ("Agreed to T&C's", self.agreed_to_terms_and_conditions),
+            ("Agreed to T&Cs", self.agreed_to_terms_and_conditions),
             ("Voucher Code", self.get_voucher_display()),
             ("Lock Reason", self.lock_reason),
             ("Last Updated", self.udpated_at),
