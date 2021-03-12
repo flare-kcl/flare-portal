@@ -19,7 +19,7 @@ class ConfigurationForm(forms.Form):
         queryset=Participant.objects.all(),
         to_field_name="participant_id",
         error_messages={
-            "invalid_choice": "This participant identifier is "
+            "invalid_choice": "This participant ID is "
             "not correct, please contact your study administrator."
         },
     )
