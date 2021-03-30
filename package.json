@@ -63,7 +63,7 @@
     "start": "npm-run-all clean compile:dev -p compile:watch watch serve --silent"
   },
   "devDependencies": {
-    "@babel/core": "^7.12.16",
+    "@babel/core": "^7.13.14",
     "@babel/preset-env": "^7.12.16",
     "@babel/preset-react": "^7.12.13",
     "autoprefixer": "^9.8.6",
