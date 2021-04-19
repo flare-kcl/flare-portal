@@ -20,8 +20,24 @@ class ExperimentForm(forms.ModelForm):
         max_value=1,
         min_value=0,
         widget=forms.NumberInput(attrs={"step": "0.01"}),
-        help_text="The minimum volume that you would like the participant to "
-        "abide by. Must be a value between 0 - 1, e.g. 0.5 equates to 50% volume.",
+        label="Minimum Device Volume",
+        help_text="Must be a value between 0 - 1, e.g. 0.5 equates to 50% volume. "
+        "The minimum volume that your participants must set their phones to during "
+        "the experiment. Setting this value lower than 1 gives participants the "
+        "option to reduce their device’s volume without interrupting the experiment.",
+    )
+    us_file_volume = forms.FloatField(
+        required=True,
+        max_value=1,
+        min_value=0,
+        widget=forms.NumberInput(attrs={"step": "0.01"}),
+        label="US File Volume",
+        help_text="Must be a value between 0 - 1, e.g. 0.5 equates to 50% volume. Each "
+        ".wav file has a built-in volume setting, this is what will limit the true "
+        "volume a participant will hear. True volume equals file volume multiplied "
+        "by device volume. For example, if you set the file volume to .5 and the "
+        "participant’s device volume is set to 1, the true volume the participant "
+        "will hear is .5.",
     )
 
     class Meta:
@@ -36,6 +52,7 @@ class ExperimentForm(forms.ModelForm):
             "rating_delay",
             "iti_min_delay",
             "iti_max_delay",
+            "us_file_volume",
             "minimum_volume",
             "rating_scale_anchor_label_left",
             "rating_scale_anchor_label_center",

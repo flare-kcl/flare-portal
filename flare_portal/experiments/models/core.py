@@ -57,6 +57,10 @@ class Experiment(models.Model):
     project = models.ForeignKey("experiments.Project", on_delete=models.CASCADE)
     trial_length = models.FloatField()
     rating_delay = models.FloatField(default=1)
+    us_file_volume = models.FloatField(
+        default=1,
+        validators=[MinValueValidator(0), MaxValueValidator(1)],
+    )
     minimum_volume = models.FloatField(
         default=1,
         validators=[MinValueValidator(0), MaxValueValidator(1)],

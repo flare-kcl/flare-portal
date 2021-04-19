@@ -366,7 +366,13 @@ class InstructionsScreenInline(InlineFormSetFactory):
 
 
 class InstructionsModule(Module):
-    include_volume_calibration = models.BooleanField(default=False)
+    include_volume_calibration = models.BooleanField(
+        default=False,
+        help_text=(
+            "Enabling volume calibration will override the US file "
+            "volume set in the experiment settings."
+        ),
+    )
     end_screen_title = models.CharField(max_length=255, blank=True)
     end_screen_body = models.TextField(
         blank=True,
