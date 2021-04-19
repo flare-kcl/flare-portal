@@ -5,13 +5,23 @@ import string
 from typing import Any, Dict, List, Tuple
 
 from django import forms
+from django.contrib.postgres.fields import ArrayField
 from django.core.validators import FileExtensionValidator
 from django.db.models import QuerySet
 from django.forms import inlineformset_factory
+from django.utils.datastructures import MultiValueDict
 
+from flare_portal.experiments.models.modules import get_volume_increments
 from flare_portal.users.models import User
 
-from .models import BreakEndModule, BreakStartModule, Experiment, Participant, Project
+from .models import (
+    BreakEndModule,
+    BreakStartModule,
+    Experiment,
+    InstructionsModule,
+    Participant,
+    Project,
+)
 
 
 class ExperimentForm(forms.ModelForm):
@@ -261,6 +271,61 @@ class ParticipantBulkDeleteForm(forms.Form):
     def save(self) -> None:
         # Delete all the selected participants
         self.participants.delete()
+
+
+class VolumeIncrementsWidget(forms.MultiWidget):
+    """This is a Form Widget for use with a Postgres ArrayField. It implements
+    a multi-select interface that can be given a set of `choices`.
+
+    You can provide a `delimiter` keyword argument to specify the delimeter used.
+
+    """
+
+    template_name = "widgets/volume_increments.html"
+
+    def __init__(self, *args, **kwargs):
+        self.default_values = kwargs.pop(
+            "default_values", [0.1, 0.2, 0.3, 0.9, 0.95, 1]
+        )
+        widgets = []
+        for i in range(0, len(self.default_values)):
+            widgets.append(forms.NumberInput(attrs={"step": "0.01"}))
+        super().__init__(widgets, *args, **kwargs)
+
+    def decompress(self, value):
+        if isinstance(value, ArrayField):
+            return [None]
+        elif isinstance(value, str):
+            return list(value.split(","))
+
+    def value_from_datadict(self, data, files, name):
+        if isinstance(data, MultiValueDict):
+            values = []
+            for i in range(0, len(self.default_values)):
+                value = data.get(name + "_" + str(i), None)
+                if value:
+                    values.append(value)
+            return ",".join(str(v) for v in values)
+        return ""
+
+
+class InstructionsModuleForm(forms.ModelForm):
+    class Meta:
+        model = InstructionsModule
+        fields = [
+            "experiment",
+            "label",
+            "include_volume_calibration",
+            "volume_increments",
+            "end_screen_title",
+            "end_screen_body",
+        ]
+        widgets = {
+            "experiment": forms.HiddenInput(),
+            "volume_increments": VolumeIncrementsWidget(
+                default_values=get_volume_increments(),
+            ),
+        }
 
 
 class BreakStartModuleForm(forms.ModelForm):

@@ -2,7 +2,9 @@ import re
 from typing import Any, List
 
 from django import forms
+from django.contrib.postgres.fields import ArrayField
 from django.core.exceptions import ValidationError
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.template.defaultfilters import pluralize
 from django.utils.text import get_text_list
@@ -10,6 +12,8 @@ from django.utils.text import get_text_list
 from extra_views import InlineFormSetFactory
 from model_utils import Choices
 from model_utils.managers import InheritanceManager
+
+from flare_portal.utils.validators import validate_ascending_order
 
 from .. import constants
 from .core import Nameable
@@ -365,6 +369,10 @@ class InstructionsScreenInline(InlineFormSetFactory):
     factory_kwargs = {"extra": 0}
 
 
+def get_volume_increments():
+    return [0.5, 0.65, 0.8, 0.9, 0.95, 1]
+
+
 class InstructionsModule(Module):
     include_volume_calibration = models.BooleanField(
         default=False,
@@ -372,6 +380,15 @@ class InstructionsModule(Module):
             "Enabling volume calibration will override the US file "
             "volume set in the experiment settings."
         ),
+    )
+    volume_increments = ArrayField(
+        models.FloatField(
+            blank=False,
+            validators=[MinValueValidator(0), MaxValueValidator(1)],
+        ),
+        size=6,
+        default=get_volume_increments,
+        validators=[validate_ascending_order],
     )
     end_screen_title = models.CharField(max_length=255, blank=True)
     end_screen_body = models.TextField(
@@ -390,6 +407,7 @@ class InstructionsModule(Module):
             type=self.get_module_tag(),
             config={
                 "include_volume_calibration": self.include_volume_calibration,
+                "volume_increments": self.volume_increments,
                 "end_screen_title": self.end_screen_title,
                 "end_screen_body": self.end_screen_body,
                 "screens": [
