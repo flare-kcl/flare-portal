@@ -4,6 +4,8 @@ from decimal import Decimal
 
 from django.test import TestCase
 
+from rest_framework.serializers import DateTimeField
+
 from ..exports import FearConditioningDataExporter
 from ..factories import (
     ExperimentFactory,
@@ -54,12 +56,12 @@ class ModuleExportTest(TestCase):
             )
             self.assertEqual(
                 row["trial_started_at"],
-                fc_data.trial_started_at.strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
+                DateTimeField().to_representation(fc_data.trial_started_at),
             )
 
             self.assertEqual(
                 row["response_recorded_at"],
-                fc_data.response_recorded_at.strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
+                DateTimeField().to_representation(fc_data.response_recorded_at),
             )
             self.assertEqual(row["volume_level"], str(fc_data.volume_level))
             self.assertEqual(
