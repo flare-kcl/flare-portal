@@ -2,6 +2,7 @@ from rest_framework import serializers
 from rest_framework.exceptions import APIException
 from rest_framework.request import Request
 from rest_framework.response import Response
+from rest_framework.serializers import DateTimeField
 from rest_framework.views import APIView
 
 from flare_portal.experiments.models import Experiment
@@ -95,8 +96,12 @@ class SubmissionAPIView(APIView):
 
             return Response(
                 constants.SubmissionType(
-                    participant_started_at=participant.started_at,
-                    participant_finished_at=participant.finished_at,
+                    participant_started_at=DateTimeField().to_representation(
+                        participant.started_at
+                    ),
+                    participant_finished_at=DateTimeField().to_representation(
+                        participant.finished_at
+                    ),
                 )
             )
 
