@@ -23,7 +23,7 @@ django-model-utils = "^4.1.1"
 djangorestframework = "^3.12.2"
 django-extra-views = "^0.13.0"
 django-solo = "^1.1.5"
-Pillow = "^8.1.1"
+Pillow = "^8.2.0"
 Markdown = "3.1.1"
 Faker = "^8.1.2"
 
