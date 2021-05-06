@@ -40,7 +40,6 @@ jobs:
 
   python:
     runs-on: ubuntu-latest
-    container: python:3.8
     needs: [static]
 
     env:
@@ -51,7 +50,7 @@ jobs:
       SECRET_KEY: fake_secret_key_to_run_tests
 
       # This is the URL used by databases on our CI.
-      DATABASE_URL: postgres://postgres:postgres@postgres:5432/postgres
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres
 
       # Don't redirect to HTTPS in tests.
       SECURE_SSL_REDIRECT: 'false'
@@ -61,16 +60,25 @@ jobs:
       postgres:
         image: postgres:12
         env:
-          POSTGRES_PASSWORD: postgres
+          POSTGRES_PASSWORD: postgres # pragma: allowlist secret
         # Set health checks to wait until postgres has started
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+        ports:
+          # Maps tcp port 5432 on service container to the host
+          - 5432:5432
 
     steps:
       - uses: actions/checkout@v2
+
+      # Set up environment
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8.x
 
       - name: Install Poetry
         run: pip install poetry
