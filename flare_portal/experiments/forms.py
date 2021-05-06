@@ -5,7 +5,6 @@ import string
 from typing import Any, Dict, List, Tuple
 
 from django import forms
-from django.contrib.postgres.fields import ArrayField
 from django.core.validators import FileExtensionValidator
 from django.db.models import QuerySet
 from django.forms import inlineformset_factory
@@ -274,39 +273,38 @@ class ParticipantBulkDeleteForm(forms.Form):
 
 
 class VolumeIncrementsWidget(forms.MultiWidget):
-    """This is a Form Widget for use with a Postgres ArrayField. It implements
-    a multi-select interface that can be given a set of `choices`.
-
-    You can provide a `delimiter` keyword argument to specify the delimeter used.
-
+    """
+    This is a Form Widget for use with a Postgres ArrayField. It implements
+    a multi-field interface to allow multiple float values to submitted.
     """
 
     template_name = "widgets/volume_increments.html"
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         self.default_values = kwargs.pop(
             "default_values", [0.1, 0.2, 0.3, 0.9, 0.95, 1]
         )
         widgets = []
-        for i in range(0, len(self.default_values)):
+        for _ in range(0, len(self.default_values)):
             widgets.append(forms.NumberInput(attrs={"step": "0.01"}))
         super().__init__(widgets, *args, **kwargs)
 
-    def decompress(self, value):
-        if isinstance(value, ArrayField):
-            return [None]
-        elif isinstance(value, str):
+    def decompress(self, value: str) -> List[str]:
+        # Split combined value of the arrayfield into the values for each widget
+        if isinstance(value, str):
             return list(value.split(","))
+        return [None]
 
-    def value_from_datadict(self, data, files, name):
+    def value_from_datadict(self, data: Any, files: Any, name: str) -> List[str]:
+        # Parse inputs by name and output array of values
         if isinstance(data, MultiValueDict):
             values = []
             for i in range(0, len(self.default_values)):
                 value = data.get(name + "_" + str(i), None)
                 if value:
                     values.append(value)
-            return ",".join(str(v) for v in values)
-        return ""
+            return values
+        return []
 
 
 class InstructionsModuleForm(forms.ModelForm):

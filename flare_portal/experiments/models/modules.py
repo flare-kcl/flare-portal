@@ -369,7 +369,7 @@ class InstructionsScreenInline(InlineFormSetFactory):
     factory_kwargs = {"extra": 0}
 
 
-def get_volume_increments():
+def get_volume_increments() -> List[float]:
     return [0.5, 0.65, 0.8, 0.9, 0.95, 1]
 
 
