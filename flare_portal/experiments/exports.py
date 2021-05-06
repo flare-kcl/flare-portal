@@ -313,6 +313,27 @@ class ParticipantExporter(Exporter):
         return Participant.objects.filter(experiment=self.experiment).order_by("pk")
 
 
+class CompletedParticipantIDsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Participant
+        fields = [
+            "participant_id",
+        ]
+
+
+class CompletedParticipantIDsExporter(Exporter):
+    serializer_class = CompletedParticipantIDsSerializer
+
+    def get_filename(self, current_time: datetime) -> str:
+        now = current_time.strftime("%Y%m%dT%H%M%SZ")
+        return f"{self.experiment.code}-{now}-completed-participant-ids.csv"
+
+    def get_queryset(self) -> QuerySet[Participant]:
+        return Participant.objects.filter(
+            experiment=self.experiment, finished_at__isnull=False
+        ).order_by("pk")
+
+
 class ZipExporter:
     exporters: List[Type[Exporter]] = [
         AffectiveRatingDataExporter,
@@ -322,6 +343,7 @@ class ZipExporter:
         ContingencyAwarenessDataExporter,
         VolumeCalibrationDataExporter,
         ParticipantExporter,
+        CompletedParticipantIDsExporter,
         PostExperimentQuestionsDataExporter,
         USUnpleasantnessDataExporter,
         VolumeCalibrationDataExporter,
