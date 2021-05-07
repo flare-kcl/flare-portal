@@ -293,7 +293,9 @@ class VolumeIncrementsWidget(forms.MultiWidget):
         # Split combined value of the arrayfield into the values for each widget
         if isinstance(value, str):
             return list(value.split(","))
-        return [None for _ in range(0, len(self.default_values))]  # return None for each widget
+        return [
+            None for _ in range(0, len(self.default_values))
+        ]  # return None for each widget
 
     def value_from_datadict(self, data: Any, files: Any, name: str) -> List[str]:
         # Parse inputs by name and output array of values
