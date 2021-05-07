@@ -48,6 +48,10 @@
                         {% endif %}
                     </div>
                 </div>
+            {% elif field|widget_type == 'volumeincrementswidget' %}
+                <div class="form-group{% if field.errors %} has-errors{% endif %}">
+                    {{ field|add_class:"form-control"|add_error_class:"is-invalid" }}
+                </div>
             {% else %}
                 {{ field|add_class:"form-control"|add_error_class:"is-invalid" }}
             {% endif %}

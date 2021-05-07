@@ -15,7 +15,7 @@ from extra_views import (
     UpdateWithInlinesView,
 )
 
-from .forms import BreakStartModuleForm
+from .forms import BreakStartModuleForm, InstructionsModuleForm
 from .models import (
     AffectiveRatingData,
     AffectiveRatingModule,
@@ -251,6 +251,16 @@ class BreakModuleCreateView(ModuleCreateView):
     form_class = BreakStartModuleForm
 
 
+class InstructionsModuleUpdateView(ModuleUpdateView):
+    model = InstructionsModule
+    form_class = InstructionsModuleForm
+
+
+class InstructionsModuleCreateView(ModuleCreateView):
+    model = InstructionsModule
+    form_class = InstructionsModuleForm
+
+
 module_registry = ModuleRegistry()
 
 module_registry.register(AffectiveRatingModule)
@@ -261,7 +271,11 @@ module_registry.register(BreakStartModule, create_view_class=BreakModuleCreateVi
 module_registry.register(CriterionModule)
 module_registry.register(ContingencyAwarenessModule)
 module_registry.register(FearConditioningModule)
-module_registry.register(InstructionsModule)
+module_registry.register(
+    InstructionsModule,
+    update_view_class=InstructionsModuleUpdateView,
+    create_view_class=InstructionsModuleCreateView,
+)
 module_registry.register(TaskInstructionsModule)
 module_registry.register(TextModule)
 module_registry.register(WebModule)

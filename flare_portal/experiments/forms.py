@@ -8,10 +8,19 @@ from django import forms
 from django.core.validators import FileExtensionValidator
 from django.db.models import QuerySet
 from django.forms import inlineformset_factory
+from django.utils.datastructures import MultiValueDict
 
+from flare_portal.experiments.models.modules import get_volume_increments
 from flare_portal.users.models import User
 
-from .models import BreakEndModule, BreakStartModule, Experiment, Participant, Project
+from .models import (
+    BreakEndModule,
+    BreakStartModule,
+    Experiment,
+    InstructionsModule,
+    Participant,
+    Project,
+)
 
 
 class ExperimentForm(forms.ModelForm):
@@ -20,8 +29,24 @@ class ExperimentForm(forms.ModelForm):
         max_value=1,
         min_value=0,
         widget=forms.NumberInput(attrs={"step": "0.01"}),
-        help_text="The minimum volume that you would like the participant to "
-        "abide by. Must be a value between 0 - 1, e.g. 0.5 equates to 50% volume.",
+        label="Minimum Device Volume",
+        help_text="Must be a value between 0 - 1, e.g. 0.5 equates to 50% volume. "
+        "The minimum volume that your participants must set their phones to during "
+        "the experiment. Setting this value lower than 1 gives participants the "
+        "option to reduce their device’s volume without interrupting the experiment.",
+    )
+    us_file_volume = forms.FloatField(
+        required=True,
+        max_value=1,
+        min_value=0,
+        widget=forms.NumberInput(attrs={"step": "0.01"}),
+        label="US File Volume",
+        help_text="Must be a value between 0 - 1, e.g. 0.5 equates to 50% volume. Each "
+        ".wav file has a built-in volume setting, this is what will limit the true "
+        "volume a participant will hear. True volume equals file volume multiplied "
+        "by device volume. For example, if you set the file volume to .5 and the "
+        "participant’s device volume is set to 1, the true volume the participant "
+        "will hear is .5.",
     )
 
     class Meta:
@@ -36,6 +61,7 @@ class ExperimentForm(forms.ModelForm):
             "rating_delay",
             "iti_min_delay",
             "iti_max_delay",
+            "us_file_volume",
             "minimum_volume",
             "rating_scale_anchor_label_left",
             "rating_scale_anchor_label_center",
@@ -244,6 +270,62 @@ class ParticipantBulkDeleteForm(forms.Form):
     def save(self) -> None:
         # Delete all the selected participants
         self.participants.delete()
+
+
+class VolumeIncrementsWidget(forms.MultiWidget):
+    """
+    This is a Form Widget for use with a Postgres ArrayField. It implements
+    a multi-field interface to allow multiple float values to be submitted.
+    """
+
+    template_name = "widgets/volume_increments.html"
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        self.default_values = kwargs.pop(
+            "default_values", [0.1, 0.2, 0.3, 0.9, 0.95, 1]
+        )
+        widgets = []
+        for _ in range(0, len(self.default_values)):
+            widgets.append(forms.NumberInput(attrs={"step": "0.01"}))
+        super().__init__(widgets, *args, **kwargs)
+
+    def decompress(self, value: str) -> List[str]:
+        # Split combined value of the arrayfield into the values for each widget
+        if isinstance(value, str):
+            return list(value.split(","))
+        return [
+            None for _ in range(0, len(self.default_values))
+        ]  # return None for each widget
+
+    def value_from_datadict(self, data: Any, files: Any, name: str) -> List[str]:
+        # Parse inputs by name and output array of values
+        if isinstance(data, MultiValueDict):
+            values = []
+            for i in range(0, len(self.default_values)):
+                value = data.get(name + "_" + str(i), None)
+                if value:
+                    values.append(value)
+            return values
+        return []
+
+
+class InstructionsModuleForm(forms.ModelForm):
+    class Meta:
+        model = InstructionsModule
+        fields = [
+            "experiment",
+            "label",
+            "include_volume_calibration",
+            "volume_increments",
+            "end_screen_title",
+            "end_screen_body",
+        ]
+        widgets = {
+            "experiment": forms.HiddenInput(),
+            "volume_increments": VolumeIncrementsWidget(
+                default_values=get_volume_increments(),
+            ),
+        }
 
 
 class BreakStartModuleForm(forms.ModelForm):
