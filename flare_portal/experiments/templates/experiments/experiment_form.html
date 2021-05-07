@@ -90,6 +90,9 @@
                         {% include "includes/form-group.html" with field=form.us accept="audio/wav,audio/mp3" %}
                         <div class="row gutter-xs mt-6">
                             <div class="col-8">
+                                {% include "includes/form-group.html" with field=form.us_file_volume %}
+                            </div>
+                            <div class="col-8">
                                 {% include "includes/form-group.html" with field=form.minimum_volume %}
                             </div>
                         </div>

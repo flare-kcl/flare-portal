@@ -1,0 +1,12 @@
+{% spaceless %}
+<div class="custom-array-widget">
+    {% for widget in widget.subwidgets %}
+        <div class="custom-array-widget__input-wrapper">
+            <label class="sr-only" for="{{ widget.attrs.id }}">
+                Step {{ forloop.counter }}
+            </label>
+            {% include widget.template_name %}
+        </div>
+    {% endfor %}
+</div>
+{% endspaceless %}
