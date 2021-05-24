@@ -36,7 +36,7 @@ django-extensions = "~3.1"
 fabric = "~2.6"
 stellar = "~0.4"
 SQLAlchemy = "1.2.5"
-SQLAlchemy-Utils = "0.33.1"
+SQLAlchemy-Utils = "0.37.4"
 factory-boy = "^3.2.0"
 
 # Linters etc.
