@@ -31,7 +31,7 @@ Faker = "^8.1.2"
 gunicorn = ["gunicorn"]
 
 [tool.poetry.dev-dependencies]
-Werkzeug = "~1.0"
+Werkzeug = "~2.0"
 django-extensions = "~3.1"
 fabric = "~2.6"
 stellar = "~0.4"
