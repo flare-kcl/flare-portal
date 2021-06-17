@@ -7,7 +7,7 @@ authors = ["Torchbox <hello@torchbox.com>"]
 [tool.poetry.dependencies]
 python = "^3.8"
 django = "~3.2"
-psycopg2 = "~2.8"
+psycopg2 = "~2.9"
 gunicorn = {version = "~20.0", optional = true}
 whitenoise = "~5.2"
 dj-database-url = "~0.5"
