@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 from solo.models import SingletonModel
 
@@ -15,7 +16,7 @@ class SiteConfiguration(SingletonModel):
         default="# Privacy Policy", blank=True
     )
     researcher_privacy_policy = models.TextField(default="# Privacy Policy", blank=True)
-    researcher_terms_updated_at = models.DateTimeField(null=True)
+    researcher_terms_updated_at = models.DateTimeField(null=True, default=timezone.now)
 
     def __str__(self) -> str:
         return "Site configuration"
