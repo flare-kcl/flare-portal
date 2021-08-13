@@ -583,6 +583,12 @@ REST_FRAMEWORK = {
 }
 
 
+# Django security settings
+
+# Default is 1000, Temp solution to help prevent errors when
+# editing large particpant lists
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 10000
+
 # Auth settings
 
 AUTH_USER_MODEL = "users.User"
