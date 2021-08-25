@@ -138,7 +138,7 @@ class AffectiveRatingDataExporter(DataExporter):
     def get_queryset(self) -> QuerySet[AffectiveRatingData]:
         return (
             AffectiveRatingData.objects.filter(module__experiment=self.experiment)
-            .select_related("participant", "module")
+            .select_related("participant", "module__experiment")
             .order_by("participant_id", "module__sortorder")
         )
 
@@ -163,7 +163,7 @@ class BasicInfoDataExporter(DataExporter):
     def get_queryset(self) -> QuerySet[BasicInfoData]:
         return (
             BasicInfoData.objects.filter(module__experiment=self.experiment)
-            .select_related("participant", "module")
+            .select_related("participant", "module", "module__experiment")
             .order_by("participant_id", "module__sortorder")
         )
 
@@ -184,7 +184,7 @@ class ContingencyAwarenessDataExporter(DataExporter):
     def get_queryset(self) -> QuerySet[ContingencyAwarenessData]:
         return (
             ContingencyAwarenessData.objects.filter(module__experiment=self.experiment)
-            .select_related("participant", "module")
+            .select_related("participant", "module", "module__experiment")
             .order_by("participant_id", "module__sortorder")
         )
 
@@ -213,7 +213,7 @@ class CriterionDataExporter(DataExporter):
     def get_queryset(self) -> QuerySet[CriterionData]:
         return (
             CriterionData.objects.filter(module__experiment=self.experiment)
-            .select_related("participant", "module", "question")
+            .select_related("participant", "module", "question", "module__experiment")
             .order_by("participant_id", "module__sortorder", "question_id")
         )
 
@@ -230,7 +230,7 @@ class VolumeCalibrationDataExporter(DataExporter):
     def get_queryset(self) -> QuerySet[VolumeCalibrationData]:
         return (
             VolumeCalibrationData.objects.filter(module__experiment=self.experiment)
-            .select_related("participant", "module")
+            .select_related("participant", "module", "module__experiment")
             .order_by("participant_id", "module__sortorder")
         )
 
@@ -249,7 +249,7 @@ class PostExperimentQuestionsDataExporter(DataExporter):
             PostExperimentQuestionsData.objects.filter(
                 module__experiment=self.experiment
             )
-            .select_related("participant", "module")
+            .select_related("participant", "module", "module__experiment")
             .order_by("participant_id", "module__sortorder")
         )
 
@@ -268,7 +268,7 @@ class USUnpleasantnessDataExporter(DataExporter):
     def get_queryset(self) -> QuerySet[USUnpleasantnessData]:
         return (
             USUnpleasantnessData.objects.filter(module__experiment=self.experiment)
-            .select_related("participant", "module")
+            .select_related("participant", "module", "module__experiment")
             .order_by("participant_id", "module__sortorder")
         )
 
@@ -310,7 +310,11 @@ class ParticipantExporter(Exporter):
         return f"{self.experiment.code}-{now}-participants.csv"
 
     def get_queryset(self) -> QuerySet[Participant]:
-        return Participant.objects.filter(experiment=self.experiment).order_by("pk")
+        return (
+            Participant.objects.filter(experiment=self.experiment)
+            .order_by("pk")
+            .select_related("voucher", "current_module", "experiment")
+        )
 
 
 class CompletedParticipantIDsSerializer(serializers.ModelSerializer):
