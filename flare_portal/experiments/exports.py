@@ -1,5 +1,5 @@
 import csv
-import io
+import tempfile
 import zipfile
 from collections import OrderedDict
 from datetime import datetime
@@ -57,7 +57,7 @@ class Exporter:
         """Returns the queryset used for the export"""
         raise NotImplementedError()
 
-    def write(self, file: io.StringIO) -> None:
+    def write(self, file: IO) -> None:
         """Writes the CSV into the given file"""
         serializer = self.serializer_class(self.get_queryset(), many=True)
 
@@ -355,27 +355,22 @@ class ZipExporter:
 
     def __init__(self, experiment: Experiment):
         self.experiment = experiment
+        self.now = timezone.now()
 
-    def get_filename(self, current_time: datetime) -> str:
-        now = current_time.strftime("%Y%m%dT%H%M%SZ")
+    def get_filename(self) -> str:
+        now = self.now.strftime("%Y%m%dT%H%M%SZ")
         return f"{self.experiment.code}-{now}.zip"
 
     def write(self, content: IO) -> str:
-        now = timezone.now()
-
-        # Gather files
-        files = []
-
-        for exporter_class in self.exporters:
-            csv_export = io.StringIO()
-            exporter = exporter_class(self.experiment)
-            exporter.write(csv_export)
-            files.append((exporter.get_filename(now), csv_export))
-
         with zipfile.ZipFile(
             content, mode="w", compression=zipfile.ZIP_DEFLATED
         ) as archive_file:
-            for filename, file in files:
-                archive_file.writestr(filename, file.read())
+            for exporter_class in self.exporters:
+                with tempfile.NamedTemporaryFile(mode="w") as csv_export:
+                    exporter = exporter_class(self.experiment)
+                    exporter.write(csv_export)
+                    archive_file.write(
+                        csv_export.name, arcname=exporter.get_filename(self.now)
+                    )
 
-        return self.get_filename(now)
+        return self.get_filename()

@@ -190,10 +190,8 @@ class Participant(models.Model):
 
     @property
     def reinforced_stimulus(self) -> str:
-        from flare_portal.experiments.models import FearConditioningData
-
         # Get the first trial response
-        trial = FearConditioningData.objects.filter(participant_id=self.pk).first()
+        trial = self.fearconditioningdata_set.first()
         if trial:
             return trial.reinforced_stimulus
 
