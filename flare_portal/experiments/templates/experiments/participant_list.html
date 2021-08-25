@@ -22,7 +22,7 @@
                         <div class="card-header">
                             <div class="d-flex align-items-baseline">
                                 <h3 class="card-title">Participants</h3>
-                                <p class="card-subtitle m-0 ml-2">{{ participants|length }} participant{{ participants|length|pluralize }}</p>
+                                <p class="card-subtitle m-0 ml-2">{{ formset|length }} participant{{ formset|length|pluralize }}</p>
                             </div>
                             <div class="card-options">
                                 <a href="{% url "experiments:participant_upload" project_pk=view.kwargs.project_pk experiment_pk=view.kwargs.experiment_pk %}" class="btn btn-sm btn-secondary ml-4"">
