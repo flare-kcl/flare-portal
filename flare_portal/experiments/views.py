@@ -533,7 +533,7 @@ class ParticipantFormSetView(FormView):
             "instance": self.experiment,
             "queryset": Participant.objects.filter(
                 experiment=self.experiment,
-            ).select_related("experiment", "voucher"),
+            ).select_related("experiment", "voucher", "current_module"),
         }
 
     def get_success_url(self) -> str:

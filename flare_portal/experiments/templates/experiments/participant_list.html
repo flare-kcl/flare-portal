@@ -113,7 +113,7 @@
                                                 <span class="status-icon {% if form.instance.has_been_rejected %}bg-success{% else %}bg-danger{% endif %}"></span> {{ form.instance.has_been_rejected|yesno|title }}
                                             </td>
 
-                                            {% if experiment.voucher_pool %} <td>{{ form.instance.get_voucher_status }}</td> {% endif %}
+                                            {% if experiment.voucher_pool_id %} <td>{{ form.instance.get_voucher_status }}</td> {% endif %}
 
                                             <td>
                                                 {{ form.id }}
