@@ -1,5 +1,5 @@
 import csv
-import io
+import tempfile
 import zipfile
 from collections import OrderedDict
 from datetime import datetime
@@ -57,7 +57,7 @@ class Exporter:
         """Returns the queryset used for the export"""
         raise NotImplementedError()
 
-    def write(self, file: io.StringIO) -> None:
+    def write(self, file: IO) -> None:
         """Writes the CSV into the given file"""
         serializer = self.serializer_class(self.get_queryset(), many=True)
 
@@ -138,7 +138,7 @@ class AffectiveRatingDataExporter(DataExporter):
     def get_queryset(self) -> QuerySet[AffectiveRatingData]:
         return (
             AffectiveRatingData.objects.filter(module__experiment=self.experiment)
-            .select_related("participant", "module")
+            .select_related("participant", "module__experiment")
             .order_by("participant_id", "module__sortorder")
         )
 
@@ -163,7 +163,7 @@ class BasicInfoDataExporter(DataExporter):
     def get_queryset(self) -> QuerySet[BasicInfoData]:
         return (
             BasicInfoData.objects.filter(module__experiment=self.experiment)
-            .select_related("participant", "module")
+            .select_related("participant", "module", "module__experiment")
             .order_by("participant_id", "module__sortorder")
         )
 
@@ -184,7 +184,7 @@ class ContingencyAwarenessDataExporter(DataExporter):
     def get_queryset(self) -> QuerySet[ContingencyAwarenessData]:
         return (
             ContingencyAwarenessData.objects.filter(module__experiment=self.experiment)
-            .select_related("participant", "module")
+            .select_related("participant", "module", "module__experiment")
             .order_by("participant_id", "module__sortorder")
         )
 
@@ -213,7 +213,7 @@ class CriterionDataExporter(DataExporter):
     def get_queryset(self) -> QuerySet[CriterionData]:
         return (
             CriterionData.objects.filter(module__experiment=self.experiment)
-            .select_related("participant", "module", "question")
+            .select_related("participant", "module", "question", "module__experiment")
             .order_by("participant_id", "module__sortorder", "question_id")
         )
 
@@ -230,7 +230,7 @@ class VolumeCalibrationDataExporter(DataExporter):
     def get_queryset(self) -> QuerySet[VolumeCalibrationData]:
         return (
             VolumeCalibrationData.objects.filter(module__experiment=self.experiment)
-            .select_related("participant", "module")
+            .select_related("participant", "module", "module__experiment")
             .order_by("participant_id", "module__sortorder")
         )
 
@@ -249,7 +249,7 @@ class PostExperimentQuestionsDataExporter(DataExporter):
             PostExperimentQuestionsData.objects.filter(
                 module__experiment=self.experiment
             )
-            .select_related("participant", "module")
+            .select_related("participant", "module", "module__experiment")
             .order_by("participant_id", "module__sortorder")
         )
 
@@ -268,7 +268,7 @@ class USUnpleasantnessDataExporter(DataExporter):
     def get_queryset(self) -> QuerySet[USUnpleasantnessData]:
         return (
             USUnpleasantnessData.objects.filter(module__experiment=self.experiment)
-            .select_related("participant", "module")
+            .select_related("participant", "module", "module__experiment")
             .order_by("participant_id", "module__sortorder")
         )
 
@@ -310,7 +310,11 @@ class ParticipantExporter(Exporter):
         return f"{self.experiment.code}-{now}-participants.csv"
 
     def get_queryset(self) -> QuerySet[Participant]:
-        return Participant.objects.filter(experiment=self.experiment).order_by("pk")
+        return (
+            Participant.objects.filter(experiment=self.experiment)
+            .order_by("pk")
+            .select_related("voucher", "current_module", "experiment")
+        )
 
 
 class CompletedParticipantIDsSerializer(serializers.ModelSerializer):
@@ -351,27 +355,22 @@ class ZipExporter:
 
     def __init__(self, experiment: Experiment):
         self.experiment = experiment
+        self.now = timezone.now()
 
-    def get_filename(self, current_time: datetime) -> str:
-        now = current_time.strftime("%Y%m%dT%H%M%SZ")
+    def get_filename(self) -> str:
+        now = self.now.strftime("%Y%m%dT%H%M%SZ")
         return f"{self.experiment.code}-{now}.zip"
 
     def write(self, content: IO) -> str:
-        now = timezone.now()
-
-        # Gather files
-        files = []
-
-        for exporter_class in self.exporters:
-            csv_export = io.StringIO()
-            exporter = exporter_class(self.experiment)
-            exporter.write(csv_export)
-            files.append((exporter.get_filename(now), csv_export))
-
         with zipfile.ZipFile(
             content, mode="w", compression=zipfile.ZIP_DEFLATED
         ) as archive_file:
-            for filename, file in files:
-                archive_file.writestr(filename, file.read())
+            for exporter_class in self.exporters:
+                with tempfile.NamedTemporaryFile(mode="w") as csv_export:
+                    exporter = exporter_class(self.experiment)
+                    exporter.write(csv_export)
+                    archive_file.write(
+                        csv_export.name, arcname=exporter.get_filename(self.now)
+                    )
 
-        return self.get_filename(now)
+        return self.get_filename()

@@ -1176,7 +1176,6 @@ class ParticipantFormSetViewTest(TestCase):
 
         self.assertEqual(200, resp.status_code)
         self.assertEqual(resp.context["experiment"], experiment)
-        self.assertEqual(list(resp.context["participants"]), participants)
 
         form_data = {
             "participants-TOTAL_FORMS": "6",

@@ -317,7 +317,7 @@ class DataListView(DataViewMixin, ListView):
         if self.participant:
             return qs.filter(participant=self.participant)
 
-        return qs
+        return qs.select_related("module__experiment")
 
     def get_context_data(self, **kwargs: Any) -> dict:
         context = super().get_context_data(**kwargs)

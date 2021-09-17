@@ -533,7 +533,7 @@ class ParticipantFormSetView(FormView):
             "instance": self.experiment,
             "queryset": Participant.objects.filter(
                 experiment=self.experiment,
-            ).select_related("experiment", "voucher"),
+            ).select_related("experiment", "voucher", "current_module"),
         }
 
     def get_success_url(self) -> str:
@@ -548,7 +548,6 @@ class ParticipantFormSetView(FormView):
     def get_context_data(self, **kwargs: Any) -> dict:
         context = super().get_context_data(**kwargs)
         context["experiment"] = self.experiment
-        context["participants"] = self.experiment.participants.all()
         return context
 
     def form_valid(self, formset: ParticipantFormSet) -> HttpResponse:  # type: ignore
