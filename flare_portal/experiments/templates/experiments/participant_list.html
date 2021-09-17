@@ -116,6 +116,8 @@
                                             {% if experiment.voucher_pool_id %} <td>{{ form.instance.get_voucher_status }}</td> {% endif %}
 
                                             <td>
+                                                {{ form.id }}
+                                                {{ form.experiment }}
                                                 <a class="text-danger" href="{% url 'experiments:participant_delete' project_pk=view.kwargs.project_pk experiment_pk=view.kwargs.experiment_pk participant_pk=form.instance.pk %}">
                                                     <i class="fe fe-trash-2"></i>
                                                 </a>
