@@ -632,9 +632,9 @@ python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
 
 [[package]]
 name = "jsmin"
-version = "2.2.2"
+version = "3.0.0"
 description = "JavaScript minifier."
-category = "dev"
+category = "main"
 optional = false
 python-versions = "*"
 
@@ -1321,7 +1321,7 @@ gunicorn = ["gunicorn"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "ddfb1511bb0f2d71739fa5d29511384e5af89c954a5f6d0e16822d76ed35c3b7"
+content-hash = "cb410a67fa41791513406014a5613ed4ee4a444f7d786eed0d05db6df6a15f76"
 
 [metadata.files]
 appdirs = [
@@ -1588,7 +1588,7 @@ jmespath = [
     {file = "jmespath-0.10.0.tar.gz", hash = "sha256:b85d0567b8666149a93172712e68920734333c0ce7e89b78b3e987f71e5ed4f9"},
 ]
 jsmin = [
-    {file = "jsmin-2.2.2.tar.gz", hash = "sha256:b6df99b2cd1c75d9d342e4335b535789b8da9107ec748212706ef7bbe5c2553b"},
+    {file = "jsmin-3.0.0.tar.gz", hash = "sha256:88fc1bd6033a47c5911dbcada7d279c7a8b7ad0841909590f6a742c20c4d2e08"},
 ]
 livereload = [
     {file = "livereload-2.6.3.tar.gz", hash = "sha256:776f2f865e59fde56490a56bcc6773b6917366bce0c267c60ee8aaf1a0959869"},
