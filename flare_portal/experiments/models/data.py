@@ -344,7 +344,7 @@ class PostExperimentQuestionsData(BaseData):
     did_pay_attention = models.BooleanField(null=True)
     task_environment = models.CharField(max_length=255, null=True)
     was_quiet = models.BooleanField(null=True)
-    was_alone = models.BooleanField(null=True)
+    was_not_alone = models.BooleanField(null=True)
     was_interrupted = models.BooleanField(null=True)
     module = models.ForeignKey(  # type: ignore
         "experiments.PostExperimentQuestionsModule",
@@ -372,7 +372,7 @@ class PostExperimentQuestionsData(BaseData):
         "did_pay_attention",
         "task_environment",
         "was_quiet",
-        "was_alone",
+        "was_not_alone",
         "was_interrupted",
     ]
 

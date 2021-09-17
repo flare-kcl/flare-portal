@@ -679,7 +679,7 @@ class PostExperimentQuestionsModule(Module):
         verbose_name="Was the place where you did the task quiet?",
     )
 
-    was_alone = models.BooleanField(
+    was_not_alone = models.BooleanField(
         verbose_name="Were there any other people in the room (or passing by) "
         "while you were doing the task?",
     )
@@ -701,7 +701,7 @@ class PostExperimentQuestionsModule(Module):
                     "did_pay_attention": self.did_pay_attention,
                     "task_environment": self.task_environment,
                     "was_quiet": self.was_quiet,
-                    "was_alone": self.was_alone,
+                    "was_not_alone": self.was_not_alone,
                     "was_interrupted": self.was_interrupted,
                 },
             },
