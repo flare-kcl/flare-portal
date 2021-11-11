@@ -2,8 +2,10 @@ from itertools import combinations
 from typing import Any, Dict
 
 from django import forms
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import get_user_model
+from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db.models import QuerySet
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect
@@ -522,17 +524,33 @@ participant_detail_view = ParticipantDetailView.as_view()
 class ParticipantFormSetView(FormView):
     form_class = ParticipantFormSet  # type: ignore
     template_name = "experiments/participant_list.html"
+    paginate_by = settings.DEFAULT_PER_PAGE
 
     def dispatch(self, *args: Any, **kwargs: Any) -> HttpResponse:
         self.experiment = get_object_or_404(Experiment, pk=kwargs["experiment_pk"])
         return super().dispatch(*args, **kwargs)
 
     def get_form_kwargs(self) -> dict:
+        self.page = self.request.GET.get("page", 1)
+        participants_qs = Participant.objects.filter(
+            experiment=self.experiment,
+        )
+        paginator = Paginator(participants_qs, self.paginate_by)
+        try:
+            participants = paginator.page(self.page)
+        except PageNotAnInteger:
+            participants = paginator.page(1)
+        except EmptyPage:
+            participants = paginator.page(paginator.num_pages)
+        self.paginator_page = participants
+
         return {
             **super().get_form_kwargs(),
             "instance": self.experiment,
+            # Re-create as a standard queryset here using participant ids
+            # as FormView cannot take a sliced queryset
             "queryset": Participant.objects.filter(
-                experiment=self.experiment,
+                id__in=[participant.id for participant in participants.object_list]
             ).select_related("experiment", "voucher", "current_module"),
         }
 
@@ -548,6 +566,32 @@ class ParticipantFormSetView(FormView):
     def get_context_data(self, **kwargs: Any) -> dict:
         context = super().get_context_data(**kwargs)
         context["experiment"] = self.experiment
+
+        # pagination extra context
+        num_pages = self.paginator_page.paginator.num_pages
+        current_page = self.paginator_page.number
+        context["paginator_page"] = self.paginator_page
+        context["paginate_by"] = self.paginate_by
+        context["paginated_items_offset"] = self.paginate_by * (current_page - 1)
+        # Create iterators to display pagination buttons
+        num_pages_preceding = current_page - 1
+        num_pages_following = num_pages - current_page
+        context["num_pages_preceding"] = num_pages_preceding
+        context["num_pages_following"] = num_pages_following
+        # Limit amount of pagination buttons shown
+        pagination_display_buttom_limit = 3
+        num_pages_preceding = max(
+            min(pagination_display_buttom_limit - 1, num_pages_preceding), 0
+        )
+        num_pages_following = max(
+            min(pagination_display_buttom_limit, num_pages_following), 0
+        )
+        context["pages_preceding"] = range(
+            current_page - num_pages_preceding, current_page
+        )
+        context["pages_following"] = range(
+            current_page + 1, current_page + num_pages_following
+        )
         return context
 
     def form_valid(self, formset: ParticipantFormSet) -> HttpResponse:  # type: ignore
