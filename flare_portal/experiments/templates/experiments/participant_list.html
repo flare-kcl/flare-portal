@@ -22,7 +22,7 @@
                         <div class="card-header">
                             <div class="d-flex align-items-baseline">
                                 <h3 class="card-title">Participants</h3>
-                                <p class="card-subtitle m-0 ml-2">{{ formset|length }} participant{{ formset|length|pluralize }}</p>
+                                <p class="card-subtitle m-0 ml-2">{{ paginator_page.paginator.count }} participant{{ paginator_page.paginator.count|pluralize }}</p>
                             </div>
                             <div class="card-options">
                                 <a href="{% url "experiments:participant_upload" project_pk=view.kwargs.project_pk experiment_pk=view.kwargs.experiment_pk %}" class="btn btn-sm btn-secondary ml-4"">
@@ -84,7 +84,13 @@
                                                         ">
                                                 </label>
                                             </td>
-                                            <td><a href="{% url "experiments:participant_detail" project_pk=view.kwargs.project_pk experiment_pk=view.kwargs.experiment_pk participant_pk=form.instance.pk %}"><span class="text-muted">{{ forloop.counter }}</span></a></td>
+                                            <td>
+                                                <a href="{% url "experiments:participant_detail" project_pk=view.kwargs.project_pk experiment_pk=view.kwargs.experiment_pk participant_pk=form.instance.pk %}">
+                                                    <span class="text-muted">
+                                                        {{ forloop.counter|add:paginated_items_offset }}
+                                                    </span>
+                                                </a>
+                                            </td>
                                             <td>
                                                 {% if form.non_field_errors %}
                                                     {% for error in form.non_field_errors %}
@@ -176,6 +182,11 @@
                                 "
                             ></button>
                         </div>
+                        {# Pagination #}
+                        {% if paginator_page.paginator.num_pages > 1 %}
+                            {% include "includes/pagination.html" with page_num=paginator_page.number num_pages=paginator_page.paginator.num_pages total=paginator_page.paginator.count %}
+                        {% endif %}
+
                     </form>
                 </div>
             </div>
