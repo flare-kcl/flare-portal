@@ -578,6 +578,9 @@ REST_FRAMEWORK = {
     )
 }
 
+# Default size for page pagination used on the front-end.
+DEFAULT_PER_PAGE = int(env.get("DEFAULT_PER_PAGE", 30))
+
 
 # Django security settings
 

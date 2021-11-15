@@ -54,7 +54,7 @@ Starting a local build can be done by running:
 git clone [URL TO GIT REMOTE]
 cd flare_portal
 fab build
-fab up
+fab start
 fab sh
 ```
 
