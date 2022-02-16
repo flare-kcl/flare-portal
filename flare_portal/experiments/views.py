@@ -531,10 +531,16 @@ class ParticipantFormSetView(FormView):
         return super().dispatch(*args, **kwargs)
 
     def get_form_kwargs(self) -> dict:
+        self.search_query = self.request.GET.get("query", None)
         self.page = self.request.GET.get("page", 1)
+
         participants_qs = Participant.objects.filter(
-            experiment=self.experiment,
+            experiment=self.experiment
         )
+
+        if self.search_query:
+            participants_qs = participants_qs.filter(participant_id__icontains=self.search_query)
+
         paginator = Paginator(participants_qs, self.paginate_by)
         try:
             participants = paginator.page(self.page)
@@ -566,7 +572,7 @@ class ParticipantFormSetView(FormView):
     def get_context_data(self, **kwargs: Any) -> dict:
         context = super().get_context_data(**kwargs)
         context["experiment"] = self.experiment
-
+        context["search_query"] = self.search_query if self.search_query else ""
         # pagination extra context
         num_pages = self.paginator_page.paginator.num_pages
         current_page = self.paginator_page.number

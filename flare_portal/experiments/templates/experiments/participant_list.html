@@ -12,184 +12,222 @@
                     {% include "experiments/includes/experiment_sidebar.html" %}
                 </div>
                 <div class="col-lg-9">
-                    <form id="participants-form" class="card" method="POST" action="" x-data="{ forms: [], selectedRows: [], startIndex: {{ formset.management_form.TOTAL_FORMS.value }} }">
-                        {% csrf_token %}
-                        {{ formset.management_form.TOTAL_FORMS|attr:"x-bind::value:startIndex + forms.length" }}
-                        {{ formset.management_form.INITIAL_FORMS }}
-                        {{ formset.management_form.MIN_NUM_FORMS }}
-                        {{ formset.management_form.MAX_NUM_FORMS }}
+
+                    <div class="card">
 
                         <div class="card-header">
                             <div class="d-flex align-items-baseline">
                                 <h3 class="card-title">Participants</h3>
                                 <p class="card-subtitle m-0 ml-2">{{ paginator_page.paginator.count }} participant{{ paginator_page.paginator.count|pluralize }}</p>
                             </div>
-                            <div class="card-options">
-                                <a href="{% url "experiments:participant_upload" project_pk=view.kwargs.project_pk experiment_pk=view.kwargs.experiment_pk %}" class="btn btn-sm btn-secondary ml-4"">
-                                    Upload
-                                </a>
-                                <a href="{% url "experiments:participant_create_batch" project_pk=view.kwargs.project_pk experiment_pk=view.kwargs.experiment_pk %}" class="btn btn-sm btn-secondary ml-4">
-                                    Generate batch
-                                </a>
-                                <button x-show="selectedRows.length == 0" class="btn btn-sm btn-primary ml-4" type="submit">Save changes</button>
+                            <form action="" method="get" role="search" class="card-options">
+                                <div class="row g-2">
+                                    <div>
+                                        <input type="search" name="query"{% if search_query %} value="{{ search_query }}"{% endif %} class="form-control form-control-sm" placeholder="Search by Login ID" aria-label="Search for participants">
+                                    </div>
+                                    <div class="col-auto">
+                                        <button class="btn btn-sm btn-white btn-icon" type="submit" value="Search">
+                                            <i class="fe fe-search"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+                        <form id="participants-form" method="POST" action="" x-data="{ forms: [], selectedRows: [], startIndex: {{ formset.management_form.TOTAL_FORMS.value }} }">
+                            {% csrf_token %}
+                            {{ formset.management_form.TOTAL_FORMS|attr:"x-bind::value:startIndex + forms.length" }}
+                            {{ formset.management_form.INITIAL_FORMS }}
+                            {{ formset.management_form.MIN_NUM_FORMS }}
+                            {{ formset.management_form.MAX_NUM_FORMS }}
+
+                            <div class="card-header">
+                                <div class="card-options">
+                                    <a href="{% url "experiments:participant_upload" project_pk=view.kwargs.project_pk experiment_pk=view.kwargs.experiment_pk %}" class="btn btn-sm btn-secondary ml-4"">
+                                        Upload
+                                    </a>
+                                    <a href="{% url "experiments:participant_create_batch" project_pk=view.kwargs.project_pk experiment_pk=view.kwargs.experiment_pk %}" class="btn btn-sm btn-secondary ml-4">
+                                        Generate batch
+                                    </a>
+                                    <button x-show="selectedRows.length == 0" class="btn btn-sm btn-primary ml-4" type="submit">Save changes</button>
+                                    <button
+                                        x-show="selectedRows.length > 0"
+                                        x-text="selectedRows.length > 1 ? `Delete ${selectedRows.length} participants` : `Delete participant`"
+                                        class="btn btn-sm btn-danger ml-4"
+                                        type="button"
+                                        @click="
+                                            window.location = `{% url 'experiments:participant_delete_batch' project_pk=view.kwargs.project_pk experiment_pk=view.kwargs.experiment_pk participant_pks='PKS-PLACEHOLDER' %}`
+                                            .replace('PKS-PLACEHOLDER', encodeURIComponent(selectedRows.join()))
+                                        "
+                                    ></button>
+                                </div>
+                            </div>
+
+                            <div class="table-responsive">
+                                <table class="table card-table table-vcenter">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                <label class="form-label mt-2">
+                                                    <input class="form-check" type="checkbox" aria-label="Press to select all participants with collected data for deletion." onclick="toggleCheckboxes(this);">
+                                                </label>
+                                            </th>
+                                            <th></th>
+                                            <th>Login ID</th>
+                                            <th>Started</th>
+                                            <th>Finished</th>
+                                            <th>Current Module</th>
+                                            <th>ID Locked</th>
+
+                                            <!-- Only show voucher column if the experiment has a 'Voucher Pool' -->
+                                            {% if experiment.voucher_pool %} <th>Voucher</th> {% endif %}
+
+                                            <th></th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for form in formset %}
+                                            <tr>
+                                                <td>
+                                                    <label class="form-label mt-2">
+                                                        <input
+                                                            class="form-check"
+                                                            type="checkbox"
+                                                            name="checkbox"
+                                                            aria-label="Press to select this participant row for deletion."
+                                                            {% if form.instance.started_at %} disabled {% endif %}
+                                                            @change="
+                                                                const id = {{ form.instance.pk }}
+                                                                if (selectedRows.includes(id)) {
+                                                                    selectedRows = selectedRows.filter(selectedId => selectedId != id)
+                                                                } else {
+                                                                    selectedRows.push(id)
+                                                                }
+                                                            ">
+                                                    </label>
+                                                </td>
+                                                <td>
+                                                    <a href="{% url "experiments:participant_detail" project_pk=view.kwargs.project_pk experiment_pk=view.kwargs.experiment_pk participant_pk=form.instance.pk %}">
+                                                        <span class="text-muted">
+                                                            {{ forloop.counter|add:paginated_items_offset }}
+                                                        </span>
+                                                    </a>
+                                                </td>
+                                                <td>
+                                                    {% if form.non_field_errors %}
+                                                        {% for error in form.non_field_errors %}
+                                                            <div class="text-danger small mb-2">{{ error }}</div>
+                                                        {% endfor %}
+                                                    {% endif %}
+
+                                                    {% if form.instance.pk %}
+                                                        {{ form.participant_id|add_class:"form-control"|add_error_class:"is-invalid" }}
+                                                    {% else %}
+                                                        {{ form.participant_id|add_class:"form-control"|add_error_class:"is-invalid"|attr:"placeholder:New participant" }}
+                                                    {% endif %}
+
+                                                    {% for error in form.participant_id.errors %}
+                                                        <div class="invalid-feedback">{{ error }}</div>
+                                                    {% endfor %}
+                                                </td>
+                                                <td>{{ form.instance.started_at|default:"" }}</td>
+                                                <td>{{ form.instance.finished_at|default:"" }}</td>
+
+                                                <td>
+                                                    {{ form.instance.current_module.specific.get_module_title }}
+                                                </td>
+
+                                                <td>
+                                                    <span class="status-icon {% if form.instance.has_been_rejected %}bg-success{% else %}bg-danger{% endif %}"></span> {{ form.instance.has_been_rejected|yesno|title }}
+                                                </td>
+
+                                                {% if experiment.voucher_pool_id %} <td>{{ form.instance.get_voucher_status }}</td> {% endif %}
+
+                                                <td>
+                                                    {{ form.id }}
+                                                    {{ form.experiment }}
+                                                    <a class="text-danger" href="{% url 'experiments:participant_delete' project_pk=view.kwargs.project_pk experiment_pk=view.kwargs.experiment_pk participant_pk=form.instance.pk %}">
+                                                        <i class="fe fe-trash-2"></i>
+                                                    </a>
+                                                </td>
+                                                <td>
+                                                    <div class="dropdown">
+                                                        <button type="button" class="btn btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown">
+                                                            View data
+                                                        </button>
+                                                        <div class="dropdown-menu">
+                                                            {% get_module_data_types as data_types %}
+                                                            {% for data_type in data_types %}
+                                                                <a class="dropdown-item" href="{% get_data_list_url data_type %}?participant={{ form.instance.participant_id }}">{{ data_type.get_module_name|capfirst }}</a>
+                                                            {% endfor %}
+                                                        </div>
+                                                    </div>
+                                                </td>
+
+                                            </tr>
+                                        {% endfor %}
+                                        <template x-for="(form, index) in forms" :key="index">
+                                            <tr>
+                                                <td></td>
+                                                <td><span class="text-muted" x-text="index + startIndex + 1"></span></td>
+                                                <td>
+                                                    <input type="text" :name="`participants-${index + startIndex}-participant_id`" maxlength="24" placeholder="New participant" class="form-control" :id="`id_participants-${index + startIndex}-participant_id`" x-model="forms[index]">
+                                                </td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td>
+                                                    <a class="icon" href="#" @click.prevent="forms.splice(index, 1)"><i class="fe fe-trash text-danger"></i></a>
+                                                    <input type="hidden" :name="`participants-${index + startIndex}-id`" :id="`id_participants-${index + startIndex}-id`">
+                                                    <input type="hidden" :name="`participants-${index + startIndex}-experiment`" value="{{ experiment.pk }}" :id="`id_participants-${index + startIndex}-experiment`">
+                                                </td>
+                                                <td></td>
+                                            </tr>
+                                        </template>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="card-footer d-flex">
+                                <button class="btn btn-sm btn-secondary" @click.prevent="forms.push('')">Add participants</button>
+                                <button x-show="selectedRows.length == 0" class="btn btn-sm btn-primary ml-auto" type="submit">Save changes</button>
                                 <button
                                     x-show="selectedRows.length > 0"
                                     x-text="selectedRows.length > 1 ? `Delete ${selectedRows.length} participants` : `Delete participant`"
-                                    class="btn btn-sm btn-danger ml-4"
+                                    class="btn btn-sm btn-danger ml-auto"
                                     type="button"
                                     @click="
                                         window.location = `{% url 'experiments:participant_delete_batch' project_pk=view.kwargs.project_pk experiment_pk=view.kwargs.experiment_pk participant_pks='PKS-PLACEHOLDER' %}`
-                                        .replace('PKS-PLACEHOLDER', encodeURIComponent(selectedRows.join()))
+                                            .replace('PKS-PLACEHOLDER', encodeURIComponent(selectedRows.join()))
                                     "
                                 ></button>
                             </div>
-                        </div>
+                            {# Pagination #}
+                            {% if paginator_page.paginator.num_pages > 1 %}
+                                {% include "includes/pagination.html" with page_num=paginator_page.number num_pages=paginator_page.paginator.num_pages total=paginator_page.paginator.count %}
+                            {% endif %}
 
-                        <div class="table-responsive">
-                            <table class="table card-table table-vcenter">
-                                <thead>
-                                    <tr>
-                                        <th></th>
-                                        <th></th>
-                                        <th>Login ID</th>
-                                        <th>Started</th>
-                                        <th>Finished</th>
-                                        <th>Current Module</th>
-                                        <th>ID Locked</th>
-
-                                        <!-- Only show voucher column if the experiment has a 'Voucher Pool' -->
-                                        {% if experiment.voucher_pool %} <th>Voucher</th> {% endif %}
-
-                                        <th></th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for form in formset %}
-                                        <tr>
-                                            <td>
-                                                <label class="form-label mt-2">
-                                                    <input
-                                                        class="form-check"
-                                                        type="checkbox"
-                                                        aria-label="Press to select this participant row for deletion."
-                                                        {% if form.instance.started_at %} disabled {% endif %}
-                                                        @change="
-                                                            const id = {{ form.instance.pk }}
-                                                            if (selectedRows.includes(id)) {
-                                                                selectedRows = selectedRows.filter(selectedId => selectedId != id)
-                                                            } else {
-                                                                selectedRows.push(id)
-                                                            }
-                                                        ">
-                                                </label>
-                                            </td>
-                                            <td>
-                                                <a href="{% url "experiments:participant_detail" project_pk=view.kwargs.project_pk experiment_pk=view.kwargs.experiment_pk participant_pk=form.instance.pk %}">
-                                                    <span class="text-muted">
-                                                        {{ forloop.counter|add:paginated_items_offset }}
-                                                    </span>
-                                                </a>
-                                            </td>
-                                            <td>
-                                                {% if form.non_field_errors %}
-                                                    {% for error in form.non_field_errors %}
-                                                        <div class="text-danger small mb-2">{{ error }}</div>
-                                                    {% endfor %}
-                                                {% endif %}
-
-                                                {% if form.instance.pk %}
-                                                    {{ form.participant_id|add_class:"form-control"|add_error_class:"is-invalid" }}
-                                                {% else %}
-                                                    {{ form.participant_id|add_class:"form-control"|add_error_class:"is-invalid"|attr:"placeholder:New participant" }}
-                                                {% endif %}
-
-                                                {% for error in form.participant_id.errors %}
-                                                    <div class="invalid-feedback">{{ error }}</div>
-                                                {% endfor %}
-                                            </td>
-                                            <td>{{ form.instance.started_at|default:"" }}</td>
-                                            <td>{{ form.instance.finished_at|default:"" }}</td>
-
-                                            <td>
-                                                {{ form.instance.current_module.specific.get_module_title }}
-                                            </td>
-
-                                            <td>
-                                                <span class="status-icon {% if form.instance.has_been_rejected %}bg-success{% else %}bg-danger{% endif %}"></span> {{ form.instance.has_been_rejected|yesno|title }}
-                                            </td>
-
-                                            {% if experiment.voucher_pool_id %} <td>{{ form.instance.get_voucher_status }}</td> {% endif %}
-
-                                            <td>
-                                                {{ form.id }}
-                                                {{ form.experiment }}
-                                                <a class="text-danger" href="{% url 'experiments:participant_delete' project_pk=view.kwargs.project_pk experiment_pk=view.kwargs.experiment_pk participant_pk=form.instance.pk %}">
-                                                    <i class="fe fe-trash-2"></i>
-                                                </a>
-                                            </td>
-                                            <td>
-                                                <div class="dropdown">
-                                                    <button type="button" class="btn btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown">
-                                                        View data
-                                                    </button>
-                                                    <div class="dropdown-menu">
-                                                        {% get_module_data_types as data_types %}
-                                                        {% for data_type in data_types %}
-                                                            <a class="dropdown-item" href="{% get_data_list_url data_type %}?participant={{ form.instance.participant_id }}">{{ data_type.get_module_name|capfirst }}</a>
-                                                        {% endfor %}
-                                                    </div>
-                                                </div>
-                                            </td>
-
-                                        </tr>
-                                    {% endfor %}
-                                    <template x-for="(form, index) in forms" :key="index">
-                                        <tr>
-                                            <td></td>
-                                            <td><span class="text-muted" x-text="index + startIndex + 1"></span></td>
-                                            <td>
-                                                <input type="text" :name="`participants-${index + startIndex}-participant_id`" maxlength="24" placeholder="New participant" class="form-control" :id="`id_participants-${index + startIndex}-participant_id`" x-model="forms[index]">
-                                            </td>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
-                                            <td>
-                                                <a class="icon" href="#" @click.prevent="forms.splice(index, 1)"><i class="fe fe-trash text-danger"></i></a>
-                                                <input type="hidden" :name="`participants-${index + startIndex}-id`" :id="`id_participants-${index + startIndex}-id`">
-                                                <input type="hidden" :name="`participants-${index + startIndex}-experiment`" value="{{ experiment.pk }}" :id="`id_participants-${index + startIndex}-experiment`">
-                                            </td>
-                                            <td></td>
-                                        </tr>
-                                    </template>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <div class="card-footer d-flex">
-                            <button class="btn btn-sm btn-secondary" @click.prevent="forms.push('')">Add participants</button>
-                            <button x-show="selectedRows.length == 0" class="btn btn-sm btn-primary ml-auto" type="submit">Save changes</button>
-                            <button
-                                x-show="selectedRows.length > 0"
-                                x-text="selectedRows.length > 1 ? `Delete ${selectedRows.length} participants` : `Delete participant`"
-                                class="btn btn-sm btn-danger ml-auto"
-                                type="button"
-                                @click="
-                                    window.location = `{% url 'experiments:participant_delete_batch' project_pk=view.kwargs.project_pk experiment_pk=view.kwargs.experiment_pk participant_pks='PKS-PLACEHOLDER' %}`
-                                        .replace('PKS-PLACEHOLDER', encodeURIComponent(selectedRows.join()))
-                                "
-                            ></button>
-                        </div>
-                        {# Pagination #}
-                        {% if paginator_page.paginator.num_pages > 1 %}
-                            {% include "includes/pagination.html" with page_num=paginator_page.number num_pages=paginator_page.paginator.num_pages total=paginator_page.paginator.count %}
-                        {% endif %}
-
-                    </form>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
     {% endwith %}
 {% endblock content %}
+
+
+{% block extra_scripts %}
+<script>
+    function toggleCheckboxes(source) {
+        checkboxes = document.getElementsByName('checkbox');
+        for (let i=0, n=checkboxes.length; i<n; i++) {
+            if (!checkboxes[i].disabled) {
+                checkboxes[i].checked = source.checked;
+            }
+        }
+    }
+</script>
+{% endblock extra_scripts %}
