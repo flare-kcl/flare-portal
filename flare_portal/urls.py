@@ -66,7 +66,7 @@ urlpatterns: List[Union[URLPattern, URLResolver]] = [
         researcher_terms_view,
         name="researcher_terms_and_conditions",
     ),
-    path("accept-terms", terms_accept_view, name="researcher_terms_form"),
+    path("accept-terms/", terms_accept_view, name="researcher_terms_form"),
 ]
 
 

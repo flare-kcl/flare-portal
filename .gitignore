@@ -4,6 +4,7 @@ __pycache__
 *.pyc
 .DS_Store
 *.swp
+.python-version
 /venv/
 /static/
 /media/
@@ -36,3 +37,4 @@ wheels/
 *.egg
 .vim
 .nvimrc
+Session.vim

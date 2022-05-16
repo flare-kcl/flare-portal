@@ -16,7 +16,7 @@ from . import constants
 def role_required(
     function: Callable,
     role_name: constants.Roles,
-    login_url: str = None,
+    login_url: str = "",
     redirect_field_name: str = REDIRECT_FIELD_NAME,
 ) -> Callable:
     def decorator(view_func: Callable) -> Callable:
@@ -24,8 +24,10 @@ def role_required(
         def _wrapped_view(
             request: HttpRequest, *args: Any, **kwargs: Any
         ) -> HttpResponse:
-            if request.user.is_authenticated and (
-                request.user.has_role(role_name) or request.user.is_superuser
+            if (
+                request.user.is_authenticated
+                and isinstance(request.user, User)
+                and (request.user.has_role(role_name) or request.user.is_superuser)
             ):
                 return view_func(request, *args, **kwargs)
 
@@ -49,7 +51,7 @@ def has_researcher_access(function: Callable, owner_only: bool = False) -> Calla
         def _wrapped_view(
             request: HttpRequest, *args: Any, **kwargs: Any
         ) -> HttpResponse:
-            if request.user.is_authenticated:
+            if request.user.is_authenticated and isinstance(request.user, User):
                 if project_pk := kwargs.get("project_pk"):
                     if request.user.is_admin or can_user_view_project(
                         project_pk, request.user, owner_only
@@ -76,16 +78,24 @@ def must_accept_terms(function: Callable) -> Callable:
         def _wrapped_view(
             request: HttpRequest, *args: Any, **kwargs: Any
         ) -> HttpResponse:
-            if request.user.is_authenticated:
+            if request.user.is_authenticated and isinstance(request.user, User):
                 config = SiteConfiguration.get_solo()
                 if (
-                    request.user.agreed_terms_at is not None
-                    and config.researcher_terms_updated_at is not None
-                    and (
-                        request.user.agreed_terms_at
-                        > config.researcher_terms_updated_at
+                    # Check if the user has agreed to the current terms of
+                    # service
+                    (
+                        request.user.agreed_terms_at is not None
+                        and config.researcher_terms_updated_at is not None
+                        and (
+                            request.user.agreed_terms_at
+                            > config.researcher_terms_updated_at
+                        )
                     )
-                ) or IGNORE_RESEARCHER_TERMS:
+                    # Or bypass if terms of service is not set
+                    or (config.researcher_terms_updated_at is None)
+                    # Or bypass explicitly
+                    or IGNORE_RESEARCHER_TERMS
+                ):
                     return view_func(request, *args, **kwargs)
 
             return redirect("researcher_terms_form")
