@@ -1,10 +1,16 @@
 # Flare Portal — Continuous Integration
 
-Gitlab has built-in CI tests. These can be configured by editing `.gitlab-ci.yml`. By default, these are run on all pushes and merge requests.
+Github Actions are configured to run CI tests. See `.github/workflows/ci.yml`
+for more details. CI is run when pushing to `main`, `production`, and when
+opening PRs for `main`.
 
 ## Code styleguide
 
-This project’s code formatting is enforced with [Prettier](https://prettier.io/) for supported languages. Make sure to have Prettier integrated with your editor to auto-format when saving files, or to manually run it before committing (`npm run format`).
+This project’s formatting is enforced with [Prettier](https://prettier.io/) for
+supported languages. Make sure to have Prettier integrated with your editor to
+auto-format when saving files, or to manually run it before committing (`npm run format`).
+
+This project also uses `black` and `isort`.
 
 ## Automatic linting locally
 

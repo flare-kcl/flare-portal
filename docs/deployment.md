@@ -1,13 +1,7 @@
 # Flare Portal — hosts and deployment
 
-The VM comes preinstalled with Fabric, Heroku CLI and AWS CLI.
-
-## Deployed environments
-
-| Environment | Branch    | URL                                            | Heroku                         |
-| ----------- | --------- | ---------------------------------------------- | ------------------------------ |
-| Production  | `master`  | e.g. https://flare_portal.org                  | e.g. `flare_portal-production` |
-| Staging     | `staging` | e.g. https://flare_portal.staging.torchbox.com | e.g. `flare_portal-staging`    |
+FLARe Portal is deployed on Heroku under Torchbox's Heroku account. Access is
+granted only to authorized personnel.
 
 ## Login to Heroku
 
@@ -29,6 +23,4 @@ fab production-shell
 
 When you set up a server you should make sure the following scheduled tasks are set.
 
-- `django-admin publish_scheduled_pages` - every 10 minutes or more often. This is necessary to make publishing scheduled pages work.
 - `django-admin clearsessions` - once a day (not necessary, but useful).
-- `django-admin update_index` - once a day (not necessary, but useful to make sure the search index stays intact).
