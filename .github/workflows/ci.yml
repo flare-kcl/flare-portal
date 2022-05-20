@@ -119,7 +119,7 @@ jobs:
       - run: poetry run python manage.py test --settings flare_portal.settings.test
 
   deploy:
-    if: contains(github.ref, 'staging')
+    if: contains(github.ref, 'main')
     runs-on: ubuntu-latest
     needs: [python, static]
 
