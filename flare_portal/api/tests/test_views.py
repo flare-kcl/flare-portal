@@ -103,6 +103,7 @@ class ConfigurationAPIViewTest(TestCase):
                     experiment.rating_scale_anchor_label_right
                 ),
                 "us": experiment.us.url,
+                "us_file_volume": 1,
                 "csa": experiment.csa.url,
                 "csb": experiment.csb.url,
                 "context_a": experiment.context_a.url,
