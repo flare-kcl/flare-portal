@@ -548,7 +548,7 @@ def dellar_snapshot(c, filename):
 
 @task
 def dellar_restore(c, filename):
-    """ Restore the database from a snapshot in the db container """
+    """Restore the database from a snapshot in the db container"""
     delete_docker_database(c)
 
     dexec(
