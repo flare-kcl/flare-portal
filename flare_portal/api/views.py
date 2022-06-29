@@ -51,6 +51,7 @@ class ConfigurationAPIView(APIView):
                             experiment.rating_scale_anchor_label_right
                         ),
                         us=experiment.us.url,
+                        us_file_volume=experiment.us_file_volume,
                         csa=experiment.csa.url,
                         csb=experiment.csb.url,
                         context_a=(
