@@ -1,3 +1,5 @@
+from typing import Any, Dict, Optional, Set, Union
+
 from django import template
 from django.db.models import Model
 from django.http.request import QueryDict
@@ -11,8 +13,12 @@ MODE_TOGGLE = "__toggle"
 
 @register.simple_tag(takes_context=True)
 def querystring_modify(
-    context, base=None, remove_blanks=False, remove_utm=True, **kwargs
-):
+    context: Dict[str, Any],
+    base: Optional[str] = None,
+    remove_blanks: bool = False,
+    remove_utm: bool = True,
+    **kwargs: Any,
+) -> str:
     """
     Renders a URL and IRI encoded querystring (e.g.
     "q=Hello%20World&amp;category=1") that is safe to include in links. The
@@ -120,31 +126,31 @@ def querystring_modify(
 
         if key.endswith(MODE_TOGGLE):
             key = key[: -len(MODE_TOGGLE)]
-            values = set(querydict.get_list(key))
+            values = set(querydict.getlist(key))
             if value in values:
                 values.remove(value)
             else:
                 values.add(value)
-            querydict.set_list(key, list(values))
+            querydict.setlist(key, list(values))
 
         elif key.endswith(MODE_ADD):
             key = key[: -len(MODE_ADD)]
-            values = set(querydict.get_list(key))
+            values = set(querydict.getlist(key))
             if value not in values:
                 values.add(value)
-                querydict.set_list(key, list(values))
+                querydict.setlist(key, list(values))
 
         elif key.endswith(MODE_REMOVE):
             key = key[: -len(MODE_REMOVE)]
-            values = set(querydict.get_list(key))
+            values = set(querydict.getlist(key))
             if value in values:
                 values.remove(value)
-                querydict.set_list(key, list(values))
+                querydict.setlist(key, list(values))
 
         elif value is None:
             querydict.pop(key, None)
         else:
-            if isinstance(value, (str, bytes)):
+            if isinstance(value, str):
                 querydict[key] = value
             elif hasattr(value, "__iter__"):
                 querydict.setlist(key, list(value))
@@ -154,7 +160,9 @@ def querystring_modify(
     return f"?{querydict.urlencode()}"
 
 
-def get_base_querydict(context, base):
+def get_base_querydict(
+    context: Dict[str, Any], base: Union[QueryDict, dict, str]
+) -> QueryDict:
     if base is None and "request" in context:
         return context["request"].GET.copy()
     if isinstance(base, QueryDict):
@@ -167,8 +175,10 @@ def get_base_querydict(context, base):
     return QueryDict("", mutable=True)
 
 
-def clean_querydict(querydict, remove_blanks=False, remove_utm=True):
-    remove_vals = {None}
+def clean_querydict(
+    querydict: QueryDict, remove_blanks: bool = False, remove_utm: bool = True
+) -> None:
+    remove_vals: Set[Any] = {None}
     if remove_blanks:
         remove_vals.add("")
 
