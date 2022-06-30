@@ -531,13 +531,19 @@ class ParticipantFormSetView(FormView):
         return super().dispatch(*args, **kwargs)
 
     def get_form_kwargs(self) -> dict:
-        self.page = self.request.GET.get("page", 1)
+        page = self.request.GET.get("page", 1)
+        query = self.request.GET.get("query")
+
         participants_qs = Participant.objects.filter(
             experiment=self.experiment,
-        )
+        ).order_by("pk")
+
+        if query:
+            participants_qs = participants_qs.filter(participant_id__icontains=query)
+
         paginator = Paginator(participants_qs, self.paginate_by)
         try:
-            participants = paginator.page(self.page)
+            participants = paginator.page(page)
         except PageNotAnInteger:
             participants = paginator.page(1)
         except EmptyPage:
@@ -592,6 +598,10 @@ class ParticipantFormSetView(FormView):
         context["pages_following"] = range(
             current_page + 1, current_page + num_pages_following
         )
+
+        query = self.request.GET.get("query")
+        context["query"] = query
+
         return context
 
     def form_valid(self, formset: ParticipantFormSet) -> HttpResponse:  # type: ignore

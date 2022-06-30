@@ -20,6 +20,17 @@
                                 <p class="card-subtitle m-0 ml-2">{{ paginator_page.paginator.count }} participant{{ paginator_page.paginator.count|pluralize }}</p>
                             </div>
                             <div class="card-options">
+                                <form action="" method="GET">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control form-control-sm" placeholder="Search by login ID..." name="query" value="{{ query|default_if_none:"" }}">
+                                        <span class="input-group-btn ml-2">
+                                            <button class="btn btn-sm btn-default" type="submit">
+                                                <span class="fe fe-search"></span>
+                                            </button>
+                                        </span>
+                                    </div>
+                                </form>
+
                                 <a href="{% url "experiments:participant_upload" project_pk=view.kwargs.project_pk experiment_pk=view.kwargs.experiment_pk %}" class="btn btn-sm btn-secondary ml-4">
                                     Upload
                                 </a>

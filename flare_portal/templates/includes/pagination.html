@@ -1,14 +1,15 @@
+{% load querystring_modify %}
 <div class="card-footer d-flex align-items-center">
     <p class="m-0 mr-auto text-muted">Showing <span>1</span> to <span>{{ paginate_by }} participants</span> of <span>{{ num_pages }}</span> entries</p>
     <ul class="pagination m-0 ms-auto">
         {% if paginator_page.has_previous %}
             <li class="page-item">
-                <a class="page-link" href="?page=1" aria-label="First page of results">
+                <a class="page-link" href="{% querystring_modify page=1 %}" aria-label="First page of results">
                     <span class="icon"><i class="fe fe-chevrons-left"></i></span>
                 </a>
             </li>
             <li class="page-item">
-                <a class="page-link" href="?page={{ paginator_page.previous_page_number }}" aria-label="Previous page of results">
+                <a class="page-link" href="{% querystring_modify page=paginator_page.previous_page_number %}" aria-label="Previous page of results">
                     <span class="icon"><i class="fe fe-chevron-left"></i></span>
                 </a>
             </li>
@@ -35,7 +36,7 @@
         {% endif %}
 
         {% for n in pages_preceding %}
-            <a class="page-link" href="?page={{ n }}">
+            <a class="page-link" href="{% querystring_modify page=n %}">
                 {{ n }}
             </a>
         {% endfor %}
@@ -48,7 +49,7 @@
         </li>
 
         {% for n in pages_following %}
-            <a class="page-link" href="?page={{ n }}">
+            <a class="page-link" href="{% querystring_modify page=n %}">
                 {{ n }}
             </a>
         {% endfor %}
@@ -64,12 +65,12 @@
 
         {% if paginator_page.has_next %}
             <li class="page-item">
-                <a class="page-link" href="?page={{ paginator_page.next_page_number }}" aria-label="Next page of results">
+                <a class="page-link" href="{% querystring_modify page=paginator_page.next_page_number %}" aria-label="Next page of results">
                     <span class="icon"><i class="fe fe-chevron-right"></i></span>
                 </a>
             </li>
             <li class="page-item">
-                <a class="page-link" href="?page={{ num_pages }}" aria-label="Last page of results">
+                <a class="page-link" href="{% querystring_modify page=num_pages %}" aria-label="Last page of results">
                     <span class="icon"><i class="fe fe-chevrons-right"></i></span>
                 </a>
             </li>
