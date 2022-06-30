@@ -12,12 +12,7 @@
                     {% include "experiments/includes/experiment_sidebar.html" %}
                 </div>
                 <div class="col-lg-9">
-                    <form id="participants-form" class="card" method="POST" action="" x-data="{ forms: [], selectedRows: [], startIndex: {{ formset.management_form.TOTAL_FORMS.value }} }">
-                        {% csrf_token %}
-                        {{ formset.management_form.TOTAL_FORMS|attr:"x-bind::value:startIndex + forms.length" }}
-                        {{ formset.management_form.INITIAL_FORMS }}
-                        {{ formset.management_form.MIN_NUM_FORMS }}
-                        {{ formset.management_form.MAX_NUM_FORMS }}
+                    <div class="card" x-data="{ forms: [], selectedRows: [], startIndex: {{ formset.management_form.TOTAL_FORMS.value }} }">
 
                         <div class="card-header">
                             <div class="d-flex align-items-baseline">
@@ -25,13 +20,13 @@
                                 <p class="card-subtitle m-0 ml-2">{{ paginator_page.paginator.count }} participant{{ paginator_page.paginator.count|pluralize }}</p>
                             </div>
                             <div class="card-options">
-                                <a href="{% url "experiments:participant_upload" project_pk=view.kwargs.project_pk experiment_pk=view.kwargs.experiment_pk %}" class="btn btn-sm btn-secondary ml-4"">
+                                <a href="{% url "experiments:participant_upload" project_pk=view.kwargs.project_pk experiment_pk=view.kwargs.experiment_pk %}" class="btn btn-sm btn-secondary ml-4">
                                     Upload
                                 </a>
                                 <a href="{% url "experiments:participant_create_batch" project_pk=view.kwargs.project_pk experiment_pk=view.kwargs.experiment_pk %}" class="btn btn-sm btn-secondary ml-4">
                                     Generate batch
                                 </a>
-                                <button x-show="selectedRows.length == 0" class="btn btn-sm btn-primary ml-4" type="submit">Save changes</button>
+                                <button x-show="selectedRows.length == 0" class="btn btn-sm btn-primary ml-4" type="submit" form="participants-form">Save changes</button>
                                 <button
                                     x-show="selectedRows.length > 0"
                                     x-text="selectedRows.length > 1 ? `Delete ${selectedRows.length} participants` : `Delete participant`"
@@ -45,7 +40,13 @@
                             </div>
                         </div>
 
-                        <div class="table-responsive">
+                        <form class="table-responsive" id="participants-form" method="POST" action="">
+                            {% csrf_token %}
+                            {{ formset.management_form.TOTAL_FORMS|attr:"x-bind::value:startIndex + forms.length" }}
+                            {{ formset.management_form.INITIAL_FORMS }}
+                            {{ formset.management_form.MIN_NUM_FORMS }}
+                            {{ formset.management_form.MAX_NUM_FORMS }}
+
                             <table class="table card-table table-vcenter">
                                 <thead>
                                     <tr>
@@ -166,11 +167,11 @@
                                     </template>
                                 </tbody>
                             </table>
-                        </div>
+                        </form>
 
                         <div class="card-footer d-flex">
                             <button class="btn btn-sm btn-secondary" @click.prevent="forms.push('')">Add participants</button>
-                            <button x-show="selectedRows.length == 0" class="btn btn-sm btn-primary ml-auto" type="submit">Save changes</button>
+                            <button x-show="selectedRows.length == 0" class="btn btn-sm btn-primary ml-auto" type="submit" form="participants-form">Save changes</button>
                             <button
                                 x-show="selectedRows.length > 0"
                                 x-text="selectedRows.length > 1 ? `Delete ${selectedRows.length} participants` : `Delete participant`"
@@ -187,7 +188,7 @@
                             {% include "includes/pagination.html" with page_num=paginator_page.number num_pages=paginator_page.paginator.num_pages total=paginator_page.paginator.count %}
                         {% endif %}
 
-                    </form>
+                    </div>
                 </div>
             </div>
         </div>
