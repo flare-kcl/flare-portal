@@ -10,16 +10,18 @@ from django.core.validators import (
     MinValueValidator,
 )
 from django.db import models
-from django.db.models import QuerySet
+from django.db.models import Q, QuerySet
 from django.urls import reverse
 from django.utils.text import camel_case_to_spaces, slugify
+
+User = get_user_model()
 
 
 class Project(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
-    owner = models.ForeignKey(get_user_model(), on_delete=models.PROTECT)
-    researchers = models.ManyToManyField(get_user_model(), related_name="projects")
+    owner = models.ForeignKey(User, on_delete=models.PROTECT)
+    researchers = models.ManyToManyField(User, related_name="projects")
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -31,9 +33,10 @@ class Project(models.Model):
         return self.name
 
     def get_researchers(self) -> QuerySet[Any]:
-        return (
-            get_user_model().objects.filter(pk=self.owner.pk) | self.researchers.all()
-        ).distinct()
+        return User.objects.filter(
+            Q(pk=self.owner_id)
+            | Q(pk__in=self.researchers.all().values_list("pk", flat=True))
+        )
 
 
 def experiment_assets_path(instance: "Experiment", filename: str) -> str:
@@ -53,7 +56,7 @@ class Experiment(models.Model):
             )
         ],
     )
-    owner = models.ForeignKey(get_user_model(), on_delete=models.PROTECT)
+    owner = models.ForeignKey(User, on_delete=models.PROTECT)
     project = models.ForeignKey("experiments.Project", on_delete=models.CASCADE)
     trial_length = models.FloatField()
     rating_delay = models.FloatField(default=1)

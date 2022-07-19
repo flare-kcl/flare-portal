@@ -40,6 +40,34 @@ class ProjectTest(TestCase):
         self.assertEqual(project.created_at, now)
         self.assertEqual(project.updated_at, now)
 
+    def test_get_researchers(self):
+        project = ProjectFactory()
+        researcher = UserFactory()
+        project.researchers.set([researcher])
+
+        queryset = project.get_researchers()
+
+        self.assertEqual(2, len(queryset))
+        self.assertIn(project.owner, queryset)
+        self.assertIn(researcher, queryset)
+
+    def test_get_researchers_no_duplicates(self):
+        project = ProjectFactory()
+        researcher = UserFactory()
+        project.researchers.set([project.owner, researcher])
+
+        queryset = project.get_researchers()
+
+        self.assertEqual(2, len(queryset))
+        self.assertIn(project.owner, queryset)
+        self.assertIn(researcher, queryset)
+
+        # There used to be a bug where this raises MultipleObjectsReturned
+        # error. That is what this test is testing.
+        owner = project.get_researchers().get(pk=project.owner_id)
+
+        self.assertEqual(owner, project.owner)
+
 
 class ExperimentTest(TestCase):
     def test_model(self) -> None:
