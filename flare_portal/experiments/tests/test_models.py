@@ -40,7 +40,7 @@ class ProjectTest(TestCase):
         self.assertEqual(project.created_at, now)
         self.assertEqual(project.updated_at, now)
 
-    def test_get_researchers(self):
+    def test_get_researchers(self) -> None:
         project = ProjectFactory()
         researcher = UserFactory()
         project.researchers.set([researcher])
@@ -51,7 +51,7 @@ class ProjectTest(TestCase):
         self.assertIn(project.owner, queryset)
         self.assertIn(researcher, queryset)
 
-    def test_get_researchers_no_duplicates(self):
+    def test_get_researchers_no_duplicates(self) -> None:
         project = ProjectFactory()
         researcher = UserFactory()
         project.researchers.set([project.owner, researcher])
